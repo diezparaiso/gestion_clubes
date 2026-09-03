@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -13,6 +14,7 @@ class _DashboardPageState extends State<DashboardPage> {
   static const _navigationItems = [
     (Icons.grid_view_rounded, 'Resumen'),
     (Icons.people_alt_outlined, 'Socios'),
+    (Icons.groups_outlined, 'Equipos'),
     (Icons.account_balance_wallet_outlined, 'Tesorería'),
     (Icons.confirmation_number_outlined, 'Rifas'),
     (Icons.settings_outlined, 'Configuración'),
@@ -78,7 +80,11 @@ class _DashboardPageState extends State<DashboardPage> {
               icon: item.$1,
               label: item.$2,
               selected: _selectedIndex == index,
-              onTap: () => setState(() => _selectedIndex = index),
+              onTap: () {
+                setState(() => _selectedIndex = index);
+                if (index == 1) context.go('/members');
+                if (index == 2) context.go('/teams');
+              },
             );
           }),
           const Spacer(),
@@ -280,7 +286,11 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildBottomNavigation() {
     return NavigationBar(
       selectedIndex: _selectedIndex,
-      onDestinationSelected: (index) => setState(() => _selectedIndex = index),
+      onDestinationSelected: (index) {
+        setState(() => _selectedIndex = index);
+        if (index == 1) context.go('/members');
+        if (index == 2) context.go('/teams');
+      },
       destinations: _navigationItems
           .map((item) => NavigationDestination(icon: Icon(item.$1), label: item.$2))
           .toList(),

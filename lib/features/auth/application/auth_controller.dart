@@ -7,18 +7,20 @@ import '../../clubs/data/repositories/club_repository.dart';
 enum AuthStatus { signedOut, signingIn, creatingClub, signedIn, needsClub, error }
 
 class AuthState {
-  const AuthState({this.status = AuthStatus.signedOut, this.email, this.errorMessage, this.clubName});
+  const AuthState({this.status = AuthStatus.signedOut, this.email, this.errorMessage, this.clubId, this.clubName});
 
   final AuthStatus status;
   final String? email;
   final String? errorMessage;
+  final String? clubId;
   final String? clubName;
 
-  AuthState copyWith({AuthStatus? status, String? email, String? errorMessage, String? clubName, bool clearError = false}) {
+  AuthState copyWith({AuthStatus? status, String? email, String? errorMessage, String? clubId, String? clubName, bool clearError = false}) {
     return AuthState(
       status: status ?? this.status,
       email: email ?? this.email,
       errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
+      clubId: clubId ?? this.clubId,
       clubName: clubName ?? this.clubName,
     );
   }
@@ -67,7 +69,7 @@ class AuthController extends Notifier<AuthState> {
     state = state.copyWith(status: AuthStatus.creatingClub, clearError: true);
     try {
       final club = await ref.read(clubRepositoryProvider).createClub(publicName: clubName);
-      state = state.copyWith(status: AuthStatus.signedIn, clubName: club.publicName, clearError: true);
+      state = state.copyWith(status: AuthStatus.signedIn, clubId: club.id, clubName: club.publicName, clearError: true);
     } on PostgrestException catch (error) {
       state = state.copyWith(status: AuthStatus.needsClub, errorMessage: error.message);
     } on AuthException catch (error) {

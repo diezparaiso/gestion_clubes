@@ -6,6 +6,8 @@ import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
 import '../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../features/members/presentation/pages/members_page.dart';
+import '../features/teams/presentation/pages/teams_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
@@ -30,6 +32,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/dashboard',
         name: 'dashboard',
         builder: (context, state) => const DashboardPage(),
+      ),
+      GoRoute(
+        path: '/members',
+        name: 'members',
+        builder: (context, state) => const MembersPage(),
+      ),
+      GoRoute(
+        path: '/teams',
+        name: 'teams',
+        builder: (context, state) => const TeamsPage(),
       ),
     ],
   );
