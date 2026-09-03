@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
@@ -147,7 +148,10 @@ class _TeamCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return Card(child: InkWell(
+      onTap: () => context.go('/teams/${team.id}/players', extra: team.name),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [
         const CircleAvatar(backgroundColor: Color(0xFFE8EFEC), child: Icon(Icons.groups_outlined, color: Color(0xFF168B68))),
         const Spacer(),
@@ -159,6 +163,6 @@ class _TeamCard extends StatelessWidget {
       Text(team.category),
       const SizedBox(height: 10),
       Row(children: [const Icon(Icons.calendar_today_outlined, size: 15, color: Color(0xFF77838F)), const SizedBox(width: 6), Text(team.seasonName, style: const TextStyle(fontSize: 13))]),
-    ])));
+    ]))));
   }
 }

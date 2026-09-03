@@ -7,6 +7,7 @@ import '../features/auth/presentation/pages/register_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
 import '../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../features/members/presentation/pages/members_page.dart';
+import '../features/players/presentation/pages/team_players_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -42,6 +43,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/teams',
         name: 'teams',
         builder: (context, state) => const TeamsPage(),
+      ),
+      GoRoute(
+        path: '/teams/:teamId/players',
+        name: 'team-players',
+        builder: (context, state) => TeamPlayersPage(
+          teamId: state.pathParameters['teamId']!,
+          teamName: state.extra as String? ?? 'Plantilla',
+        ),
       ),
     ],
   );
