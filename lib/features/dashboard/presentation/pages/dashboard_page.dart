@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class DashboardPage extends StatefulWidget {
+import '../../../auth/application/auth_controller.dart';
+import '../../application/dashboard_stats_provider.dart';
+
+class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
   @override
-  State<DashboardPage> createState() => _DashboardPageState();
+  ConsumerState<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> {
+class _DashboardPageState extends ConsumerState<DashboardPage> {
   int _selectedIndex = 0;
 
   static const _navigationItems = [
@@ -22,6 +26,8 @@ class _DashboardPageState extends State<DashboardPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authControllerProvider);
+    final stats = ref.watch(dashboardStatsProvider).valueOrNull;
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 900;
@@ -29,8 +35,8 @@ class _DashboardPageState extends State<DashboardPage> {
           body: SafeArea(
             child: Row(
               children: [
-                if (isDesktop) _buildSidebar(context),
-                Expanded(child: _buildContent(context, isDesktop)),
+                if (isDesktop) _buildSidebar(context, authState),
+                Expanded(child: _buildContent(context, isDesktop, authState, stats)),
               ],
             ),
           ),
@@ -40,7 +46,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildSidebar(BuildContext context) {
+  Widget _buildSidebar(BuildContext context, AuthState authState) {
     return Container(
       width: 248,
       padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
@@ -84,27 +90,29 @@ class _DashboardPageState extends State<DashboardPage> {
                 setState(() => _selectedIndex = index);
                 if (index == 1) context.go('/members');
                 if (index == 2) context.go('/teams');
+                if (index == 3) context.go('/finance');
               },
             );
           }),
           const Spacer(),
           const Divider(color: Color(0x334B5D76)),
           const SizedBox(height: 12),
-          const ListTile(
+          ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: CircleAvatar(
+            leading: const CircleAvatar(
               backgroundColor: Color(0xFFE4B363),
               child: Text('PM', style: TextStyle(color: Color(0xFF14213D), fontWeight: FontWeight.w800)),
             ),
-            title: Text('Pedro Martínez', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-            subtitle: Text('Presidente', style: TextStyle(color: Color(0xFF9BA9BC))),
+            title: Text(authState.email ?? 'Usuario', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis),
+            subtitle: const Text('Presidente', style: TextStyle(color: Color(0xFF9BA9BC))),
+            trailing: IconButton(onPressed: () => ref.read(authControllerProvider.notifier).signOut(), tooltip: 'Cerrar sesión', icon: const Icon(Icons.logout_rounded, color: Color(0xFF9BA9BC))),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, bool isDesktop) {
+  Widget _buildContent(BuildContext context, bool isDesktop, AuthState authState, DashboardStats? stats) {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 48 : 20, vertical: isDesktop ? 34 : 24),
       child: ConstrainedBox(
@@ -118,9 +126,9 @@ class _DashboardPageState extends State<DashboardPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('CD Ejemplo', style: Theme.of(context).textTheme.titleMedium),
+                      Text(authState.clubName ?? 'Tu club', style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 8),
-                      Text('Hola, Pedro', style: Theme.of(context).textTheme.headlineMedium),
+                      Text('Hola, ${authState.email?.split('@').first ?? 'de nuevo'}', style: Theme.of(context).textTheme.headlineMedium),
                       const SizedBox(height: 6),
                       const Text('Aquí tienes el estado de tu club hoy.'),
                     ],
@@ -140,23 +148,23 @@ class _DashboardPageState extends State<DashboardPage> {
               ],
             ),
             const SizedBox(height: 32),
-            _buildMetricGrid(isDesktop),
+            _buildMetricGrid(isDesktop, stats),
             const SizedBox(height: 32),
             Text('Acciones rápidas', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 14),
             _buildQuickActions(isDesktop),
             const SizedBox(height: 32),
-            _buildActivitySection(context, isDesktop),
+            _buildActivitySection(context, isDesktop, stats),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMetricGrid(bool isDesktop) {
+  Widget _buildMetricGrid(bool isDesktop, DashboardStats? stats) {
     final metrics = [
-      (Icons.account_balance_wallet_outlined, 'Saldo actual', '8.450 €', 'Disponible', const Color(0xFF168B68)),
-      (Icons.people_alt_outlined, 'Socios activos', '247', '+12 este mes', const Color(0xFF3276B1)),
+      (Icons.account_balance_wallet_outlined, 'Saldo actual', _formatCurrency(stats?.balance ?? 0), 'Disponible', const Color(0xFF168B68)),
+      (Icons.people_alt_outlined, 'Socios activos', '${stats?.memberCount ?? 0}', 'Directorio del club', const Color(0xFF3276B1)),
       (Icons.confirmation_number_outlined, 'Rifas activas', '2', '34 participaciones nuevas', const Color(0xFFD27A2C)),
     ];
     return GridView.builder(
@@ -230,7 +238,7 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
-  Widget _buildActivitySection(BuildContext context, bool isDesktop) {
+  Widget _buildActivitySection(BuildContext context, bool isDesktop, DashboardStats? stats) {
     return Wrap(
       spacing: 24,
       runSpacing: 24,
@@ -269,11 +277,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   Text('Resumen del mes', style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 24),
-                  const _SummaryLine(label: 'Ingresos', value: '2.450 €', color: Color(0xFF168B68)),
+                  _SummaryLine(label: 'Ingresos', value: _formatCurrency(stats?.income ?? 0), color: const Color(0xFF168B68)),
                   const SizedBox(height: 16),
-                  const _SummaryLine(label: 'Gastos', value: '1.180 €', color: Color(0xFFD27A2C)),
+                  _SummaryLine(label: 'Gastos', value: _formatCurrency(stats?.expenses ?? 0), color: const Color(0xFFD27A2C)),
                   const Divider(height: 32),
-                  const _SummaryLine(label: 'Balance', value: '+1.270 €', color: Color(0xFF14213D), bold: true),
+                  _SummaryLine(label: 'Balance', value: _formatCurrency(stats?.balance ?? 0), color: const Color(0xFF14213D), bold: true),
                 ],
               ),
             ),
@@ -283,6 +291,8 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  String _formatCurrency(double value) => '${value.toStringAsFixed(2).replaceAll('.', ',')} €';
+
   Widget _buildBottomNavigation() {
     return NavigationBar(
       selectedIndex: _selectedIndex,
@@ -290,6 +300,7 @@ class _DashboardPageState extends State<DashboardPage> {
         setState(() => _selectedIndex = index);
         if (index == 1) context.go('/members');
         if (index == 2) context.go('/teams');
+        if (index == 3) context.go('/finance');
       },
       destinations: _navigationItems
           .map((item) => NavigationDestination(icon: Icon(item.$1), label: item.$2))

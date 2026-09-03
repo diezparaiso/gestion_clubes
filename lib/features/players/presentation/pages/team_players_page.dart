@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/player_repository.dart';
@@ -20,7 +21,16 @@ class TeamPlayersPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final players = ref.watch(teamPlayersProvider(teamId));
     return Scaffold(
-      appBar: AppBar(title: Text(teamName)),
+      appBar: AppBar(
+        title: Text(teamName),
+        actions: [
+          IconButton(
+            onPressed: () => context.go('/teams/$teamId/staff', extra: teamName),
+            tooltip: 'Ver cuerpo técnico',
+            icon: const Icon(Icons.sports_outlined),
+          ),
+        ],
+      ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

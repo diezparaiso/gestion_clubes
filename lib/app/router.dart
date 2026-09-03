@@ -6,8 +6,10 @@ import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
 import '../features/dashboard/presentation/pages/dashboard_page.dart';
+import '../features/finance/presentation/pages/finance_page.dart';
 import '../features/members/presentation/pages/members_page.dart';
 import '../features/players/presentation/pages/team_players_page.dart';
+import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -35,6 +37,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const DashboardPage(),
       ),
       GoRoute(
+        path: '/finance',
+        name: 'finance',
+        builder: (context, state) => const FinancePage(),
+      ),
+      GoRoute(
         path: '/members',
         name: 'members',
         builder: (context, state) => const MembersPage(),
@@ -50,6 +57,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => TeamPlayersPage(
           teamId: state.pathParameters['teamId']!,
           teamName: state.extra as String? ?? 'Plantilla',
+        ),
+      ),
+      GoRoute(
+        path: '/teams/:teamId/staff',
+        name: 'team-staff',
+        builder: (context, state) => TeamStaffPage(
+          teamId: state.pathParameters['teamId']!,
+          teamName: state.extra as String? ?? 'Equipo',
         ),
       ),
     ],
