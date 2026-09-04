@@ -27,7 +27,7 @@ class ClubRepository {
   }
 
   Future<Club> getPublicClub(String slug) async {
-    if (!SupabaseService.isConfigured) return Club(id: 'demo-club', publicName: 'Club Deportivo Paraíso', slug: slug);
+    if (!SupabaseService.isConfigured) return Club(id: 'demo-club', publicName: 'Club Deportivo Paraíso', slug: slug, website: 'https://clubparaiso.example');
     final row = await Supabase.instance.client.rpc<Map<String, dynamic>>('get_public_club', params: {'target_club_slug': slug});
     return Club.fromJson(row);
   }

@@ -399,6 +399,8 @@ Migration `010_news.sql` adds the table, manager-only writes, member reads, and 
 
 Migration `013_public_club.sql` adds `get_public_club(club_slug)`, which returns only the public club identifier, name and slug for active clubs.
 
+Migration `015_public_club_links.sql` extends that RPC with the club website and selected social links. Private contact, address and tax fields remain excluded.
+
 ### `notifications`
 
 Use `club_id`, `title`, `body`, `type`, `target`, `created_at`. The target is a controlled application value; do not accept arbitrary SQL or executable content.
