@@ -36,6 +36,21 @@ class RaffleRepository {
     return result.cast<int>();
   }
 
+  Future<List<RaffleTicket>> listTickets(String raffleId) async {
+    if (!SupabaseService.isConfigured) return List.unmodifiable(_demoTickets.where((ticket) => ticket.id.startsWith(raffleId)));
+    final rows = await Supabase.instance.client.from('raffle_tickets').select('id, number, buyer_name, buyer_email, buyer_phone, payment_status, reservation_expires_at').eq('raffle_id', raffleId).order('number');
+    return rows.map(RaffleTicket.fromJson).toList();
+  }
+
+  Future<RaffleDraw> drawRaffle({required String raffleId}) async {
+    if (!SupabaseService.isConfigured) {
+      final ticket = _demoTickets.firstWhere((item) => item.id.startsWith(raffleId) && item.paymentStatus == 'paid', orElse: () => _demoTickets.first);
+      return RaffleDraw(id: 'draw-$raffleId', winningNumber: ticket.number, drawnAt: DateTime.now(), method: 'random_number');
+    }
+    final row = await Supabase.instance.client.rpc<Map<String, dynamic>>('draw_raffle_random', params: {'target_raffle_id': raffleId});
+    return RaffleDraw.fromJson(row);
+  }
+
   Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt}) async {
     if (!SupabaseService.isConfigured) {
       final raffle = Raffle(id: 'raffle-${_demoRaffles.length + 1}', title: title, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);
@@ -52,5 +67,11 @@ class RaffleRepository {
   static final _demoRaffles = <Raffle>[
     Raffle(id: 'raffle-1', title: 'Rifa Navidad', ticketPrice: 5, totalNumbers: 100, status: RaffleStatus.active, endAt: DateTime(2026, 12, 20), slug: 'rifa-navidad'),
     Raffle(id: 'raffle-2', title: 'Cesta del club', ticketPrice: 3, totalNumbers: 200, status: RaffleStatus.scheduled, endAt: DateTime(2026, 11, 30), slug: 'cesta-del-club'),
+  ];
+
+  static final _demoTickets = <RaffleTicket>[
+    const RaffleTicket(id: 'raffle-1-ticket-03', number: 3, buyerName: 'Ana García', buyerEmail: 'ana@example.com', paymentStatus: 'paid'),
+    const RaffleTicket(id: 'raffle-1-ticket-12', number: 12, buyerName: 'Luis Martín', buyerEmail: 'luis@example.com', paymentStatus: 'pending'),
+    const RaffleTicket(id: 'raffle-1-ticket-42', number: 42, buyerName: 'Marta López', buyerEmail: 'marta@example.com', paymentStatus: 'paid'),
   ];
 }

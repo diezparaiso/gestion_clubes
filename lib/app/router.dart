@@ -11,6 +11,8 @@ import '../features/members/presentation/pages/members_page.dart';
 import '../features/players/presentation/pages/team_players_page.dart';
 import '../features/raffles/presentation/pages/raffles_page.dart';
 import '../features/raffles/presentation/pages/public_raffle_page.dart';
+import '../features/raffles/presentation/pages/raffle_detail_page.dart';
+import '../features/raffles/domain/entities/raffle.dart';
 import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
 
@@ -56,6 +58,14 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/raffles',
         name: 'raffles',
         builder: (context, state) => const RafflesPage(),
+      ),
+      GoRoute(
+        path: '/raffles/:raffleId',
+        name: 'raffle-detail',
+        builder: (context, state) {
+          final raffle = state.extra as Raffle?;
+          return raffle == null ? const MissingRafflePage() : RaffleDetailPage(raffle: raffle);
+        },
       ),
       GoRoute(
         path: '/members',

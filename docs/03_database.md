@@ -381,6 +381,8 @@ The public raffle flow uses security-definer RPCs instead of exposing buyer colu
 
 A draw is append-only. A completed raffle draw cannot be updated or deleted through normal application access. Reversal requires a separate audited administrative process and must not overwrite the original result.
 
+The simulated draw is executed by `draw_raffle_random(raffle_id)`. The security-definer function requires an active club manager, selects one `paid` ticket using PostgreSQL randomness, inserts the immutable draw record, and changes the raffle status to `drawn` in the same transaction. A second draw for the same raffle is rejected.
+
 ## 10. Communication and Settings
 
 ### `events`

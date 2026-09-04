@@ -31,3 +31,41 @@ class Raffle {
     occupiedNumbers: ((json['raffle_tickets'] as List<dynamic>?) ?? const []).map((ticket) => (ticket as Map<String, dynamic>)['number'] as int).toSet(),
   );
 }
+
+class RaffleTicket {
+  const RaffleTicket({required this.id, required this.number, required this.buyerName, required this.buyerEmail, required this.paymentStatus, this.buyerPhone, this.reservationExpiresAt});
+
+  final String id;
+  final int number;
+  final String buyerName;
+  final String buyerEmail;
+  final String paymentStatus;
+  final String? buyerPhone;
+  final DateTime? reservationExpiresAt;
+
+  factory RaffleTicket.fromJson(Map<String, dynamic> json) => RaffleTicket(
+        id: json['id'] as String,
+        number: json['number'] as int,
+        buyerName: json['buyer_name'] as String,
+        buyerEmail: json['buyer_email'] as String,
+        paymentStatus: json['payment_status'] as String,
+        buyerPhone: json['buyer_phone'] as String?,
+        reservationExpiresAt: json['reservation_expires_at'] == null ? null : DateTime.parse(json['reservation_expires_at'] as String),
+      );
+}
+
+class RaffleDraw {
+  const RaffleDraw({required this.id, required this.winningNumber, required this.drawnAt, required this.method});
+
+  final String id;
+  final int winningNumber;
+  final DateTime drawnAt;
+  final String method;
+
+  factory RaffleDraw.fromJson(Map<String, dynamic> json) => RaffleDraw(
+        id: json['id'] as String,
+        winningNumber: json['winning_number'] as int,
+        drawnAt: DateTime.parse(json['drawn_at'] as String),
+        method: json['method'] as String,
+      );
+}

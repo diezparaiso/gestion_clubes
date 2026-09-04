@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
@@ -41,7 +42,7 @@ class _RaffleCard extends StatelessWidget {
   final Raffle raffle;
 
   @override
-  Widget build(BuildContext context) => Card(child: ListTile(contentPadding: const EdgeInsets.all(16), leading: const CircleAvatar(backgroundColor: Color(0xFFF7EBDD), child: Icon(Icons.confirmation_number_outlined, color: Color(0xFFD27A2C))), title: Text(raffle.title, style: const TextStyle(fontWeight: FontWeight.w800)), subtitle: Text('${raffle.totalNumbers} números · ${raffle.ticketPrice.toStringAsFixed(2).replaceAll('.', ',')} € · termina ${raffle.endAt.day}/${raffle.endAt.month}/${raffle.endAt.year}'), trailing: Chip(label: Text(_statusLabel(raffle.status)), backgroundColor: const Color(0xFFE8EFEC), side: BorderSide.none)));
+  Widget build(BuildContext context) => Card(child: ListTile(onTap: () => context.pushNamed('raffle-detail', pathParameters: {'raffleId': raffle.id}, extra: raffle), contentPadding: const EdgeInsets.all(16), leading: const CircleAvatar(backgroundColor: Color(0xFFF7EBDD), child: Icon(Icons.confirmation_number_outlined, color: Color(0xFFD27A2C))), title: Text(raffle.title, style: const TextStyle(fontWeight: FontWeight.w800)), subtitle: Text('${raffle.totalNumbers} números · ${raffle.ticketPrice.toStringAsFixed(2).replaceAll('.', ',')} € · termina ${raffle.endAt.day}/${raffle.endAt.month}/${raffle.endAt.year}'), trailing: Chip(label: Text(_statusLabel(raffle.status)), backgroundColor: const Color(0xFFE8EFEC), side: BorderSide.none)));
 
   static String _statusLabel(RaffleStatus status) => switch (status) { RaffleStatus.draft => 'Borrador', RaffleStatus.scheduled => 'Programada', RaffleStatus.active => 'Activa', RaffleStatus.soldOut => 'Agotada', RaffleStatus.closed => 'Cerrada', RaffleStatus.drawn => 'Sorteada', RaffleStatus.cancelled => 'Cancelada' };
 }
