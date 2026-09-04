@@ -23,6 +23,19 @@ class RaffleRepository {
     return Raffle.fromJson({...row, 'raffle_tickets': tickets});
   }
 
+  Future<List<int>> reservePublicNumbers({required String clubSlug, required String raffleSlug, required List<int> numbers, required String buyerName, required String buyerEmail, String? buyerPhone}) async {
+    if (!SupabaseService.isConfigured) return numbers;
+    final result = await Supabase.instance.client.rpc<List<dynamic>>('reserve_public_raffle_numbers', params: {
+      'target_club_slug': clubSlug,
+      'target_raffle_slug': raffleSlug,
+      'selected_numbers': numbers,
+      'target_buyer_name': buyerName.trim(),
+      'target_buyer_email': buyerEmail.trim(),
+      'target_buyer_phone': buyerPhone?.trim(),
+    });
+    return result.cast<int>();
+  }
+
   Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt}) async {
     if (!SupabaseService.isConfigured) {
       final raffle = Raffle(id: 'raffle-${_demoRaffles.length + 1}', title: title, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);

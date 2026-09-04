@@ -352,10 +352,16 @@ Unique constraint: (`club_id`, `slug`). Once tickets exist, `ticket_price` and `
 | `payment_status` | `ticket_payment_status` | required, default `pending` |
 | `payment_reference` | `text` | nullable |
 | `purchased_at` | `timestamptz` | nullable |
+| `reservation_expires_at` | `timestamptz` | nullable; pending public reservations expire after 15 minutes |
 | `created_at` | `timestamptz` | required |
 | `updated_at` | `timestamptz` | required |
 
 Unique constraint: (`raffle_id`, `number`). Ticket numbers are never reused after a confirmed sale. Reservations and their expiry behavior must be implemented server-side, not trusted to the client.
+
+The public raffle flow uses security-definer RPCs instead of exposing buyer columns:
+
+- `get_public_raffle_numbers(club_slug, raffle_slug)` returns only paid numbers and non-expired pending reservations.
+- `reserve_public_raffle_numbers(club_slug, raffle_slug, numbers, buyer_name, buyer_email, buyer_phone)` creates pending reservations for up to 10 numbers and sets a 15-minute expiry. It does not process payment.
 
 ### `raffle_draws`
 
