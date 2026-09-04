@@ -14,6 +14,18 @@ class NotificationRepository {
     return rows.map(ClubNotification.fromJson).toList();
   }
 
+  Future<ClubNotification> createNotification({required String clubId, required String title, required String body, required String type, required String target}) async {
+    if (!SupabaseService.isConfigured) {
+      final notification = ClubNotification(id: 'notification-${_demoNotifications.length + 1}', title: title.trim(), body: body.trim(), type: type, target: target, createdAt: DateTime.now());
+      _demoNotifications.insert(0, notification);
+      return notification;
+    }
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) throw const AuthException('La sesión ha expirado.');
+    final row = await Supabase.instance.client.from('notifications').insert({'club_id': clubId, 'title': title.trim(), 'body': body.trim(), 'type': type, 'target': target}).select('id, title, body, type, target, created_at').single();
+    return ClubNotification.fromJson(row);
+  }
+
   Future<UserDevice?> registerDevice({required String token, required DevicePlatform platform, required PermissionStatus permissionStatus}) async {
     if (!SupabaseService.isConfigured) return null;
     final userId = Supabase.instance.client.auth.currentUser?.id;
