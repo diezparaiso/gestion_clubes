@@ -32,6 +32,20 @@ class ClubRepository {
     return Club.fromJson(row);
   }
 
+  Future<Club> getClubById(String clubId) async {
+    if (!SupabaseService.isConfigured) return Club(id: clubId, publicName: 'Club Deportivo Paraíso', slug: 'club-paraiso', website: 'https://clubparaiso.example');
+    final row = await Supabase.instance.client.from('clubs').select('id, public_name, slug, website, instagram_url, facebook_url, youtube_url').eq('id', clubId).single();
+    return Club.fromJson(row);
+  }
+
+  Future<Club> updatePublicProfile({required String clubId, required String publicName, String? website, String? instagramUrl, String? facebookUrl, String? youtubeUrl}) async {
+    if (!SupabaseService.isConfigured) return Club(id: clubId, publicName: publicName.trim(), slug: 'club-paraiso', website: website, instagramUrl: instagramUrl, facebookUrl: facebookUrl, youtubeUrl: youtubeUrl);
+    final row = await Supabase.instance.client.from('clubs').update({'public_name': publicName.trim(), 'website': _nullable(website), 'instagram_url': _nullable(instagramUrl), 'facebook_url': _nullable(facebookUrl), 'youtube_url': _nullable(youtubeUrl)}).eq('id', clubId).select('id, public_name, slug, website, instagram_url, facebook_url, youtube_url').single();
+    return Club.fromJson(row);
+  }
+
+  String? _nullable(String? value) => value == null || value.trim().isEmpty ? null : value.trim();
+
   String _createSlug(String value) {
     final normalized = value
         .toLowerCase()

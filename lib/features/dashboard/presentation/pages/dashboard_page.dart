@@ -96,6 +96,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 if (index == 4) context.go('/raffles');
                 if (index == 5) context.go('/news');
                 if (index == 6) context.go('/events');
+                if (index == 7) context.go('/settings');
               },
             );
           }),
@@ -309,6 +310,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         if (index == 4) context.go('/raffles');
         if (index == 5) context.go('/news');
         if (index == 6) context.go('/events');
+        if (index == 7) context.go('/settings');
       },
       destinations: _navigationItems
           .map((item) => NavigationDestination(icon: Icon(item.$1), label: item.$2))

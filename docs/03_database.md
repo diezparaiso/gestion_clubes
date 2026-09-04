@@ -401,6 +401,8 @@ Migration `013_public_club.sql` adds `get_public_club(club_slug)`, which returns
 
 Migration `015_public_club_links.sql` extends that RPC with the club website and selected social links. Private contact, address and tax fields remain excluded.
 
+The authenticated `/settings` screen edits only `public_name` and public social links. Updates use the existing manager RLS policy; fiscal, address and private contact fields are intentionally excluded.
+
 ### `notifications`
 
 Use `club_id`, `title`, `body`, `type`, `target`, `created_at`. The target is a controlled application value; do not accept arbitrary SQL or executable content.

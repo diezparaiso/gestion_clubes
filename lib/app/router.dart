@@ -6,6 +6,7 @@ import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
 import '../features/clubs/presentation/pages/public_club_page.dart';
+import '../features/clubs/presentation/pages/club_settings_page.dart';
 import '../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../features/events/presentation/pages/events_page.dart';
 import '../features/events/presentation/pages/public_events_page.dart';
@@ -107,6 +108,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/notifications',
         name: 'notifications',
         builder: (context, state) => const NotificationsPage(),
+      ),
+      GoRoute(
+        path: '/settings',
+        name: 'settings',
+        builder: (context, state) => const ClubSettingsPage(),
       ),
       GoRoute(
         path: '/members',
