@@ -5,6 +5,7 @@ import '../features/auth/application/auth_controller.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
+import '../features/clubs/presentation/pages/public_club_page.dart';
 import '../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../features/events/presentation/pages/events_page.dart';
 import '../features/events/presentation/pages/public_events_page.dart';
@@ -29,14 +30,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.uri.path;
       final isAuthRoute = location == '/login' || location == '/register';
       final isPublicRaffle = location.startsWith('/r/');
-      final isPublicClubNews = location.startsWith('/club/') && location.endsWith('/news');
-      final isPublicClubEvents = location.startsWith('/club/') && location.endsWith('/events');
+      final isPublicClub = location.startsWith('/club/');
       final isSignedIn = authState.status == AuthStatus.signedIn;
       final needsClub = authState.status == AuthStatus.needsClub;
 
       if (needsClub && location != '/onboarding') return '/onboarding';
       if (isSignedIn && isAuthRoute) return '/dashboard';
-      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClubNews && !isPublicClubEvents) return '/login';
+      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClub) return '/login';
       return null;
     },
     routes: [
@@ -60,6 +60,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/club/:clubSlug/events',
         name: 'public-events',
         builder: (context, state) => PublicEventsPage(clubSlug: state.pathParameters['clubSlug']!),
+      ),
+      GoRoute(
+        path: '/club/:clubSlug',
+        name: 'public-club',
+        builder: (context, state) => PublicClubPage(clubSlug: state.pathParameters['clubSlug']!),
       ),
       GoRoute(
         path: '/dashboard',
