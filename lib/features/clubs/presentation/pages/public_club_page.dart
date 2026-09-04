@@ -49,7 +49,6 @@ class _PublicClubPageState extends State<PublicClubPage> {
               _PublicSection(icon: Icons.confirmation_number_outlined, title: 'Rifas', description: 'Consulta las campañas públicas del club.', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comparte el enlace de una rifa para abrirla.')))),
             ]),
           ),
-        ),
       );
 }
 
