@@ -409,6 +409,8 @@ Migration `012_notifications.sql` adds in-app notifications with member reads an
 
 Use `id`, `profile_id`, `platform`, `token`, `permission_status`, `last_seen_at`, `created_at`, `updated_at`. Device tokens are private and must be unique per platform/profile where possible.
 
+Migration `014_user_devices.sql` adds owner-only RLS and idempotent device registration support. The application does not send push notifications yet; a provider and platform-specific permission flow must be selected before activating delivery.
+
 ### `club_settings`
 
 Use one row per club with module flags: `members_enabled`, `finance_enabled`, `teams_enabled`, `raffles_enabled`, `draws_enabled`, `pools_enabled`, `events_enabled`, `news_enabled`, `notifications_enabled`, `sponsors_enabled`, `tickets_enabled`, `store_enabled`. Default all MVP modules to enabled and future/legal-dependent modules to disabled.

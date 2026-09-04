@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/services/supabase_service.dart';
 import '../../domain/entities/notification.dart';
+import '../../domain/entities/user_device.dart';
 
 final notificationRepositoryProvider = Provider<NotificationRepository>((ref) => NotificationRepository());
 
@@ -11,6 +12,27 @@ class NotificationRepository {
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoNotifications);
     final rows = await Supabase.instance.client.from('notifications').select('id, title, body, type, target, created_at').eq('club_id', clubId).order('created_at', ascending: false);
     return rows.map(ClubNotification.fromJson).toList();
+  }
+
+  Future<UserDevice?> registerDevice({required String token, required DevicePlatform platform, required PermissionStatus permissionStatus}) async {
+    if (!SupabaseService.isConfigured) return null;
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) throw const AuthException('La sesión ha expirado.');
+    final row = await Supabase.instance.client.from('user_devices').upsert({
+      'profile_id': userId,
+      'platform': platform.name,
+      'token': token,
+      'permission_status': permissionStatus.name,
+      'last_seen_at': DateTime.now().toIso8601String(),
+    }, onConflict: 'platform,token').select('id, platform, permission_status, last_seen_at').single();
+    return UserDevice.fromJson(row);
+  }
+
+  Future<void> unregisterDevice(String token) async {
+    if (!SupabaseService.isConfigured) return;
+    final userId = Supabase.instance.client.auth.currentUser?.id;
+    if (userId == null) return;
+    await Supabase.instance.client.from('user_devices').delete().eq('profile_id', userId).eq('token', token);
   }
 
   static final _demoNotifications = <ClubNotification>[
