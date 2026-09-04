@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gestion_clubes/features/raffles/domain/entities/raffle.dart';
+import 'package:gestion_clubes/features/news/domain/entities/post.dart';
 
 void main() {
   group('Raffle entities', () {
@@ -59,5 +60,19 @@ void main() {
       expect(draw.winningNumber, 4);
       expect(draw.method, 'random_number');
     });
+  });
+
+  test('parses a published news post', () {
+    final post = Post.fromJson({
+      'id': 'post-1',
+      'title': 'Nueva temporada',
+      'body': 'Información del club',
+      'status': 'published',
+      'published_at': '2026-09-01T12:00:00Z',
+    });
+
+    expect(post.status, PostStatus.published);
+    expect(post.title, 'Nueva temporada');
+    expect(post.publishedAt, isNotNull);
   });
 }

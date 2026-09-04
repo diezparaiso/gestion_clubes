@@ -8,6 +8,8 @@ import '../features/clubs/presentation/pages/club_onboarding_page.dart';
 import '../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../features/finance/presentation/pages/finance_page.dart';
 import '../features/members/presentation/pages/members_page.dart';
+import '../features/news/presentation/pages/posts_page.dart';
+import '../features/news/presentation/pages/public_posts_page.dart';
 import '../features/players/presentation/pages/team_players_page.dart';
 import '../features/raffles/presentation/pages/raffles_page.dart';
 import '../features/raffles/presentation/pages/public_raffle_page.dart';
@@ -24,12 +26,13 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.uri.path;
       final isAuthRoute = location == '/login' || location == '/register';
       final isPublicRaffle = location.startsWith('/r/');
+      final isPublicClubNews = location.startsWith('/club/') && location.endsWith('/news');
       final isSignedIn = authState.status == AuthStatus.signedIn;
       final needsClub = authState.status == AuthStatus.needsClub;
 
       if (needsClub && location != '/onboarding') return '/onboarding';
       if (isSignedIn && isAuthRoute) return '/dashboard';
-      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle) return '/login';
+      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClubNews) return '/login';
       return null;
     },
     routes: [
@@ -43,6 +46,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           clubSlug: state.pathParameters['clubSlug']!,
           raffleSlug: state.pathParameters['raffleSlug']!,
         ),
+      ),
+      GoRoute(
+        path: '/club/:clubSlug/news',
+        name: 'public-news',
+        builder: (context, state) => PublicPostsPage(clubSlug: state.pathParameters['clubSlug']!),
       ),
       GoRoute(
         path: '/dashboard',
@@ -70,6 +78,11 @@ final routerProvider = Provider<GoRouter>((ref) {
             clubId: ref.read(authControllerProvider).clubId,
           );
         },
+      ),
+      GoRoute(
+        path: '/news',
+        name: 'news',
+        builder: (context, state) => const PostsPage(),
       ),
       GoRoute(
         path: '/members',
