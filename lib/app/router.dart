@@ -9,6 +9,8 @@ import '../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../features/finance/presentation/pages/finance_page.dart';
 import '../features/members/presentation/pages/members_page.dart';
 import '../features/players/presentation/pages/team_players_page.dart';
+import '../features/raffles/presentation/pages/raffles_page.dart';
+import '../features/raffles/presentation/pages/public_raffle_page.dart';
 import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
 
@@ -19,18 +21,27 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final location = state.uri.path;
       final isAuthRoute = location == '/login' || location == '/register';
+      final isPublicRaffle = location.startsWith('/r/');
       final isSignedIn = authState.status == AuthStatus.signedIn;
       final needsClub = authState.status == AuthStatus.needsClub;
 
       if (needsClub && location != '/onboarding') return '/onboarding';
       if (isSignedIn && isAuthRoute) return '/dashboard';
-      if (!isSignedIn && !needsClub && !isAuthRoute) return '/login';
+      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle) return '/login';
       return null;
     },
     routes: [
       GoRoute(path: '/login', name: 'login', builder: (context, state) => const LoginPage()),
       GoRoute(path: '/register', name: 'register', builder: (context, state) => const RegisterPage()),
       GoRoute(path: '/onboarding', name: 'onboarding', builder: (context, state) => const ClubOnboardingPage()),
+      GoRoute(
+        path: '/r/:clubSlug/:raffleSlug',
+        name: 'public-raffle',
+        builder: (context, state) => PublicRafflePage(
+          clubSlug: state.pathParameters['clubSlug']!,
+          raffleSlug: state.pathParameters['raffleSlug']!,
+        ),
+      ),
       GoRoute(
         path: '/dashboard',
         name: 'dashboard',
@@ -40,6 +51,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/finance',
         name: 'finance',
         builder: (context, state) => const FinancePage(),
+      ),
+      GoRoute(
+        path: '/raffles',
+        name: 'raffles',
+        builder: (context, state) => const RafflesPage(),
       ),
       GoRoute(
         path: '/members',

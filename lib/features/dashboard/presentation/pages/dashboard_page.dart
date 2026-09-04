@@ -91,6 +91,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 if (index == 1) context.go('/members');
                 if (index == 2) context.go('/teams');
                 if (index == 3) context.go('/finance');
+                if (index == 4) context.go('/raffles');
               },
             );
           }),
@@ -301,6 +302,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         if (index == 1) context.go('/members');
         if (index == 2) context.go('/teams');
         if (index == 3) context.go('/finance');
+        if (index == 4) context.go('/raffles');
       },
       destinations: _navigationItems
           .map((item) => NavigationDestination(icon: Icon(item.$1), label: item.$2))
