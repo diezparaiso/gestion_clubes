@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gestion_clubes/features/raffles/domain/entities/raffle.dart';
 import 'package:gestion_clubes/features/news/domain/entities/post.dart';
+import 'package:gestion_clubes/features/events/domain/entities/event.dart';
 
 void main() {
   group('Raffle entities', () {
@@ -74,5 +75,20 @@ void main() {
     expect(post.status, PostStatus.published);
     expect(post.title, 'Nueva temporada');
     expect(post.publishedAt, isNotNull);
+  });
+
+  test('maps the database club-only visibility to the Dart enum', () {
+    final event = ClubEvent.fromJson({
+      'id': 'event-1',
+      'title': 'Reunión',
+      'description': 'Solo miembros',
+      'start_at': '2026-09-10T18:00:00Z',
+      'end_at': '2026-09-10T19:00:00Z',
+      'type': 'meeting',
+      'visibility': 'club_only',
+    });
+
+    expect(event.type, EventType.meeting);
+    expect(event.visibility, EventVisibility.clubOnly);
   });
 }

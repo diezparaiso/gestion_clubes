@@ -389,6 +389,8 @@ The simulated draw is executed by `draw_raffle_random(raffle_id)`. The security-
 
 Use `event_type`, `visibility`, `start_at`, `end_at`, `location`, `image_url`, `created_by`, timestamps. Require `end_at >= start_at`.
 
+Migration `011_events.sql` adds club-managed events with member visibility and the public `get_public_events(club_slug)` RPC. Public results include only active-club events marked `public` that have not ended.
+
 ### `posts`
 
 Use `club_id`, `title`, `body`, `image_url`, `author_id`, `status`, `published_at`, timestamps. A published post requires `published_at`.

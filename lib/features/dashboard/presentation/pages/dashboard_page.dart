@@ -22,6 +22,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     (Icons.account_balance_wallet_outlined, 'Tesorería'),
     (Icons.confirmation_number_outlined, 'Rifas'),
     (Icons.article_outlined, 'Noticias'),
+    (Icons.event_outlined, 'Eventos'),
     (Icons.settings_outlined, 'Configuración'),
   ];
 
@@ -94,6 +95,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 if (index == 3) context.go('/finance');
                 if (index == 4) context.go('/raffles');
                 if (index == 5) context.go('/news');
+                if (index == 6) context.go('/events');
               },
             );
           }),
@@ -306,6 +308,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         if (index == 3) context.go('/finance');
         if (index == 4) context.go('/raffles');
         if (index == 5) context.go('/news');
+        if (index == 6) context.go('/events');
       },
       destinations: _navigationItems
           .map((item) => NavigationDestination(icon: Icon(item.$1), label: item.$2))
