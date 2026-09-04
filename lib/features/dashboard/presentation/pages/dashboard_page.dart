@@ -140,7 +140,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   ),
                 ),
                 IconButton(
-                  onPressed: () {},
+                  onPressed: () => context.go('/notifications'),
                   tooltip: 'Notificaciones',
                   icon: const Icon(Icons.notifications_none_rounded),
                 ),

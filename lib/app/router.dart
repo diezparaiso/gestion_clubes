@@ -12,6 +12,7 @@ import '../features/finance/presentation/pages/finance_page.dart';
 import '../features/members/presentation/pages/members_page.dart';
 import '../features/news/presentation/pages/posts_page.dart';
 import '../features/news/presentation/pages/public_posts_page.dart';
+import '../features/notifications/presentation/pages/notifications_page.dart';
 import '../features/players/presentation/pages/team_players_page.dart';
 import '../features/raffles/presentation/pages/raffles_page.dart';
 import '../features/raffles/presentation/pages/public_raffle_page.dart';
@@ -96,6 +97,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/events',
         name: 'events',
         builder: (context, state) => const EventsPage(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        name: 'notifications',
+        builder: (context, state) => const NotificationsPage(),
       ),
       GoRoute(
         path: '/members',

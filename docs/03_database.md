@@ -401,6 +401,8 @@ Migration `010_news.sql` adds the table, manager-only writes, member reads, and 
 
 Use `club_id`, `title`, `body`, `type`, `target`, `created_at`. The target is a controlled application value; do not accept arbitrary SQL or executable content.
 
+Migration `012_notifications.sql` adds in-app notifications with member reads and manager-only writes. Push delivery and `user_devices` remain separate future work; this block does not register device tokens or send external notifications.
+
 ### `user_devices`
 
 Use `id`, `profile_id`, `platform`, `token`, `permission_status`, `last_seen_at`, `created_at`, `updated_at`. Device tokens are private and must be unique per platform/profile where possible.
