@@ -397,6 +397,8 @@ Use `club_id`, `title`, `body`, `image_url`, `author_id`, `status`, `published_a
 
 Migration `010_news.sql` adds the table, manager-only writes, member reads, and `get_public_posts(club_slug)`. The public RPC returns only published post content and publication metadata; author profiles and private club data are never exposed.
 
+Migration `013_public_club.sql` adds `get_public_club(club_slug)`, which returns only the public club identifier, name and slug for active clubs.
+
 ### `notifications`
 
 Use `club_id`, `title`, `body`, `type`, `target`, `created_at`. The target is a controlled application value; do not accept arbitrary SQL or executable content.

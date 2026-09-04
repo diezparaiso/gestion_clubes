@@ -26,6 +26,12 @@ class ClubRepository {
     return Club.fromJson(club as Map<String, dynamic>);
   }
 
+  Future<Club> getPublicClub(String slug) async {
+    if (!SupabaseService.isConfigured) return Club(id: 'demo-club', publicName: 'Club Deportivo Paraíso', slug: slug);
+    final row = await Supabase.instance.client.rpc<Map<String, dynamic>>('get_public_club', params: {'target_club_slug': slug});
+    return Club.fromJson(row);
+  }
+
   String _createSlug(String value) {
     final normalized = value
         .toLowerCase()
