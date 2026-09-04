@@ -64,7 +64,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'raffle-detail',
         builder: (context, state) {
           final raffle = state.extra as Raffle?;
-          return raffle == null ? const MissingRafflePage() : RaffleDetailPage(raffle: raffle);
+          return RaffleDetailPage(
+            raffle: raffle,
+            raffleId: state.pathParameters['raffleId']!,
+            clubId: ref.read(authControllerProvider).clubId,
+          );
         },
       ),
       GoRoute(

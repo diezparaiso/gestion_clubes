@@ -13,6 +13,12 @@ class RaffleRepository {
     return rows.map(Raffle.fromJson).toList();
   }
 
+  Future<Raffle> getRaffle({required String clubId, required String raffleId}) async {
+    if (!SupabaseService.isConfigured) return _demoRaffles.firstWhere((raffle) => raffle.id == raffleId, orElse: () => _demoRaffles.first);
+    final row = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at').eq('club_id', clubId).eq('id', raffleId).single();
+    return Raffle.fromJson(row);
+  }
+
   Future<Raffle> getPublicRaffle({required String clubSlug, required String raffleSlug}) async {
     if (!SupabaseService.isConfigured) {
       final raffle = _demoRaffles.firstWhere((item) => item.slug == raffleSlug, orElse: () => _demoRaffles.first);

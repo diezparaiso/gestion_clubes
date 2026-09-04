@@ -6,30 +6,49 @@ import '../../data/repositories/raffle_repository.dart';
 import '../../domain/entities/raffle.dart';
 
 class RaffleDetailPage extends ConsumerStatefulWidget {
-  const RaffleDetailPage({super.key, required this.raffle});
+  const RaffleDetailPage({super.key, this.raffle, required this.raffleId, required this.clubId});
 
-  final Raffle raffle;
+  final Raffle? raffle;
+  final String raffleId;
+  final String? clubId;
 
   @override
   ConsumerState<RaffleDetailPage> createState() => _RaffleDetailPageState();
 }
 
 class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
-  late Future<List<RaffleTicket>> _tickets;
+  late Future<Raffle> _raffle;
+  Future<List<RaffleTicket>>? _tickets;
+  String? _ticketsRaffleId;
   RaffleDraw? _draw;
   bool _drawing = false;
 
   @override
   void initState() {
     super.initState();
-    _tickets = ref.read(raffleRepositoryProvider).listTickets(widget.raffle.id);
+    final repository = ref.read(raffleRepositoryProvider);
+    _raffle = widget.raffle != null
+        ? Future.value(widget.raffle)
+        : widget.clubId == null
+            ? Future.error(const AuthException('La sesión ha expirado.'))
+            : repository.getRaffle(clubId: widget.clubId!, raffleId: widget.raffleId);
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text(widget.raffle.title)),
+  Widget build(BuildContext context) => FutureBuilder<Raffle>(
+        future: _raffle,
+        builder: (context, raffleSnapshot) {
+          if (raffleSnapshot.connectionState != ConnectionState.done) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+          if (raffleSnapshot.hasError || raffleSnapshot.data == null) return const MissingRafflePage();
+          final raffle = raffleSnapshot.data!;
+          if (_ticketsRaffleId != raffle.id) {
+            _ticketsRaffleId = raffle.id;
+            _tickets = ref.read(raffleRepositoryProvider).listTickets(raffle.id);
+          }
+          return Scaffold(
+        appBar: AppBar(title: Text(raffle.title)),
         body: FutureBuilder<List<RaffleTicket>>(
-          future: _tickets,
+          future: _tickets!,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
             if (snapshot.hasError) return const Center(child: Text('No se han podido cargar las participaciones.'));
@@ -46,6 +65,8 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
           },
         ),
       );
+        },
+      );
 
   Future<void> _confirmDraw(List<RaffleTicket> tickets) async {
     if (tickets.every((ticket) => ticket.paymentStatus != 'paid')) {
@@ -56,7 +77,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
     if (confirmed != true || !mounted) return;
     setState(() => _drawing = true);
     try {
-      final draw = await ref.read(raffleRepositoryProvider).drawRaffle(raffleId: widget.raffle.id);
+      final draw = await ref.read(raffleRepositoryProvider).drawRaffle(raffleId: widget.raffle?.id ?? widget.raffleId);
       if (mounted) setState(() { _draw = draw; _drawing = false; });
     } on PostgrestException catch (error) {
       if (mounted) { setState(() => _drawing = false); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message))); }
