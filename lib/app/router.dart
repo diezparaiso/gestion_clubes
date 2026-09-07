@@ -41,9 +41,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(path: '/login', name: 'login', builder: (context, state) => const LoginPage()),
-      GoRoute(path: '/register', name: 'register', builder: (context, state) => const RegisterPage()),
-      GoRoute(path: '/onboarding', name: 'onboarding', builder: (context, state) => const ClubOnboardingPage()),
+      GoRoute(
+        path: '/login',
+        name: 'login',
+        builder: (context, state) => const LoginPage(),
+      ),
+      GoRoute(
+        path: '/register',
+        name: 'register',
+        builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: '/onboarding',
+        name: 'onboarding',
+        builder: (context, state) => const ClubOnboardingPage(),
+      ),
       GoRoute(
         path: '/r/:clubSlug/:raffleSlug',
         name: 'public-raffle',
@@ -55,17 +67,23 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/club/:clubSlug/news',
         name: 'public-news',
-        builder: (context, state) => PublicPostsPage(clubSlug: state.pathParameters['clubSlug']!),
+        builder: (context, state) => PublicPostsPage(
+          clubSlug: state.pathParameters['clubSlug']!,
+        ),
       ),
       GoRoute(
         path: '/club/:clubSlug/events',
         name: 'public-events',
-        builder: (context, state) => PublicEventsPage(clubSlug: state.pathParameters['clubSlug']!),
+        builder: (context, state) => PublicEventsPage(
+          clubSlug: state.pathParameters['clubSlug']!,
+        ),
       ),
       GoRoute(
         path: '/club/:clubSlug',
         name: 'public-club',
-        builder: (context, state) => PublicClubPage(clubSlug: state.pathParameters['clubSlug']!),
+        builder: (context, state) => PublicClubPage(
+          clubSlug: state.pathParameters['clubSlug']!,
+        ),
       ),
       GoRoute(
         path: '/dashboard',

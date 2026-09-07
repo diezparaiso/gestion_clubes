@@ -436,6 +436,8 @@ Use one row per club with module flags: `members_enabled`, `finance_enabled`, `t
 
 Audit rows are append-only. Never store passwords, card data, access tokens or unnecessary personal data in `data`.
 
+Migration `016_audit_logs.sql` creates the append-only table and automatically audits inserted raffle draws. Normal clients can read only audit rows for clubs they manage; inserts, updates and deletes are not exposed to client roles.
+
 ## 12. Required Indexes
 
 ```sql

@@ -62,5 +62,84 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(appBar: AppBar(title: const Text('Configuración')), body: ListView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), children: [Text('Perfil público', style: Theme.of(context).textTheme.headlineMedium), const SizedBox(height: 8), const Text('Estos datos se mostrarán en la página pública del club.'), const SizedBox(height: 24), Card(child: Padding(padding: const EdgeInsets.all(24), child: Form(key: _formKey, child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [TextFormField(controller: _nameController, decoration: const InputDecoration(labelText: 'Nombre público'), validator: (value) => value == null || value.trim().length < 3 ? 'Introduce al menos 3 caracteres' : null), const SizedBox(height: 12), TextFormField(controller: _websiteController, keyboardType: TextInputType.url, decoration: const InputDecoration(labelText: 'Página web'), validator: _urlValidator), const SizedBox(height: 12), TextFormField(controller: _instagramController, keyboardType: TextInputType.url, decoration: const InputDecoration(labelText: 'Instagram'), validator: _urlValidator), const SizedBox(height: 12), TextFormField(controller: _facebookController, keyboardType: TextInputType.url, decoration: const InputDecoration(labelText: 'Facebook'), validator: _urlValidator), const SizedBox(height: 12), TextFormField(controller: _youtubeController, keyboardType: TextInputType.url, decoration: const InputDecoration(labelText: 'YouTube'), validator: _urlValidator), if (_error != null) ...[const SizedBox(height: 16), Text(_error!, style: const TextStyle(color: Colors.red))], const SizedBox(height: 24), Align(alignment: Alignment.centerRight, child: FilledButton.icon(onPressed: _saving ? null : _save, icon: _saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.save_outlined), label: const Text('Guardar cambios'))]))))]));
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(title: const Text('Configuración')),
+    body: ListView(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+      children: [
+        Text('Perfil público', style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 8),
+        const Text('Estos datos se mostrarán en la página pública del club.'),
+        const SizedBox(height: 24),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: const InputDecoration(labelText: 'Nombre público'),
+                    validator: (value) => value == null || value.trim().length < 3
+                        ? 'Introduce al menos 3 caracteres'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _websiteController,
+                    keyboardType: TextInputType.url,
+                    decoration: const InputDecoration(labelText: 'Página web'),
+                    validator: _urlValidator,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _instagramController,
+                    keyboardType: TextInputType.url,
+                    decoration: const InputDecoration(labelText: 'Instagram'),
+                    validator: _urlValidator,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _facebookController,
+                    keyboardType: TextInputType.url,
+                    decoration: const InputDecoration(labelText: 'Facebook'),
+                    validator: _urlValidator,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: _youtubeController,
+                    keyboardType: TextInputType.url,
+                    decoration: const InputDecoration(labelText: 'YouTube'),
+                    validator: _urlValidator,
+                  ),
+                  if (_error != null) ...[
+                    const SizedBox(height: 16),
+                    Text(_error!, style: const TextStyle(color: Colors.red)),
+                  ],
+                  const SizedBox(height: 24),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: FilledButton.icon(
+                      onPressed: _saving ? null : _save,
+                      icon: _saving
+                          ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Icon(Icons.save_outlined),
+                      label: const Text('Guardar cambios'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
 }

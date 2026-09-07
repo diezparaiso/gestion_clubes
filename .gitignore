@@ -1,4 +1,4 @@
-# Miscellaneous
+﻿# Miscellaneous
 *.class
 *.log
 *.pyc
@@ -46,3 +46,10 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+# Supabase CLI local (no versionar binarios ni temporales)
+supabase_*.zip
+supabase_*_windows_amd64/
+supabase/.temp/
+
+# Archivos de depuracion o estado local
+estado_arbol.txt
