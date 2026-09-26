@@ -17,7 +17,7 @@ class SponsorRepository {
 
     final supabase = _supabase;
     try {
-      final response = await supabase!
+      final response = await supabase
           .from('sponsors')
           .select()
           .eq('club_id', clubId)
@@ -37,7 +37,7 @@ class SponsorRepository {
     }
 
     try {
-      final response = await _supabase!
+      final response = await _supabase
           .from('sponsors')
           .select()
           .eq('club_id', clubId)
@@ -133,7 +133,7 @@ class SponsorRepository {
     }
 
     try {
-      final result = await _supabase!.rpc(
+      final result = await _supabase.rpc(
         'update_sponsor',
         params: {
           'p_sponsor_id': sponsorId,
