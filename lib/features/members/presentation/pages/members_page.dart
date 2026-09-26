@@ -101,6 +101,10 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _provinceController = TextEditingController();
   bool _isSaving = false;
   String? _errorMessage;
 
@@ -110,6 +114,10 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
+    _addressController.dispose();
+    _postalCodeController.dispose();
+    _cityController.dispose();
+    _provinceController.dispose();
     super.dispose();
   }
 
@@ -125,6 +133,10 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
+        address: _addressController.text,
+        postalCode: _postalCodeController.text,
+        city: _cityController.text,
+        province: _provinceController.text,
       );
       if (mounted) Navigator.of(context).pop(true);
     } on PostgrestException catch (error) {
@@ -146,6 +158,16 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
         TextFormField(controller: _lastNameController, decoration: const InputDecoration(labelText: 'Apellidos'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null),
         const SizedBox(height: 12),
         TextFormField(controller: _emailController, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email de la cuenta'), validator: (value) => value == null || !value.contains('@') ? 'Introduce un email válido' : null),
+        const SizedBox(height: 12),
+        TextFormField(controller: _addressController, decoration: const InputDecoration(labelText: 'Dirección postal')),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(child: TextFormField(controller: _postalCodeController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Código postal'))),
+          const SizedBox(width: 12),
+          Expanded(child: TextFormField(controller: _cityController, decoration: const InputDecoration(labelText: 'Localidad'))),
+        ]),
+        const SizedBox(height: 12),
+        TextFormField(controller: _provinceController, decoration: const InputDecoration(labelText: 'Provincia')),
         if (_errorMessage != null) ...[const SizedBox(height: 16), Align(alignment: Alignment.centerLeft, child: Text(_errorMessage!, style: TextStyle(color: Colors.red)))],
       ])))),
       actions: [
