@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../data/club_export_service.dart';
+import '../../data/club_export_service.dart';
 
 import '../../../auth/application/auth_controller.dart';
 import '../../application/dashboard_stats_provider.dart';
@@ -322,12 +322,12 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         clubName: auth.clubName ?? 'club',
       );
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(this.context).showSnackBar(
         const SnackBar(content: Text('Excel de gestión generado. Revisa la descarga del navegador.')),
       );
     } catch (error) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(this.context).showSnackBar(
         SnackBar(content: Text('No se ha podido exportar la gestión: $error')),
       );
     }

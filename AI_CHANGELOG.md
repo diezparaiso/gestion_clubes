@@ -356,3 +356,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregido el exportador para no depender de campos privados de los repositorios en modo demo.
 - Los datos de contacto del jugador y responsable se leen desde la relación `players`.
 - La exportación conserva pestañas separadas y evita asumir columnas de ordenación no necesarias en noticias, eventos y rifas.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — corrección de import y avisos del analyzer
+- `dashboard_page.dart`: corregido el import relativo de `club_export_service.dart` desde `presentation/pages` y protegidos los `ScaffoldMessenger` posteriores a operaciones asíncronas usando el `State.context` con `mounted`.
+- `members_page.dart`: protegido el `ScaffoldMessenger` posterior al diálogo asíncrono y corregida la documentación que contenía `<...>` como texto HTML.
+- Sin cambios de esquema, Supabase remoto ni Payments.

@@ -164,7 +164,7 @@ class _MembersPageState extends ConsumerState<MembersPage> {
       builder: (context) => _ChargeFeeDialog(member: member, clubId: clubId),
     );
     if (charged == true && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(this.context).showSnackBar(
         SnackBar(content: Text('Cuota cobrada a ${member.name}.')),
       );
     }
@@ -176,7 +176,7 @@ class _MembersPageState extends ConsumerState<MembersPage> {
 ///
 /// Uses [MockPaymentProvider] for now. Once the backend is deployed with
 /// real Stripe Connect accounts per club, swap it for:
-///   StripePaymentProvider(baseUrl: '<your deployed backend URL>')
+///   StripePaymentProvider(baseUrl: `your deployed backend URL`)
 /// No other code in this dialog needs to change.
 class _ChargeFeeDialog extends ConsumerStatefulWidget {
   const _ChargeFeeDialog({required this.member, required this.clubId});
