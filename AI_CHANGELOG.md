@@ -218,3 +218,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Las consultas de miembros validan club_id y el modo Supabase sin cliente disponible.
 - Los diálogos de cambio de rol e invitación no ejecutan setState si el diálogo ya fue desmontado durante una operación asíncrona.
 - Sin cambios de esquema ni de pagos en este bloque.
+
+### 2026-09-26 — GPT-5.6 LUNA — endurecimiento de rifas y tesorería
+- Se reparó el repositorio de rifas, que había quedado con contenido duplicado/incompleto durante el bloque anterior.
+- Las participaciones y el sorteo pasan a validar el club activo antes de operar sobre la rifa.
+- Se normalizan y validan los datos de reserva pública y se corrige la validación de email.
+- Tesorería valida categorías permitidas, normaliza descripciones y protege el diálogo frente a desmontaje asíncrono.
+- Sin cambios de pagos/Stripe en este bloque.
