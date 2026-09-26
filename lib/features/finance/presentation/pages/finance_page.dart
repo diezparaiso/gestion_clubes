@@ -9,6 +9,7 @@ import '../../data/repositories/finance_repository.dart';
 import '../../domain/entities/financial_transaction.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Usa el saldo inicial real del repositorio y valida movimientos.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Evita actualizar el diálogo tras desmontarse.
 
 final transactionsProvider = FutureProvider<List<FinancialTransaction>>((ref) {
   final clubId = ref.watch(authControllerProvider).clubId;
@@ -184,8 +185,11 @@ class _TransactionDialogState extends ConsumerState<_TransactionDialog> {
     try {
       await ref.read(financeRepositoryProvider).createTransaction(clubId: clubId, type: _type, category: _category, amount: double.parse(_amountController.text.replaceAll(',', '.')), description: _descriptionController.text);
       if (mounted) Navigator.of(context).pop(true);
-    } on PostgrestException catch (error) { setState(() { _saving = false; _error = error.message; }); }
-    catch (_) { setState(() { _saving = false; _error = 'No se ha podido guardar el movimiento.'; }); }
+    } on PostgrestException catch (error) {
+      if (mounted) setState(() { _saving = false; _error = error.message; });
+    } catch (_) {
+      if (mounted) setState(() { _saving = false; _error = 'No se ha podido guardar el movimiento.'; });
+    }
   }
 
   @override
@@ -216,7 +220,7 @@ class _TransactionDialogState extends ConsumerState<_TransactionDialog> {
                   decoration: const InputDecoration(labelText: 'Importe', suffixText: '€'),
                   validator: (value) {
                     final amount = double.tryParse((value ?? '').replaceAll(',', '.'));
-                    return amount == null || amount <= 0 ? 'Introduce un importe mayor que 0' : null;
+                    return amount == null || !amount.isFinite || amount <= 0 ? 'Introduce un importe mayor que 0' : null;
                   },
                 ),
                 const SizedBox(height: 12),
