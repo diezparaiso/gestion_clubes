@@ -141,3 +141,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/finance/presentation/pages/finance_page.dart`: el saldo ya no usa un valor fijo en la interfaz; toma el saldo inicial mediante `getOpeningBalance` del repositorio y suma/resta los movimientos actuales.
 - El alta de movimientos rechaza importes cero o negativos antes de guardar.
 - Sin cambios de esquema. Stripe/payment implementation remains untouched.
+
+### 2026-09-26 — GPT-5.6 LUNA — staff assignment integrity
+- team_staff_repository.dart valida que el equipo pertenece al club activo antes de asignar personal.
+- Evita asignaciones cruzadas entre clubes sin cambiar el esquema de Supabase.
+- Stripe/payment implementation remains untouched.
