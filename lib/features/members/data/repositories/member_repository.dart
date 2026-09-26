@@ -12,7 +12,7 @@ class MemberRepository {
 
     final rows = await Supabase.instance.client
         .from('memberships')
-        .select('id, member_number, status, profiles!inner(first_name, last_name, email)')
+        .select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, profiles!inner(first_name, last_name, email)')
         .eq('club_id', clubId)
         .order('member_number');
     return rows.map(Member.fromJson).toList();
@@ -20,7 +20,7 @@ class MemberRepository {
 
   Future<Member> createMember({required String clubId, required int memberNumber, required String firstName, required String lastName, required String email}) async {
     if (!SupabaseService.isConfigured) {
-      return Member(id: 'member-$memberNumber', memberNumber: memberNumber, name: '$firstName $lastName', email: email, status: MemberStatus.active);
+      return Member(id: 'member-$memberNumber', memberNumber: memberNumber, name: '$firstName $lastName', email: email, status: MemberStatus.active, membershipType: MembershipType.standard, joinDate: DateTime.now());
     }
 
     final client = Supabase.instance.client;
@@ -33,7 +33,7 @@ class MemberRepository {
       'member_number': memberNumber,
       'status': 'active',
       'membership_type': 'standard',
-    }).select('id, member_number, status, profiles!inner(first_name, last_name, email)').single();
+    }).select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, profiles!inner(first_name, last_name, email)').single();
     return Member.fromJson(row);
   }
 
@@ -45,6 +45,11 @@ class MemberRepository {
     required String memberId,
     required int memberNumber,
     required MemberStatus status,
+    required MembershipType membershipType,
+    required DateTime joinDate,
+    DateTime? renewalDate,
+    DateTime? leaveDate,
+    String? notes,
   }) async {
     if (!SupabaseService.isConfigured) {
       final index = _demoMembers.indexWhere((member) => member.id == memberId);
@@ -56,6 +61,11 @@ class MemberRepository {
         name: current.name,
         email: current.email,
         status: status,
+        membershipType: membershipType,
+        joinDate: joinDate,
+        renewalDate: renewalDate,
+        leaveDate: leaveDate,
+        notes: notes,
       );
       _demoMembers[index] = updated;
       return updated;
@@ -63,13 +73,18 @@ class MemberRepository {
     final row = await Supabase.instance.client.from('memberships').update({
       'member_number': memberNumber,
       'status': status.name,
+      'membership_type': membershipType.name,
+      'join_date': joinDate.toIso8601String().split('T').first,
+      'renewal_date': renewalDate?.toIso8601String().split('T').first,
+      'leave_date': leaveDate?.toIso8601String().split('T').first,
+      'notes': notes?.trim().isEmpty == true ? null : notes?.trim(),
     }).eq('id', memberId).eq('club_id', clubId).select('id, member_number, status, profiles!inner(first_name, last_name, email)').single();
     return Member.fromJson(row);
   }
 
   static final _demoMembers = <Member>[
-    Member(id: 'member-100', memberNumber: 100, name: 'Ana García', email: 'ana@ejemplo.com', status: MemberStatus.active),
-    Member(id: 'member-101', memberNumber: 101, name: 'Luis Martín', email: 'luis@ejemplo.com', status: MemberStatus.active),
-    Member(id: 'member-103', memberNumber: 103, name: 'Marta López', email: 'marta@ejemplo.com', status: MemberStatus.pending),
+    Member(id: 'member-100', memberNumber: 100, name: 'Ana García', email: 'ana@ejemplo.com', status: MemberStatus.active, membershipType: MembershipType.standard, joinDate: DateTime(2026, 7, 1)),
+    Member(id: 'member-101', memberNumber: 101, name: 'Luis Martín', email: 'luis@ejemplo.com', status: MemberStatus.active, membershipType: MembershipType.family, joinDate: DateTime(2026, 7, 1)),
+    Member(id: 'member-103', memberNumber: 103, name: 'Marta López', email: 'marta@ejemplo.com', status: MemberStatus.pending, membershipType: MembershipType.youth, joinDate: DateTime(2026, 9, 1)),
   ];
 }
