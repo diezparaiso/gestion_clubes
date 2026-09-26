@@ -174,7 +174,16 @@ class _EditStaffDialogState extends ConsumerState<_EditStaffDialog> {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _isSaving = true; _errorMessage = null; });
     try {
+      final clubId = ref.read(authControllerProvider).clubId;
+      if (clubId == null) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = 'No hay un club activo en la sesión.';
+        });
+        return;
+      }
       await ref.read(teamStaffRepositoryProvider).updateTeamStaff(
+        clubId: clubId,
         teamId: widget.teamId,
         staffId: widget.staff.id,
         role: _roleController.text.trim(),
