@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../data/repositories/notification_delivery_repository.dart';
 import '../../domain/entities/notification_delivery.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadido filtrado local de notificaciones.
+
 /// Provider para obtener las entregas de notificaciones del usuario actual
 final notificationDeliveriesProvider =
     FutureProvider<List<NotificationDelivery>>((ref) {
@@ -20,11 +22,19 @@ final unreadNotificationsProvider =
       .getUnreadDeliveries();
 });
 
-class NotificationsPage extends ConsumerWidget {
+class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NotificationsPage> createState() => _NotificationsPageState();
+}
+
+class _NotificationsPageState extends ConsumerState<NotificationsPage> {
+  bool _onlyUnread = false;
+  String _query = '';
+
+  @override
+  Widget build(BuildContext context) {
     final deliveries = ref.watch(notificationDeliveriesProvider);
 
     return Scaffold(
@@ -56,30 +66,43 @@ class NotificationsPage extends ConsumerWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-        child: deliveries.when(
+        child: Column(children: [
+          Row(children: [
+            Expanded(child: TextField(onChanged: (value) => setState(() => _query = value.trim().toLowerCase()), decoration: const InputDecoration(hintText: 'Buscar notificación', prefixIcon: Icon(Icons.search)))),
+            const SizedBox(width: 12),
+            FilterChip(label: const Text('Solo no leídas'), selected: _onlyUnread, onSelected: (value) => setState(() => _onlyUnread = value)),
+          ]),
+          const SizedBox(height: 16),
+          Expanded(child: deliveries.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(
             child: Text('Error al cargar notificaciones: $error'),
           ),
-          data: (items) => items.isEmpty
-              ? const Center(
-                  child: Text('No tienes notificaciones.'),
-                )
-              : ListView.separated(
-                  itemCount: items.length,
+          data: (items) {
+            final filtered = items.where((item) {
+              final matchesUnread = !_onlyUnread || !item.isRead;
+              final text = '${item.title ?? ''} ${item.body ?? ''}'.toLowerCase();
+              return matchesUnread && (_query.isEmpty || text.contains(_query));
+            }).toList();
+            return filtered.isEmpty
+                ? Center(child: Text(items.isEmpty ? 'No tienes notificaciones.' : 'No hay notificaciones que coincidan.'))
+                : ListView.separated(
+                  itemCount: filtered.length,
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) => _NotificationDeliveryCard(
-                    delivery: items[index],
+                    delivery: filtered[index],
                     onMarkAsRead: () async {
                       await ref
                           .read(notificationDeliveryRepositoryProvider)
-                          .markAsRead(items[index].id);
+                          .markAsRead(filtered[index].id);
                       ref.invalidate(notificationDeliveriesProvider);
                       ref.invalidate(unreadNotificationsProvider);
                     },
                   ),
-                ),
-        ),
+                );
+          },
+          ),
+        ]),
       ),
     );
   }
