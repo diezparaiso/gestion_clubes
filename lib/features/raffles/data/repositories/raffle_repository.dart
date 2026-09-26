@@ -10,7 +10,7 @@ final raffleRepositoryProvider = Provider<RaffleRepository>((ref) => RaffleRepos
 class RaffleRepository {
   Future<List<Raffle>> listRaffles(String clubId) async {
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoRaffles);
-    final rows = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at').eq('club_id', clubId).order('created_at', ascending: false);
+    final rows = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number').eq('club_id', clubId).order('created_at', ascending: false);
     return rows.map(Raffle.fromJson).toList();
   }
 
@@ -54,11 +54,11 @@ class RaffleRepository {
       final ticket = _demoTickets.firstWhere((item) => item.id.startsWith(raffleId) && item.paymentStatus == 'paid', orElse: () => _demoTickets.first);
       return RaffleDraw(id: 'draw-$raffleId', winningNumber: ticket.number, drawnAt: DateTime.now(), method: 'random_number');
     }
-    final row = await Supabase.instance.client.rpc<Map<String, dynamic>>('draw_raffle_random', params: {'target_raffle_id': raffleId});
+    final row = await Supabase.instance.client.rpc<Map<String, dynamic>>('draw_raffle_random_secure', params: {'target_raffle_id': raffleId});
     return RaffleDraw.fromJson(row);
   }
 
-  Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt}) async {
+  Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt, required RaffleType type}) async {
     if (!SupabaseService.isConfigured) {
       final raffle = Raffle(id: 'raffle-new', title: title, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);
       _demoRaffles.insert(0, raffle);
@@ -67,7 +67,7 @@ class RaffleRepository {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) throw const AuthException('La sesión ha expirado.');
     final slug = title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
-    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': title.trim(), 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at').single();
+    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': title.trim(), 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'raffle_type': type.name, 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at').single();
     return Raffle.fromJson(row);
   }
 
@@ -82,3 +82,15 @@ class RaffleRepository {
     const RaffleTicket(id: 'raffle-1-ticket-42', number: 42, buyerName: 'Marta López', buyerEmail: 'marta@example.com', paymentStatus: 'paid'),
   ];
 }
+
+
+  Future<RaffleDraw> setBasketWinner({required String raffleId, required int winningNumber}) async {
+    if (!SupabaseService.isConfigured) {
+      return RaffleDraw(id: 'manual-$raffleId', raffleId: raffleId, winningNumber: winningNumber, drawnAt: DateTime.now(), method: 'president_selected');
+    }
+    final row = await Supabase.instance.client.rpc<Map<String, dynamic>>(
+      'set_raffle_manual_winner',
+      params: {'target_raffle_id': raffleId, 'target_winning_number': winningNumber},
+    );
+    return RaffleDraw.fromJson(row);
+  }
