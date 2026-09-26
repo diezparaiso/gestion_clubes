@@ -11,7 +11,7 @@ class PlayerRepository {
     if (!SupabaseService.isConfigured) return _demoPlayers;
     final rows = await Supabase.instance.client
         .from('team_players')
-        .select('id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(profiles!inner(first_name, last_name))')
+        .select('id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, profiles!inner(first_name, last_name))')
         .eq('team_id', teamId)
         .order('jersey_number');
     return rows.map(Player.fromJson).toList();
@@ -83,26 +83,19 @@ class PlayerRepository {
     final playerId = existingPlayer?['id'] as String? ??
         (await client
                 .from('players')
-                .insert({'club_id': clubId, 'profile_id': profileId})
+                .insert({'club_id': clubId, 'profile_id': profileId, 'phone': phone.isEmpty ? null : phone, 'guardian_name': guardianName.isEmpty ? null : guardianName, 'guardian_phone': guardianPhone.isEmpty ? null : guardianPhone, 'guardian_email': guardianEmail.isEmpty ? null : guardianEmail, 'guardian_relationship': guardianRelationship.isEmpty ? null : guardianRelationship})
                 .select('id')
                 .single())['id'] as String;
 
+    if (existingPlayer != null) {
+      await client.from('players').update({'phone': phone.isEmpty ? null : phone, 'guardian_name': guardianName.isEmpty ? null : guardianName, 'guardian_phone': guardianPhone.isEmpty ? null : guardianPhone, 'guardian_email': guardianEmail.isEmpty ? null : guardianEmail, 'guardian_relationship': guardianRelationship.isEmpty ? null : guardianRelationship}).eq('id', playerId).eq('club_id', clubId);
+    }
+
     final row = await client
         .from('team_players')
-        .insert({
-          'club_id': clubId,
-          'team_id': teamId,
-          'player_id': playerId,
-          'jersey_number': jerseyNumber,
-          'is_active': true,
-          'phone': phone.isEmpty ? null : phone,
-          'guardian_name': guardianName.isEmpty ? null : guardianName,
-          'guardian_phone': guardianPhone.isEmpty ? null : guardianPhone,
-          'guardian_email': guardianEmail.isEmpty ? null : guardianEmail,
-          'guardian_relationship': guardianRelationship.isEmpty ? null : guardianRelationship,
-        })
+        .insert({'club_id': clubId, 'team_id': teamId, 'player_id': playerId, 'jersey_number': jerseyNumber, 'is_active': true})
         .select(
-          'id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(profiles!inner(first_name, last_name))',
+          'id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, profiles!inner(first_name, last_name))',
         )
         .single();
 
@@ -150,21 +143,17 @@ class PlayerRepository {
     if (team == null) {
       throw const PostgrestException(message: 'El equipo no pertenece al club activo.');
     }
+    final assignment = await client.from('team_players').select('player_id').eq('id', playerId).eq('team_id', teamId).eq('club_id', clubId).maybeSingle();
+    if (assignment == null) throw const PostgrestException(message: 'La asignación del jugador no pertenece al club activo.');
+    final assignedPlayerId = assignment['player_id'] as String;
+    await client.from('players').update({'phone': phone.isEmpty ? null : phone, 'guardian_name': guardianName.isEmpty ? null : guardianName, 'guardian_phone': guardianPhone.isEmpty ? null : guardianPhone, 'guardian_email': guardianEmail.isEmpty ? null : guardianEmail, 'guardian_relationship': guardianRelationship.isEmpty ? null : guardianRelationship}).eq('id', assignedPlayerId).eq('club_id', clubId);
     final row = await client
         .from('team_players')
-        .update({
-          'jersey_number': jerseyNumber,
-          'is_active': isActive,
-          'phone': phone.isEmpty ? null : phone,
-          'guardian_name': guardianName.isEmpty ? null : guardianName,
-          'guardian_phone': guardianPhone.isEmpty ? null : guardianPhone,
-          'guardian_email': guardianEmail.isEmpty ? null : guardianEmail,
-          'guardian_relationship': guardianRelationship.isEmpty ? null : guardianRelationship,
-        })
+        .update({'jersey_number': jerseyNumber, 'is_active': isActive})
         .eq('id', playerId)
         .eq('team_id', teamId)
         .select(
-          'id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(profiles!inner(first_name, last_name))',
+          'id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, profiles!inner(first_name, last_name))',
         )
         .single();
     return Player.fromJson(row);
