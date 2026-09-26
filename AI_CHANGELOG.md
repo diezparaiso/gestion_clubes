@@ -445,3 +445,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-26 — GPT-5.6 LUNA — remates del módulo de rifas
 - La página pública distingue correctamente la modalidad mensual y muestra el día de renovación.
 - La notificación del resultado mensual usa directamente el ID recién creado, evitando asociaciones ambiguas en concurrencia.
+
+### 2026-09-26 — GPT-5.6 LUNA — preparación de monetización Google AdSense
+- Añadida configuración `AdsConfig` mediante `--dart-define=ADSENSE_PUBLISHER_ID=ca-pub-...`.
+- Añadida carga global de AdSense en Flutter Web desde `AdsService`, por lo que el mismo código acompaña a todas las rutas de la aplicación.
+- No se incrusta ningún ID de editor ficticio ni se activan anuncios reales hasta configurar el ID del propietario.
+- La estrategia web usa AdSense Auto ads para anclas y barras laterales, que Google puede colocar de forma responsive sin invadir el contenido. Las posiciones y frecuencia se controlan desde AdSense.
+- No se crea `ads.txt` todavía porque Google exige el ID `pub-...` real del editor.
+- En EEE/Reino Unido/Suiza debe configurarse el consentimiento/CMP correspondiente antes de publicidad personalizada.
