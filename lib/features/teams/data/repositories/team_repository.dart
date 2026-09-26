@@ -26,14 +26,16 @@ class TeamRepository {
 
   // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): CRUD de temporadas con columnas existentes.
   Future<Season> createSeason({required String clubId, required String name, required DateTime startDate}) async {
+    final normalizedName = name.trim();
+    if (normalizedName.isEmpty) throw FormatException('El nombre de la temporada es obligatorio.');
     if (!SupabaseService.isConfigured) {
-      final season = Season(id: 'season-${_demoSeasons.length + 1}', name: name.trim(), startDate: startDate);
+      final season = Season(id: 'season-${_demoSeasons.length + 1}', name: normalizedName, startDate: startDate);
       _demoSeasons.add(season);
       return season;
     }
     final row = await Supabase.instance.client.from('seasons').insert({
       'club_id': clubId,
-      'name': name.trim(),
+      'name': normalizedName,
       'start_date': startDate.toIso8601String().split('T').first,
     }).select('id, name, start_date').single();
     return Season.fromJson(row);
@@ -87,6 +89,9 @@ class TeamRepository {
     required String category,
     required String seasonId,
   }) async {
+    final normalizedName = name.trim();
+    final normalizedCategory = category.trim();
+    if (normalizedName.isEmpty || normalizedCategory.isEmpty) throw FormatException('El nombre y la categoría del equipo son obligatorios.');
     if (!SupabaseService.isConfigured) {
       final index = _demoTeams.indexWhere((team) => team.id == teamId);
       if (index < 0) throw StateError('Equipo no encontrado.');
@@ -98,9 +103,11 @@ class TeamRepository {
     }
     final season = await Supabase.instance.client.from('seasons').select('id').eq('id', seasonId).eq('club_id', clubId).maybeSingle();
     if (season == null) throw const PostgrestException(message: 'La temporada no pertenece al club activo.');
+    final season = await Supabase.instance.client.from('seasons').select('id').eq('id', seasonId).eq('club_id', clubId).maybeSingle();
+    if (season == null) throw const PostgrestException(message: 'La temporada no pertenece al club activo.');
     final row = await Supabase.instance.client.from('teams').update({
-      'name': name.trim(),
-      'category': category.trim(),
+      'name': normalizedName,
+      'category': normalizedCategory,
       'season_id': seasonId,
     }).eq('id', teamId).eq('club_id', clubId).select('id, name, category, is_active, seasons!inner(name)').single();
     return Team.fromJson(row);
