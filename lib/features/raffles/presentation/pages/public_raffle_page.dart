@@ -1,4 +1,6 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Corrige el rango visual de números y la reserva pública.\n\nimport 'package:flutter/material.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Corrige el rango visual de números y la reserva pública.
+
+import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
