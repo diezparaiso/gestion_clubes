@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
 import '../../../../core/services/export_service.dart';
 import '../../../../core/utils/csv_exporter.dart';
 import '../../data/repositories/finance_repository.dart';
@@ -44,7 +45,7 @@ class _FinancePageState extends ConsumerState<FinancePage> {
     final transactions = ref.watch(transactionsProvider);
     final openingBalance = ref.watch(openingBalanceProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Tesorería')),
+      appBar: const ClubNavigationAppBar(title: 'Tesorería'),
       body: RefreshIndicator(
         onRefresh: () => ref.refresh(transactionsProvider.future),
         child: Padding(
