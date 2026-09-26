@@ -467,3 +467,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - La pantalla de gestión de accesos queda reservada al presidente, coherente con el requisito funcional original.
 - Se conserva auditoría del rol anterior y del nuevo.
 - La migración sigue pendiente de ejecutar en Supabase remoto.
+
+### 2026-09-26 — GPT-5.6 LUNA — inventario permanente de pendientes
+- Añadido PENDIENTES.md con el estado de rifas, pagos, publicidad Google, seguridad, autenticación y pruebas.
+- Se distinguen tareas ya preparadas de dependencias externas y de tareas que requieren ejecución en Supabase.
+- El siguiente foco recomendado queda en RLS/permisos y pruebas, sin ejecutar cambios en Supabase live.
