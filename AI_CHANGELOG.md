@@ -136,3 +136,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-26 — GPT-5.6 LUNA — final analyzer error repair
 - Removed an invalid `const StateError` invocation in `post_repository.dart`.
 - The remaining analyzer messages are informational/warnings only and are not blocking errors.
+
+### 2026-09-26 — GPT-5.6 LUNA — finance balance integrity
+- `lib/features/finance/presentation/pages/finance_page.dart`: el saldo ya no usa un valor fijo en la interfaz; toma el saldo inicial mediante `getOpeningBalance` del repositorio y suma/resta los movimientos actuales.
+- El alta de movimientos rechaza importes cero o negativos antes de guardar.
+- Sin cambios de esquema. Stripe/payment implementation remains untouched.
