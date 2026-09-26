@@ -30,7 +30,7 @@ class PostRepository {
       return post;
     }
     final userId = Supabase.instance.client.auth.currentUser?.id;
-    if (userId == null) throw const AuthException('La sesión ha expirado.');
+    if (userId == null) throw AuthException('La sesión ha expirado.');
     final row = await Supabase.instance.client.from('posts').insert({'club_id': clubId, 'title': normalizedTitle, 'body': normalizedBody, 'status': status.name, 'published_at': status == PostStatus.published ? DateTime.now().toIso8601String() : null, 'author_id': userId}).select('id, title, body, status, image_url, published_at, created_at').single();
     return Post.fromJson(row);
   }
