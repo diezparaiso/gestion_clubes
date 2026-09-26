@@ -278,3 +278,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-26 — GPT-5.6 LUNA — filtros avanzados de socios
 - `lib/features/members/presentation/pages/members_page.dart`: añadido filtrado local por estado y tipo de socio, combinado con la búsqueda existente por nombre, email y número.
 - No se realizan consultas adicionales ni cambios de esquema; se filtran los datos ya cargados para el club autenticado.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — filtros de tesorería
+- `lib/features/finance/presentation/pages/finance_page.dart`: añadidos búsqueda local por descripción/categoría y filtro por ingresos/gastos.
+- El saldo inicial y los datos financieros siguen procediendo del repositorio; los filtros solo afectan al listado y sus métricas visibles.
+- Sin cambios de esquema, RLS ni Payments.
