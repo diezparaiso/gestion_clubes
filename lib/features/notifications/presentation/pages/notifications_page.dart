@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 
 import '../../data/repositories/notification_delivery_repository.dart';
 import '../../domain/entities/notification_delivery.dart';
@@ -38,8 +39,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     final deliveries = ref.watch(notificationDeliveriesProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notificaciones'),
+      appBar: ClubNavigationAppBar(
+        title: 'Notificaciones',
         actions: [
           ref.watch(unreadNotificationsProvider).when(
             data: (unread) => unread.isEmpty
