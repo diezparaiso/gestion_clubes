@@ -1,3 +1,5 @@
+enum RaffleType { cesta, sorteoPuro }
+
 enum RaffleStatus { draft, scheduled, active, soldOut, closed, drawn, cancelled }
 
 class Raffle {
@@ -8,6 +10,8 @@ class Raffle {
     required this.totalNumbers,
     required this.status,
     required this.endAt,
+    this.type = RaffleType.sorteoPuro,
+    this.winningNumber,
     this.clubName,
     this.clubSlug,
     this.slug,
@@ -23,6 +27,8 @@ class Raffle {
   final int totalNumbers;
   final RaffleStatus status;
   final DateTime endAt;
+  final RaffleType type;
+  final int? winningNumber;
   final String? clubName;
   final String? clubSlug;
   final String? slug;
@@ -53,6 +59,8 @@ class Raffle {
         title: json['title'] as String,
         ticketPrice: (json['ticket_price'] as num).toDouble(),
         totalNumbers: json['total_numbers'] as int,
+        type: RaffleType.values.firstWhere((value) => value.name == (json['raffle_type'] as String? ?? 'sorteoPuro'), orElse: () => RaffleType.sorteoPuro),
+        winningNumber: json['winning_number'] as int?,
         status: RaffleStatus.values.firstWhere(
           (value) => value.name == json['status'],
           orElse: () => RaffleStatus.draft,
