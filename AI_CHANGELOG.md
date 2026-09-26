@@ -132,7 +132,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 
 
 ### 2026-09-26 — GPT-5.6 LUNA — repair public raffle imports
-- Fixed a malformed literal \\n sequence at the beginning of `public_raffle_page.dart` that commented out the Flutter imports and caused the large analyzer cascade, including the router type error.
+- Fixed a malformed literal \
+ sequence at the beginning of `public_raffle_page.dart` that commented out the Flutter imports and caused the large analyzer cascade, including the router type error.
 - Fixed the non-const `AuthException` invocation in `post_repository.dart`.
 - No payment/Stripe changes and no live Supabase execution.
 
@@ -229,4 +230,39 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Se normalizan y validan los datos de reserva pública y se corrige la validación de email.
 - Tesorería valida categorías permitidas, normaliza descripciones y protege el diálogo frente a desmontaje asíncrono.
 - Sin cambios de pagos/Stripe en este bloque.
-\n### 2026-09-26 — GPT-5.6 LUNA — cierre del flujo de rifas\n- `raffle_detail_page.dart`: evita ejecutar el sorteo sin club activo.\n- `raffles_page.dart`: permite elegir fecha y hora reales de finalización y protege el diálogo frente a operaciones asíncronas tras desmontaje.\n- La rifa deja de depender de una fecha fija de 30 días.\n- Sin cambios de Stripe/pagos.\n\n### 2026-09-26 — GPT-5.6 LUNA — integridad del presidente activo\n- Añadida `supabase/migrations/025_revoke_active_president_integrity.sql`.\n- `revoke_member_access` ahora cuenta únicamente presidentes activos y bloquea la revocación del único presidente activo.\n- La migración queda en el repositorio y pendiente de aplicación en Supabase remoto.\n\n### 2026-09-26 — GPT-5.6 LUNA — integridad financiera de base de datos\n- Añadida `supabase/migrations/026_financial_transaction_account_integrity.sql`.\n- Las transacciones financieras ahora validan en base de datos que `account_id` pertenece al mismo `club_id`.\n- La migración queda en el repositorio y pendiente de aplicación en Supabase remoto.\n- Sin cambios de Stripe/pagos.\n\n### 2026-09-26 — GPT-5.6 LUNA — integridad de equipos y personal\n- Añadida `027_team_player_club_integrity.sql`: equipo, jugador y `club_id` deben pertenecer al mismo club.\n- Añadida `028_team_staff_club_integrity.sql`: equipo, personal y `club_id` deben pertenecer al mismo club y el perfil debe tener membresía activa.\n- Las migraciones quedan pendientes de aplicación en Supabase remoto.\n\n### 2026-09-26 — GPT-5.6 LUNA — cierre de integridad, notificaciones, tests y PWA\n- Patrocinadores: validación de club, fechas e importe en repositorio y migración `029_sponsor_integrity.sql`.\n- Notificaciones: repositorio seguro en modo demo y lectura restringida al usuario autenticado mediante `030_notification_read_integrity.sql`.\n- Tests: añadido `test/data_integrity_test.dart` con cobertura de validaciones financieras, rifas, fechas y patrocinadores.\n- PWA/producción: actualizados `web/index.html` y `web/manifest.json` con identidad, descripción, viewport y theme-color de producción.\n- No se ejecuta ninguna migración sobre Supabase remoto desde este flujo.\n\n\n### 2026-09-26 — GPT-5.6 LUNA — dashboard actions and real metrics\n- `lib/features/dashboard/presentation/pages/dashboard_page.dart`: las acciones rápidas ya navegan a Socios, Tesorería y Rifas en lugar de ejecutar botones sin acción.\n- El tercer indicador del dashboard deja de mostrar datos ficticios de rifas y usa el número real de equipos disponible en `dashboardStatsProvider`.\n- Se añade el marcador `MODIFICADO POR GPT-5.6 LUNA` al archivo tocado.\n- No se modifica Payments, Supabase ni el esquema de base de datos.\n
+
+### 2026-09-26 — GPT-5.6 LUNA — cierre del flujo de rifas
+- `raffle_detail_page.dart`: evita ejecutar el sorteo sin club activo.
+- `raffles_page.dart`: permite elegir fecha y hora reales de finalización y protege el diálogo frente a operaciones asíncronas tras desmontaje.
+- La rifa deja de depender de una fecha fija de 30 días.
+- Sin cambios de Stripe/pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — integridad del presidente activo
+- Añadida `supabase/migrations/025_revoke_active_president_integrity.sql`.
+- `revoke_member_access` ahora cuenta únicamente presidentes activos y bloquea la revocación del único presidente activo.
+- La migración queda en el repositorio y pendiente de aplicación en Supabase remoto.
+
+### 2026-09-26 — GPT-5.6 LUNA — integridad financiera de base de datos
+- Añadida `supabase/migrations/026_financial_transaction_account_integrity.sql`.
+- Las transacciones financieras ahora validan en base de datos que `account_id` pertenece al mismo `club_id`.
+- La migración queda en el repositorio y pendiente de aplicación en Supabase remoto.
+- Sin cambios de Stripe/pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — integridad de equipos y personal
+- Añadida `027_team_player_club_integrity.sql`: equipo, jugador y `club_id` deben pertenecer al mismo club.
+- Añadida `028_team_staff_club_integrity.sql`: equipo, personal y `club_id` deben pertenecer al mismo club y el perfil debe tener membresía activa.
+- Las migraciones quedan pendientes de aplicación en Supabase remoto.
+
+### 2026-09-26 — GPT-5.6 LUNA — cierre de integridad, notificaciones, tests y PWA
+- Patrocinadores: validación de club, fechas e importe en repositorio y migración `029_sponsor_integrity.sql`.
+- Notificaciones: repositorio seguro en modo demo y lectura restringida al usuario autenticado mediante `030_notification_read_integrity.sql`.
+- Tests: añadido `test/data_integrity_test.dart` con cobertura de validaciones financieras, rifas, fechas y patrocinadores.
+- PWA/producción: actualizados `web/index.html` y `web/manifest.json` con identidad, descripción, viewport y theme-color de producción.
+- No se ejecuta ninguna migración sobre Supabase remoto desde este flujo.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — dashboard actions and real metrics
+- `lib/features/dashboard/presentation/pages/dashboard_page.dart`: las acciones rápidas ya navegan a Socios, Tesorería y Rifas en lugar de ejecutar botones sin acción.
+- El tercer indicador del dashboard deja de mostrar datos ficticios de rifas y usa el número real de equipos disponible en `dashboardStatsProvider`.
+- Se añade el marcador `MODIFICADO POR GPT-5.6 LUNA` al archivo tocado.
+- No se modifica Payments, Supabase ni el esquema de base de datos.
