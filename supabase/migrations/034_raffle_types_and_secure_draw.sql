@@ -1,7 +1,7 @@
 -- MODIFICADO POR GPT-5.6 LUNA (2026-09-26): modalidades Cesta y Sorteo puro.
 alter table public.raffles
   add column if not exists raffle_type text not null default 'sorteoPuro'
-    check (raffle_type in ('cesta', 'sorteoPuro')),
+    check (raffle_type in ('cesta', 'sorteoPuro', 'mensual')),
   add column if not exists winning_number integer;
 
 alter table public.raffles
