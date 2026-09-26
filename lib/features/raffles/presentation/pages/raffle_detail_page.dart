@@ -1,6 +1,7 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Restaura implementación Flutter válida tras corrección del analizador.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../data/repositories/raffle_repository.dart';
@@ -47,7 +48,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
             _tickets = ref.read(raffleRepositoryProvider).listTickets(raffle.id);
           }
           return Scaffold(
-        appBar: AppBar(title: Text(raffle.title)),
+        appBar: ClubNavigationAppBar(title: raffle.title),
         body: FutureBuilder<List<RaffleTicket>>(
           future: _tickets!,
           builder: (context, snapshot) {
