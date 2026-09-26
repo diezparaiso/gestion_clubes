@@ -153,6 +153,27 @@ class RaffleRepository {
     );
   }
 
+  Future<List<Map<String, dynamic>>> listMyMonthlySubscriptions(String profileId) async {
+    if (!SupabaseService.isConfigured) return const [];
+    final rows = await Supabase.instance.client
+        .from('raffle_monthly_subscriptions')
+        .select('id, raffle_id, number, amount, currency, status, current_period_start, current_period_end, raffles!inner(id, title, raffle_type, monthly_day)')
+        .eq('profile_id', profileId)
+        .order('created_at', ascending: false);
+    return rows.cast<Map<String, dynamic>>();
+  }
+
+  Future<List<Map<String, dynamic>>> listMyPaidTickets(String profileId) async {
+    if (!SupabaseService.isConfigured) return const [];
+    final rows = await Supabase.instance.client
+        .from('raffle_tickets')
+        .select('id, raffle_id, number, payment_status, paid_at, payment_reference, receipt_number, raffles!inner(title, ticket_price)')
+        .eq('profile_id', profileId)
+        .eq('payment_status', 'paid')
+        .order('paid_at', ascending: false);
+    return rows.cast<Map<String, dynamic>>();
+  }
+
   Future<Map<String, dynamic>?> getMyMonthlySubscription({
     required String raffleId,
     required String profileId,
