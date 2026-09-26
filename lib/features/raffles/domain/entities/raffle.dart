@@ -12,6 +12,8 @@ class Raffle {
     required this.endAt,
     this.type = RaffleType.sorteoPuro,
     this.winningNumber,
+    this.monthlyDay,
+    this.subscriptionEnabled = false,
     this.clubName,
     this.clubSlug,
     this.slug,
@@ -29,6 +31,8 @@ class Raffle {
   final DateTime endAt;
   final RaffleType type;
   final int? winningNumber;
+  final int? monthlyDay;
+  final bool subscriptionEnabled;
   final String? clubName;
   final String? clubSlug;
   final String? slug;
@@ -61,6 +65,8 @@ class Raffle {
         totalNumbers: json['total_numbers'] as int,
         type: RaffleType.values.firstWhere((value) => value.name == (json['raffle_type'] as String? ?? 'sorteoPuro'), orElse: () => RaffleType.sorteoPuro),
         winningNumber: json['winning_number'] as int?,
+        monthlyDay: json['monthly_day'] as int?,
+        subscriptionEnabled: json['subscription_enabled'] as bool? ?? false,
         status: RaffleStatus.values.firstWhere(
           (value) => value.name == json['status'],
           orElse: () => RaffleStatus.draft,
