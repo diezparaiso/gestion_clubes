@@ -29,6 +29,7 @@ class ClubNavigationAppBar extends ConsumerWidget implements PreferredSizeWidget
       if (_has(role, 'events')) (label: 'Eventos', path: '/events', icon: Icons.event_outlined),
       (label: 'Notificaciones', path: '/notifications', icon: Icons.notifications_outlined),
       if (role == 'club_president' || role == 'club_secretary') (label: 'Configuración', path: '/settings', icon: Icons.settings_outlined),
+      (label: 'Mi perfil', path: '/profile', icon: Icons.person_outline),
     ];
     return AppBar(
       leading: IconButton(
