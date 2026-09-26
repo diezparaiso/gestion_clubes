@@ -23,6 +23,15 @@ This file is the permanent handoff log between AI assistants working on this rep
 
 ## 2026-09-26 — GPT-5.6 LUNA — continued implementation
 
+### 2026-09-26 — GPT-5.6 LUNA — arquitectura de gestión de accesos y permisos
+- Añadida `supabase/migrations/032_club_access_permissions.sql`: marca cuentas que deben cambiar su contraseña inicial y define permisos por rol mediante `club_role_permissions` y `has_club_permission`.
+- Añadida `supabase/functions/manage-club-user/index.ts`: backend seguro para que un presidente/secretario pueda crear o activar una cuenta Auth, asignarle email, contraseña inicial, datos básicos y rol sin exponer la service role key al navegador.
+- La interfaz visual de Configuración queda pendiente de completar porque la escritura de esa modificación fue bloqueada por el control de seguridad de la sesión; no se dejó un cambio parcial.
+- Ninguna migración ni Edge Function se ha desplegado/ejecutado sobre Supabase remoto desde este flujo.
+- Stripe/payment implementation remains untouched.
+
+
+
 ### 2026-09-26 — GPT-5.6 LUNA — acceso a clubes existentes y rol real
 - `lib/features/auth/application/auth_controller.dart`: añade la carga de clubes con membresía activa, selección del club y conservación del rol `club_role` en el estado de autenticación.
 - `lib/features/clubs/presentation/pages/club_onboarding_page.dart`: muestra los clubes existentes del usuario y permite entrar directamente en ellos; mantiene la opción de crear un club nuevo.
