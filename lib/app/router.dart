@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): cierre funcional del módulo de rifas.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
