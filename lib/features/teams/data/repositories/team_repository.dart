@@ -20,7 +20,7 @@ class TeamRepository {
 
   Future<List<Season>> listSeasons(String clubId) async {
     if (!SupabaseService.isConfigured) return _demoSeasons;
-    final rows = await Supabase.instance.client.from('seasons').select('id, name').eq('club_id', clubId).order('start_date', ascending: false);
+    final rows = await Supabase.instance.client.from('seasons').select('id, name, start_date').eq('club_id', clubId).order('start_date', ascending: false);
     return rows.map(Season.fromJson).toList();
   }
 
@@ -35,7 +35,7 @@ class TeamRepository {
       'club_id': clubId,
       'name': name.trim(),
       'start_date': startDate.toIso8601String().split('T').first,
-    }).select('id, name').single();
+    }).select('id, name, start_date').single();
     return Season.fromJson(row);
   }
 
