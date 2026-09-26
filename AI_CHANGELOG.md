@@ -1,3 +1,11 @@
+### 2026-09-26 — GPT-5.6 LUNA — perfil y cambio de contraseña
+- Añadido perfil de usuario con cambio de contraseña.
+- Los usuarios creados con contraseña inicial quedan obligados a cambiarla antes de acceder a la gestión.
+- El requisito se controla mediante `profiles.must_change_password` y se libera al completar correctamente el cambio.
+- Añadida ruta `/profile` y ruta protegida `/profile/password`.
+- Añadido acceso a Mi perfil desde la navegación superior.
+- No se guardan contraseñas en la base de datos ni en logs.
+
 ### 2026-09-26 — GPT-5.6 LUNA — navegación superior por rol
 - Añadida barra `ClubNavigationAppBar` reutilizable para las pantallas de gestión.
 - Todas las pantallas principales incorporan botón de inicio y menú superior de navegación.
