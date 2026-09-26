@@ -1,3 +1,12 @@
+### 2026-09-26 — GPT-5.6 LUNA — cierre inicial del módulo de accesos
+- Añadida `club_access_management_page.dart`: listado de accesos activos, alta de usuario mediante Edge Function, cambio de rol y revocación.
+- Añadida la ruta `/settings/access` y acceso directo desde Configuración.
+- Añadida `033_change_member_role.sql` con RPC protegida por el permiso `access_manage`.
+- La contraseña inicial se solicita solo en el formulario y se marca `must_change_password` desde la Edge Function; no se guarda en la base de datos ni en logs.
+- Las migraciones y la Edge Function siguen pendientes de despliegue en Supabase remoto.
+- No se modifica Payments/Stripe.
+- Marcado como `MODIFICADO POR GPT-5.6 LUNA` en los archivos tocados.
+
 # AI CHANGELOG — gestión_clubes
 
 This file is the permanent handoff log between AI assistants working on this repository.
