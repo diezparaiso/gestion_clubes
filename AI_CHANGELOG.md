@@ -9,13 +9,17 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Do not remove previous AI markers. If a section is substantially rewritten, preserve the previous marker in the history/comments.
 - Git commit messages should also identify the AI when practical.
 
-## Scope restriction requested by Juanlu
+## Working rules requested by Juanlu
 
-- Do NOT modify the live Supabase database from this workflow.
-- Do NOT add, alter or delete Supabase migrations.
-- Do NOT modify Stripe/payment implementation.
-- Changes may use existing Supabase tables/columns already present in the repository, but must not require a schema change in this phase.
-- If a requested feature requires a new table, column, RLS policy, storage policy, Edge Function or Stripe change, STOP that part and document it as pending instead of implementing it.
+- Do NOT modify the live Supabase database from this workflow. Repository migrations may be created or updated, but they are **not executed against the live Supabase project** from this workflow.
+- Supabase migrations are part of the repository and may be added when required by the planned application architecture, integrity, RLS or data model. Their remote application remains a separate deployment step.
+- Do NOT modify the Stripe/payment implementation in gestion_clubes unless that integration is explicitly scheduled. The separate payments project remains independent until integration is planned.
+- If a requested feature requires a schema, RLS, storage policy, Edge Function or payment change, document the change and keep live deployment separate from code changes.
+
+### 2026-09-26 — GPT-5.6 LUNA — documentación de reglas de trabajo
+- Se corrige la antigua restricción documental que prohibía crear o modificar migraciones, porque el repositorio ya contiene migraciones 020–024 creadas durante este desarrollo.
+- Se mantiene la separación entre cambios de código/migraciones del repositorio y la aplicación de esos cambios sobre el Supabase remoto.
+- Stripe/pagos siguen fuera de gestion_clubes hasta que se programe explícitamente su integración.
 
 ## 2026-09-26 — GPT-5.6 LUNA — continued implementation
 
