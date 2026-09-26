@@ -312,3 +312,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-26 — GPT-5.6 LUNA — corrección estructural de filtros de socios
 - Se corrige la estructura del Row de búsqueda y filtros en members_page.dart.
 - Sin cambios de esquema, RLS ni Payments.
+
+### 2026-09-26 — GPT-5.6 LUNA — interfaz completa de filtros de tesorería
+- Se incorpora a la interfaz el buscador, filtro por tipo y filtro por categoría que ya utilizaba la lógica de filtrado.
+- Las métricas financieras siguen calculándose sobre todos los movimientos.
+- Sin cambios de esquema, RLS ni Payments.
