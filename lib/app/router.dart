@@ -89,6 +89,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(
+        path: '/profile',
+        name: 'profile',
+        builder: (context, state) => const ProfilePage(),
+      ),
+      GoRoute(
         path: '/profile/password',
         name: 'profile-password',
         builder: (context, state) => const ProfilePage(forcePasswordChange: true),
