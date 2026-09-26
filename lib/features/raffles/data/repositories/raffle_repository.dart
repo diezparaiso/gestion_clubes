@@ -79,7 +79,7 @@ class RaffleRepository {
 
   static final _demoRaffles = <Raffle>[
     Raffle(id: 'raffle-1', title: 'Rifa Navidad', ticketPrice: 5, totalNumbers: 100, status: RaffleStatus.active, endAt: DateTime(2026, 12, 20), clubSlug: 'club-paraiso', slug: 'rifa-navidad'),
-    Raffle(id: 'raffle-2', title: 'Cesta del club', ticketPrice: 3, totalNumbers: 200, status: RaffleStatus.scheduled, endAt: DateTime(2026, 11, 30), slug: 'cesta-del-club'),
+    Raffle(id: 'raffle-2', title: 'Cesta del club', ticketPrice: 3, totalNumbers: 200, status: RaffleStatus.scheduled, endAt: DateTime(2026, 11, 30), clubSlug: 'club-paraiso', slug: 'cesta-del-club'),
   ];
 
   static final _demoTickets = <RaffleTicket>[
