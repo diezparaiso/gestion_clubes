@@ -460,3 +460,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Configuración mediante `ADSENSE_PUBLISHER_ID` y `ADSENSE_AD_SLOT`; no se han inventado identificadores de Google.
 - El bloque usa carga responsive y no se crean refrescos artificiales desde la aplicación.
 - Pendiente de activar con los identificadores reales del editor y completar la configuración de consentimiento/CMP de AdSense.
+
+### 2026-09-26 — GPT-5.6 LUNA — endurecimiento de accesos
+- `change_member_role` ya no permite nombrar presidente desde un acceso ordinario.
+- Se impide degradar al único presidente activo del club.
+- La pantalla de gestión de accesos queda reservada al presidente, coherente con el requisito funcional original.
+- Se conserva auditoría del rol anterior y del nuevo.
+- La migración sigue pendiente de ejecutar en Supabase remoto.
