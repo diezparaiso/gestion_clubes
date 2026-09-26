@@ -66,10 +66,12 @@ class TeamRepository {
       _demoTeams.add(team);
       return team;
     }
+    final season = await Supabase.instance.client.from('seasons').select('id').eq('id', seasonId).eq('club_id', clubId).maybeSingle();
+    if (season == null) throw const PostgrestException(message: 'La temporada no pertenece al club activo.');
     final row = await Supabase.instance.client.from('teams').insert({
       'club_id': clubId,
-      'name': name.trim(),
-      'category': category.trim(),
+      'name': normalizedName,
+      'category': normalizedCategory,
       'season_id': seasonId,
     }).select('id, name, category, is_active, seasons!inner(name)').single();
     return Team.fromJson(row);
