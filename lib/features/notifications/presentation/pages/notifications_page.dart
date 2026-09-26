@@ -102,6 +102,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                 );
           },
           ),
+        ),
         ]),
       ),
     );
