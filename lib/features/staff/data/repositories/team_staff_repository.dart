@@ -13,6 +13,32 @@ class TeamStaffRepository {
     return rows.map(TeamStaff.fromJson).toList();
   }
 
+  Future<TeamStaff> createAndAssignStaff({
+    required String clubId,
+    required String teamId,
+    required String email,
+    required String role,
+    DateTime? startDate,
+  }) async {
+    if (!SupabaseService.isConfigured) {
+      final staff = TeamStaff(id: 'staff-' + (_demoStaff.length + 1).toString(), name: email.trim(), role: role.trim(), isActive: true);
+      _demoStaff.add(staff);
+      return staff;
+    }
+    final client = Supabase.instance.client;
+    final profile = await client.from('profiles').select('id, first_name, last_name, email').eq('email', email.trim()).maybeSingle();
+    if (profile == null) throw const PostgrestException(message: 'No existe una cuenta con ese email. La persona debe registrarse antes de asignarla.');
+    final row = await client.from('team_staff').insert({
+      'club_id': clubId,
+      'team_id': teamId,
+      'profile_id': profile['id'],
+      'role': role.trim(),
+      'start_date': (startDate ?? DateTime.now()).toIso8601String().split('T').first,
+      'is_active': true,
+    }).select('id, role, is_active, profiles!inner(first_name, last_name)').single();
+    return TeamStaff.fromJson(row);
+  }
+
   // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Edición de rol/estado con columnas existentes.
   // No requiere cambios de esquema Supabase.
   Future<TeamStaff> updateTeamStaff({
