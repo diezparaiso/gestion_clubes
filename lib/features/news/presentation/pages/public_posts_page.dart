@@ -1,1 +1,79 @@
-import 'package:flutter/material.dart';\n\nimport '../../data/repositories/post_repository.dart';\nimport '../../domain/entities/post.dart';\n\n// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra la imagen opcional de las noticias públicas.\nclass PublicPostsPage extends StatefulWidget {\n  const PublicPostsPage({super.key, required this.clubSlug});\n  final String clubSlug;\n\n  @override\n  State<PublicPostsPage> createState() => _PublicPostsPageState();\n}\n\nclass _PublicPostsPageState extends State<PublicPostsPage> {\n  late final Future<List<Post>> _posts;\n\n  @override\n  void initState() {\n    super.initState();\n    _posts = PostRepository().listPublicPosts(widget.clubSlug);\n  }\n\n  @override\n  Widget build(BuildContext context) => Scaffold(\n        appBar: AppBar(title: const Text('Noticias del club')),\n        body: FutureBuilder<List<Post>>(\n          future: _posts,\n          builder: (context, snapshot) {\n            if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());\n            if (snapshot.hasError) return const Center(child: Text('No se han podido cargar las noticias.'));\n            final posts = snapshot.data!;\n            if (posts.isEmpty) return const Center(child: Text('Todavía no hay noticias publicadas.'));\n            return ListView.separated(\n              padding: const EdgeInsets.all(24),\n              itemCount: posts.length,\n              separatorBuilder: (_, index) => const SizedBox(height: 16),\n              itemBuilder: (context, index) {\n                final post = posts[index];\n                return Card(\n                  clipBehavior: Clip.antiAlias,\n                  child: Column(\n                    crossAxisAlignment: CrossAxisAlignment.start,\n                    children: [\n                      if (post.imageUrl != null && post.imageUrl!.trim().isNotEmpty)\n                        Image.network(\n                          post.imageUrl!,\n                          width: double.infinity,\n                          height: 220,\n                          fit: BoxFit.cover,\n                          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),\n                        ),\n                      Padding(\n                        padding: const EdgeInsets.all(20),\n                        child: Column(\n                          crossAxisAlignment: CrossAxisAlignment.start,\n                          children: [\n                            Text(post.title, style: Theme.of(context).textTheme.titleLarge),\n                            const SizedBox(height: 8),\n                            Text(post.body),\n                            if (post.publishedAt != null) ...[\n                              const SizedBox(height: 12),\n                              Text(\n                                '${post.publishedAt!.day.toString().padLeft(2, '0')}/${post.publishedAt!.month.toString().padLeft(2, '0')}/${post.publishedAt!.year}',\n                                style: Theme.of(context).textTheme.bodySmall,\n                              ),\n                            ],\n                          ],\n                        ),\n                      ),\n                    ],\n                  ),\n                );\n              },\n            );\n          },\n        ),\n      );\n}\n
+import 'package:flutter/material.dart';
+
+import '../../data/repositories/post_repository.dart';
+import '../../domain/entities/post.dart';
+
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra la imagen opcional de las noticias públicas.
+class PublicPostsPage extends StatefulWidget {
+  const PublicPostsPage({super.key, required this.clubSlug});
+  final String clubSlug;
+
+  @override
+  State<PublicPostsPage> createState() => _PublicPostsPageState();
+}
+
+class _PublicPostsPageState extends State<PublicPostsPage> {
+  late final Future<List<Post>> _posts;
+
+  @override
+  void initState() {
+    super.initState();
+    _posts = PostRepository().listPublicPosts(widget.clubSlug);
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(title: const Text('Noticias del club')),
+        body: FutureBuilder<List<Post>>(
+          future: _posts,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
+            if (snapshot.hasError) return const Center(child: Text('No se han podido cargar las noticias.'));
+            final posts = snapshot.data!;
+            if (posts.isEmpty) return const Center(child: Text('Todavía no hay noticias publicadas.'));
+            return ListView.separated(
+              padding: const EdgeInsets.all(24),
+              itemCount: posts.length,
+              separatorBuilder: (_, index) => const SizedBox(height: 16),
+              itemBuilder: (context, index) {
+                final post = posts[index];
+                return Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (post.imageUrl != null && post.imageUrl!.trim().isNotEmpty)
+                        Image.network(
+                          post.imageUrl!,
+                          width: double.infinity,
+                          height: 220,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(post.title, style: Theme.of(context).textTheme.titleLarge),
+                            const SizedBox(height: 8),
+                            Text(post.body),
+                            if (post.publishedAt != null) ...[
+                              const SizedBox(height: 12),
+                              Text(
+                                '${post.publishedAt!.day.toString().padLeft(2, '0')}/${post.publishedAt!.month.toString().padLeft(2, '0')}/${post.publishedAt!.year}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      );
+}
