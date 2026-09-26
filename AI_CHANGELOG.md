@@ -350,3 +350,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - En modo demo se exportan los datos demo existentes.
 - La descarga se realiza mediante el navegador; Chrome gestiona la ubicación final del archivo según su configuración de descargas.
 - Añadida dependencia `excel`; ejecutar `flutter pub get` tras actualizar el proyecto.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — ajuste del exportador Excel
+- Corregido el exportador para no depender de campos privados de los repositorios en modo demo.
+- Los datos de contacto del jugador y responsable se leen desde la relación `players`.
+- La exportación conserva pestañas separadas y evita asumir columnas de ordenación no necesarias en noticias, eventos y rifas.
