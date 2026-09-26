@@ -175,3 +175,34 @@ class RaffleDraw {
         raffleId: json['raffle_id'] as String?,
       );
 }
+
+class MonthlyRaffleResult {
+  const MonthlyRaffleResult({
+    required this.id,
+    required this.raffleId,
+    required this.drawMonth,
+    required this.winningNumber,
+    required this.prizeAmount,
+    this.winnerProfileId,
+    this.notes,
+  });
+
+  final String id;
+  final String raffleId;
+  final DateTime drawMonth;
+  final int winningNumber;
+  final double prizeAmount;
+  final String? winnerProfileId;
+  final String? notes;
+
+  factory MonthlyRaffleResult.fromJson(Map<String, dynamic> json) =>
+      MonthlyRaffleResult(
+        id: json['id'] as String,
+        raffleId: json['raffle_id'] as String,
+        drawMonth: DateTime.parse(json['draw_month'] as String),
+        winningNumber: json['winning_number'] as int,
+        prizeAmount: (json['prize_amount'] as num).toDouble(),
+        winnerProfileId: json['winner_profile_id'] as String?,
+        notes: json['notes'] as String?,
+      );
+}
