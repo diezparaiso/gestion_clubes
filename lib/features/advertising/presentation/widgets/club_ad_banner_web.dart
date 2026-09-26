@@ -1,8 +1,12 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): banner AdSense real para Flutter Web.
 import 'dart:async';
+import 'dart:js_interop';
 import 'dart:ui_web' as ui_web;
 
 import 'package:flutter/material.dart';
+
+@JS('adsbygoogle.push')
+external void _pushAd(JSObject options);
 import 'package:universal_html/html.dart' as html;
 
 import '../../../../core/config/ads_config.dart';
@@ -35,15 +39,14 @@ class ClubAdBanner extends StatelessWidget {
 
       wrapper.append(ad);
 
-      Timer(const Duration(milliseconds: 300), () {
+      var attempts = 0;
+      Timer.periodic(const Duration(milliseconds: 500), (timer) {
+        attempts++;
         try {
-          final queue = html.document
-              .querySelector('body')
-              ?.getAttribute('data-adsense-ready');
-          if (queue != 'true') return;
-          // El script global de AdSense detecta y procesa el bloque.
+          _pushAd(JSObject());
+          timer.cancel();
         } catch (_) {
-          // El anuncio nunca debe romper la aplicación.
+          if (attempts >= 10) timer.cancel();
         }
       });
 
