@@ -335,3 +335,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `player.dart`: amplía la entidad con los datos de contacto.
 - Añadida `supabase/migrations/031_player_guardian_contact.sql` con las nuevas columnas y validaciones básicas; queda pendiente de aplicar en Supabase remoto.
 - Sin cambios en Payments.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — corrección de persistencia de contacto de jugadores
+- Los teléfonos y datos del progenitor/responsable quedan almacenados en `players`, no en `team_players`, para que acompañen al jugador al cambiar de equipo.
+- La lectura usa la relación anidada de `players` y la edición actualiza el jugador asociado a la asignación.
+- Corregido también el modo demo para soportar los nuevos campos.
