@@ -98,3 +98,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/raffles/data/repositories/raffle_repository.dart`: las nuevas rifas pasan a `active` al crearse, porque la interfaz actual no ofrece una acción separada para activarlas y el RPC público solo expone rifas activas.
 - Usa únicamente la columna `status` existente; no requiere cambio de esquema.
 - Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — simple public raffle sharing
+- `lib/features/raffles/data/repositories/raffle_repository.dart`: carga el `slug` público y el `club_slug` existentes para poder construir el enlace público de cada rifa desde la gestión.
+- `lib/features/raffles/presentation/pages/raffle_detail_page.dart`: añade una acción sencilla para copiar el enlace público y pegarlo después en WhatsApp u otro canal.
+- No se añade un sistema de WhatsApp ni nuevas tablas/endpoints.
+- El pago real de la participación sigue separado del flujo actual; no se modifica Stripe/payment en este bloque.
