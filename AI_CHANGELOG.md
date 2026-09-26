@@ -161,3 +161,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - sponsor_repository.dart elimina aserciones `!` redundantes tras comprobar el cliente Supabase.
 - team_staff_repository.dart y post_repository.dart usan interpolación de cadenas donde correspondía.
 - Cambios únicamente de código Dart; sin cambios de esquema ni pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — analyzer lint cleanup continued
+- Eliminados los avisos `use_build_context_synchronously` de copia de enlaces públicos en club y rifas.
+- Corregido el formato de fechas de socios mediante interpolación.
+- Sin cambios de esquema ni de pagos.
