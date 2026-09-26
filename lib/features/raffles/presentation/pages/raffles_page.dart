@@ -73,6 +73,7 @@ class _CreateRaffleDialogState extends ConsumerState<_CreateRaffleDialog> {
       await ref.read(raffleRepositoryProvider).createRaffle(clubId: clubId, title: _titleController.text, ticketPrice: double.parse(_priceController.text.replaceAll(',', '.')), totalNumbers: int.parse(_numbersController.text), endAt: DateTime.now().add(const Duration(days: 30)));
       if (mounted) Navigator.of(context).pop(true);
     } on PostgrestException catch (error) { setState(() { _saving = false; _error = error.message; }); }
+    on FormatException catch (error) { setState(() { _saving = false; _error = error.message; }); }
     catch (_) { setState(() { _saving = false; _error = 'No se ha podido guardar la rifa.'; }); }
   }
 
