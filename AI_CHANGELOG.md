@@ -321,3 +321,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-26 — GPT-5.6 LUNA — dashboard sin actividad ficticia
 - Se eliminan ejemplos ficticios del dashboard y se muestran métricas reales.
 - Sin cambios de esquema, RLS ni Payments.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — corrección sintáctica de notificaciones
+- Se corrige el cierre de paréntesis de Expanded en notifications_page.dart, que provocaba el error `Expected to find ')'` de `flutter analyze`.
+- Sin cambios de esquema, RLS ni Payments.
+- El proyecto debe volver a validarse localmente con `flutter analyze --no-pub`.
