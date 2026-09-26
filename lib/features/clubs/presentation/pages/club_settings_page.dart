@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Comparte el enlace público del club y corrige anotación duplicada.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade acceso directo a la gestión de usuarios y permisos.
 
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/club_repository.dart';
@@ -70,7 +70,16 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
     body: ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       children: [
-        Text('Perfil público', style: Theme.of(context).textTheme.headlineMedium),
+        Row(
+          children: [
+            Expanded(child: Text('Perfil público', style: Theme.of(context).textTheme.headlineMedium)),
+            OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).pushNamed('/settings/access'),
+              icon: const Icon(Icons.manage_accounts_outlined),
+              label: const Text('Usuarios y permisos'),
+            ),
+          ],
+        ),
         const SizedBox(height: 8),
         const Text('Estos datos se mostrarán en la página pública del club.'),
         const SizedBox(height: 24),
