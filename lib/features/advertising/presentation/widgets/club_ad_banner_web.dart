@@ -4,12 +4,12 @@ import 'dart:js_interop';
 import 'dart:ui_web' as ui_web;
 
 import 'package:flutter/material.dart';
-
-@JS('adsbygoogle.push')
-external void _pushAd(JSObject options);
 import 'package:universal_html/html.dart' as html;
 
 import '../../../../core/config/ads_config.dart';
+
+@JS('adsbygoogle.push')
+external void _pushAd(JSObject options);
 
 class ClubAdBanner extends StatelessWidget {
   const ClubAdBanner({super.key, this.height = 60});
