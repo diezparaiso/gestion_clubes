@@ -1,6 +1,8 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadida gestión de edición y activación/desactivación de equipos. Sin cambios de esquema Supabase.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
@@ -28,8 +30,33 @@ class TeamsPage extends ConsumerStatefulWidget {
 }
 
 class _TeamsPageState extends ConsumerState<TeamsPage> {
+  Future<void> _edit(BuildContext context, WidgetRef ref) async {
+    final result = await showDialog<bool>(context: context, builder: (_) => _TeamFormDialog(team: team));
+    if (result == true) ref.invalidate(teamsProvider);
+  }
+
+  Future<void> _toggleActive(BuildContext context, WidgetRef ref) async {
+    final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+      title: Text(team.isActive ? 'Desactivar equipo' : 'Activar equipo'),
+      content: Text(team.isActive ? 'El equipo seguirá existiendo y conservará su histórico.' : '¿Quieres volver a activar este equipo?'),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancelar')),
+        FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(team.isActive ? 'Desactivar' : 'Activar')),
+      ],
+    ));
+    if (confirmed != true || !context.mounted) return;
+    final clubId = ref.read(authControllerProvider).clubId;
+    if (clubId == null) return;
+    try {
+      await ref.read(teamRepositoryProvider).setTeamActive(clubId: clubId, teamId: team.id, isActive: !team.isActive);
+      ref.invalidate(teamsProvider);
+    } on PostgrestException catch (error) {
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final teams = ref.watch(teamsProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Equipos')),
@@ -73,20 +100,29 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
   }
 }
 
-class _CreateTeamDialog extends ConsumerStatefulWidget {
-  const _CreateTeamDialog();
-
+class _TeamFormDialog extends ConsumerStatefulWidget {
+  const _TeamFormDialog({this.team});
+  final Team? team;
   @override
-  ConsumerState<_CreateTeamDialog> createState() => _CreateTeamDialogState();
+  ConsumerState<_TeamFormDialog> createState() => _TeamFormDialogState();
 }
 
-class _CreateTeamDialogState extends ConsumerState<_CreateTeamDialog> {
+class _TeamFormDialogState extends ConsumerState<_TeamFormDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _categoryController = TextEditingController();
   Season? _selectedSeason;
   bool _isSaving = false;
+
+  bool get _isEditing => widget.team != null;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.team?.name ?? '';
+    _categoryController.text = widget.team?.category ?? '';
+  }
 
   @override
   void dispose() {
@@ -114,7 +150,7 @@ class _CreateTeamDialogState extends ConsumerState<_CreateTeamDialog> {
   Widget build(BuildContext context) {
     final seasons = ref.watch(seasonsProvider);
     return AlertDialog(
-      title: const Text('Nuevo equipo'),
+      title: Text(_isEditing ? 'Editar equipo' : 'Nuevo equipo'),
       content: SizedBox(width: 420, child: Form(key: _formKey, child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
         TextFormField(controller: _nameController, decoration: const InputDecoration(labelText: 'Nombre del equipo'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null),
         const SizedBox(height: 12),
@@ -141,7 +177,7 @@ class _CreateTeamDialogState extends ConsumerState<_CreateTeamDialog> {
   }
 }
 
-class _TeamCard extends StatelessWidget {
+class _TeamCard extends ConsumerWidget {
   const _TeamCard({required this.team});
 
   final Team team;
