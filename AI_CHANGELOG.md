@@ -151,3 +151,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - team_repository.dart valida que la temporada pertenece al club activo al crear o editar un equipo.
 - player_repository.dart verifica la existencia del equipo antes de editar una asignación de jugador.
 - Sin cambios de esquema. Stripe/payment implementation remains untouched.
+
+### 2026-09-26 — GPT-5.6 LUNA — team form validation
+- team_repository.dart valida nombres de temporada/equipo y categoría antes de guardar.
+- La edición de equipos comprueba la pertenencia de la temporada al club activo.
+- Stripe/payment implementation remains untouched.
