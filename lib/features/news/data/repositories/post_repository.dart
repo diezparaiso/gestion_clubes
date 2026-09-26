@@ -38,7 +38,7 @@ class PostRepository {
   Future<void> updatePost({required String postId, required String title, required String body, required PostStatus status}) async {
     final normalizedTitle = title.trim();
     final normalizedBody = body.trim();
-    if (normalizedTitle.isEmpty || normalizedBody.isEmpty) throw const FormatException('El título y el contenido son obligatorios.');
+    if (normalizedTitle.isEmpty || normalizedBody.isEmpty) throw FormatException('El título y el contenido son obligatorios.');
     if (!SupabaseService.isConfigured) {
       final index = _demoPosts.indexWhere((post) => post.id == postId);
       if (index < 0) throw const StateError('Noticia no encontrada.');
