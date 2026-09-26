@@ -89,6 +89,7 @@ declare
   r public.raffles%rowtype;
   winner uuid;
   result_id uuid;
+  notification_id uuid;
 begin
   select * into r from public.raffles where id = target_raffle_id for update;
   if r.id is null then raise exception 'Rifa no encontrada'; end if;
@@ -113,12 +114,11 @@ begin
   insert into public.notifications (club_id, title, body, type, target)
   values (r.club_id, 'Resultado de la rifa mensual',
           'El número ' || target_winning_number || ' ha sido premiado este mes en ' || r.title || '.',
-          'raffle_monthly_result', 'profile');
+          'raffle_monthly_result', 'profile')
+  returning id into notification_id;
 
   insert into public.notification_deliveries (notification_id, profile_id)
-  select id, winner from public.notifications
-  where club_id = r.club_id and type = 'raffle_monthly_result'
-  order by created_at desc limit 1;
+  values (notification_id, winner);
 
   return jsonb_build_object('id', result_id, 'winning_number', target_winning_number, 'winner_profile_id', winner);
 end;
