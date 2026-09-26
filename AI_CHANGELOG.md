@@ -125,3 +125,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Repaired the public events page string literal that caused the Dart parser errors.
 - Repaired the post repository validation exception so it is valid with the current SDK.
 - Public raffle/router analyzer errors were reviewed; the reported router error is a cascade from the public raffle page analyzer failure, while the fetched branch source is structurally valid. No payment/Stripe changes.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — repair public raffle imports
+- Fixed a malformed literal \\n sequence at the beginning of `public_raffle_page.dart` that commented out the Flutter imports and caused the large analyzer cascade, including the router type error.
+- Fixed the non-const `AuthException` invocation in `post_repository.dart`.
+- No payment/Stripe changes and no live Supabase execution.
