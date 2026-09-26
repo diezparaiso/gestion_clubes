@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../data/repositories/post_repository.dart';
 import '../../domain/entities/post.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra la imagen opcional de las noticias públicas.
 class PublicPostsPage extends StatefulWidget {
   const PublicPostsPage({super.key, required this.clubSlug});
   final String clubSlug;
@@ -15,7 +16,10 @@ class _PublicPostsPageState extends State<PublicPostsPage> {
   late final Future<List<Post>> _posts;
 
   @override
-  void initState() { super.initState(); _posts = PostRepository().listPublicPosts(widget.clubSlug); }
+  void initState() {
+    super.initState();
+    _posts = PostRepository().listPublicPosts(widget.clubSlug);
+  }
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -33,7 +37,40 @@ class _PublicPostsPageState extends State<PublicPostsPage> {
               separatorBuilder: (_, index) => const SizedBox(height: 16),
               itemBuilder: (context, index) {
                 final post = posts[index];
-                return Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(post.title, style: Theme.of(context).textTheme.titleLarge), const SizedBox(height: 8), Text(post.body), if (post.publishedAt != null) ...[const SizedBox(height: 12), Text('${post.publishedAt!.day}/${post.publishedAt!.month}/${post.publishedAt!.year}', style: Theme.of(context).textTheme.bodySmall)]])));
+                return Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (post.imageUrl != null && post.imageUrl!.trim().isNotEmpty)
+                        Image.network(
+                          post.imageUrl!,
+                          width: double.infinity,
+                          height: 220,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => const SizedBox.shrink(),
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(post.title, style: Theme.of(context).textTheme.titleLarge),
+                            const SizedBox(height: 8),
+                            Text(post.body),
+                            if (post.publishedAt != null) ...[
+                              const SizedBox(height: 12),
+                              Text(
+                                '${post.publishedAt!.day.toString().padLeft(2, '0')}/${post.publishedAt!.month.toString().padLeft(2, '0')}/${post.publishedAt!.year}',
+                                style: Theme.of(context).textTheme.bodySmall,
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
               },
             );
           },

@@ -1,3 +1,5 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Refuerza validación financiera y evita operaciones con club_id vacío.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida categorías financieras y normaliza la descripción.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -8,20 +10,27 @@ final financeRepositoryProvider = Provider<FinanceRepository>((ref) => FinanceRe
 
 class FinanceRepository {
   Future<double> getOpeningBalance(String clubId) async {
+    if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
     if (!SupabaseService.isConfigured) return 7180;
     final rows = await Supabase.instance.client.from('financial_accounts').select('opening_balance').eq('club_id', clubId).eq('is_active', true);
     return rows.fold<double>(0, (sum, row) => sum + (row['opening_balance'] as num).toDouble());
   }
 
   Future<List<FinancialTransaction>> listTransactions(String clubId) async {
+    if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoTransactions);
     final rows = await Supabase.instance.client.from('financial_transactions').select('id, type, category, amount, description, transaction_date').eq('club_id', clubId).order('transaction_date', ascending: false);
     return rows.map(FinancialTransaction.fromJson).toList();
   }
 
   Future<void> createTransaction({required String clubId, required TransactionType type, required String category, required double amount, required String description}) async {
+    if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
+    final normalizedDescription = description.trim();
+    if (normalizedDescription.isEmpty) throw const FormatException('La descripción es obligatoria.');
+    if (!amount.isFinite || amount <= 0) throw const FormatException('El importe debe ser mayor que 0.');
+    if (!_validCategories.contains(category)) throw const FormatException('La categoría financiera no es válida.');
     if (!SupabaseService.isConfigured) {
-      _demoTransactions.insert(0, FinancialTransaction(id: 'transaction-${_demoTransactions.length + 1}', type: type, category: category, amount: amount, description: description, date: DateTime.now()));
+      _demoTransactions.insert(0, FinancialTransaction(id: 'transaction-${_demoTransactions.length + 1}', type: type, category: category, amount: amount, description: normalizedDescription, date: DateTime.now()));
       return;
     }
     final userId = Supabase.instance.client.auth.currentUser?.id;
@@ -33,7 +42,7 @@ class FinanceRepository {
       'category': category,
       'amount': amount,
       'transaction_date': DateTime.now().toIso8601String().substring(0, 10),
-      'description': description.trim(),
+      'description': normalizedDescription,
       'created_by': userId,
     });
   }
@@ -43,6 +52,11 @@ class FinanceRepository {
     if (account == null) throw const PostgrestException(message: 'No hay una cuenta financiera activa configurada.');
     return account['id'] as String;
   }
+
+  static const _validCategories = {
+    'membership', 'sponsorship', 'raffle', 'event', 'equipment', 'federation',
+    'facilities', 'salaries', 'supplies', 'other',
+  };
 
   static final _demoTransactions = <FinancialTransaction>[
     FinancialTransaction(id: 'transaction-1', type: TransactionType.income, category: 'Cuotas', amount: 2450, description: 'Cuotas de socios', date: DateTime(2026, 9, 2)),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Gestión completa de campos existentes en memberships.
+
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/member_repository.dart';
 import '../../domain/entities/member.dart';
@@ -58,7 +60,10 @@ class _MembersPageState extends ConsumerState<MembersPage> {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: filtered.length,
                   separatorBuilder: (_, index) => const Divider(height: 1),
-                  itemBuilder: (context, index) => _MemberTile(member: filtered[index]),
+                  itemBuilder: (context, index) => _MemberTile(
+                    member: filtered[index],
+                    onEdit: () => _showEditMemberDialog(context, filtered[index]),
+                  ),
                 ));
               },
             )),
@@ -66,6 +71,15 @@ class _MembersPageState extends ConsumerState<MembersPage> {
         ),
       ),
     );
+  }
+
+
+  Future<void> _showEditMemberDialog(BuildContext context, Member member) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => _EditMemberDialog(member: member),
+    );
+    if (result == true && mounted) ref.invalidate(membersProvider);
   }
 
   Future<void> _showCreateMemberDialog(BuildContext context) async {
@@ -87,6 +101,10 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _addressController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _provinceController = TextEditingController();
   bool _isSaving = false;
   String? _errorMessage;
 
@@ -96,6 +114,10 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
+    _addressController.dispose();
+    _postalCodeController.dispose();
+    _cityController.dispose();
+    _provinceController.dispose();
     super.dispose();
   }
 
@@ -111,6 +133,10 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
+        address: _addressController.text,
+        postalCode: _postalCodeController.text,
+        city: _cityController.text,
+        province: _provinceController.text,
       );
       if (mounted) Navigator.of(context).pop(true);
     } on PostgrestException catch (error) {
@@ -132,6 +158,16 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
         TextFormField(controller: _lastNameController, decoration: const InputDecoration(labelText: 'Apellidos'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null),
         const SizedBox(height: 12),
         TextFormField(controller: _emailController, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email de la cuenta'), validator: (value) => value == null || !value.contains('@') ? 'Introduce un email válido' : null),
+        const SizedBox(height: 12),
+        TextFormField(controller: _addressController, decoration: const InputDecoration(labelText: 'Dirección postal')),
+        const SizedBox(height: 12),
+        Row(children: [
+          Expanded(child: TextFormField(controller: _postalCodeController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Código postal'))),
+          const SizedBox(width: 12),
+          Expanded(child: TextFormField(controller: _cityController, decoration: const InputDecoration(labelText: 'Localidad'))),
+        ]),
+        const SizedBox(height: 12),
+        TextFormField(controller: _provinceController, decoration: const InputDecoration(labelText: 'Provincia')),
         if (_errorMessage != null) ...[const SizedBox(height: 16), Align(alignment: Alignment.centerLeft, child: Text(_errorMessage!, style: TextStyle(color: Colors.red)))],
       ])))),
       actions: [
@@ -142,19 +178,286 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
   }
 }
 
-class _MemberTile extends StatelessWidget {
-  const _MemberTile({required this.member});
+class _EditMemberDialog extends ConsumerStatefulWidget {
+  const _EditMemberDialog({required this.member});
 
   final Member member;
 
   @override
+  ConsumerState<_EditMemberDialog> createState() => _EditMemberDialogState();
+}
+
+class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _numberController;
+  late final TextEditingController _notesController;
+  late final TextEditingController _addressController;
+  late final TextEditingController _postalCodeController;
+  late final TextEditingController _cityController;
+  late final TextEditingController _provinceController;
+  late MemberStatus _status;
+  late MembershipType _membershipType;
+  late DateTime _joinDate;
+  DateTime? _renewalDate;
+  DateTime? _leaveDate;
+  bool _isSaving = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _numberController = TextEditingController(text: widget.member.memberNumber.toString());
+    _notesController = TextEditingController(text: widget.member.notes ?? '');
+    _addressController = TextEditingController(text: widget.member.address ?? '');
+    _postalCodeController = TextEditingController(text: widget.member.postalCode ?? '');
+    _cityController = TextEditingController(text: widget.member.city ?? '');
+    _provinceController = TextEditingController(text: widget.member.province ?? '');
+    _status = widget.member.status;
+    _membershipType = widget.member.membershipType;
+    _joinDate = widget.member.joinDate;
+    _renewalDate = widget.member.renewalDate;
+    _leaveDate = widget.member.leaveDate;
+  }
+
+  @override
+  void dispose() {
+    _numberController.dispose();
+    _notesController.dispose();
+    _addressController.dispose();
+    _postalCodeController.dispose();
+    _cityController.dispose();
+    _provinceController.dispose();
+    super.dispose();
+  }
+
+  String _statusLabel(MemberStatus status) {
+    switch (status) {
+      case MemberStatus.active:
+        return 'Activo';
+      case MemberStatus.pending:
+        return 'Pendiente';
+      case MemberStatus.expired:
+        return 'Caducado';
+      case MemberStatus.cancelled:
+        return 'Cancelado';
+      case MemberStatus.suspended:
+        return 'Suspendido';
+      case MemberStatus.deceased:
+        return 'Fallecido';
+    }
+  }
+
+  String _membershipTypeLabel(MembershipType type) {
+    switch (type) {
+      case MembershipType.standard: return 'Estándar';
+      case MembershipType.youth: return 'Juvenil';
+      case MembershipType.family: return 'Familiar';
+      case MembershipType.supporter: return 'Simpatizante';
+      case MembershipType.other: return 'Otro';
+    }
+  }
+
+  String _formatDate(DateTime date) => '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
+
+  Future<DateTime?> _pickDate(DateTime? current) async {
+    return showDatePicker(context: context, initialDate: current ?? DateTime.now(), firstDate: DateTime(1950), lastDate: DateTime(2100));
+  }
+
+  Future<void> _selectJoinDate() async {
+    final value = await _pickDate(_joinDate);
+    if (value != null && mounted) setState(() => _joinDate = value);
+  }
+
+  Future<void> _selectRenewalDate() async {
+    final value = await _pickDate(_renewalDate);
+    if (value != null && mounted) setState(() => _renewalDate = value);
+  }
+
+  Future<void> _selectLeaveDate() async {
+    final value = await _pickDate(_leaveDate);
+    if (value != null && mounted) setState(() => _leaveDate = value);
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    final clubId = ref.read(authControllerProvider).clubId;
+    if (clubId == null) return;
+
+    setState(() {
+      _isSaving = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await ref.read(memberRepositoryProvider).updateMember(
+        clubId: clubId,
+        memberId: widget.member.id,
+        memberNumber: int.parse(_numberController.text),
+        status: _status,
+        membershipType: _membershipType,
+        joinDate: _joinDate,
+        renewalDate: _renewalDate,
+        leaveDate: _leaveDate,
+        notes: _notesController.text,
+        address: _addressController.text,
+        postalCode: _postalCodeController.text,
+        city: _cityController.text,
+        province: _provinceController.text,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } on PostgrestException catch (error) {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = error.message.contains('duplicate')
+              ? 'Ese número de socio ya está asignado.'
+              : error.message;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = 'No se ha podido guardar el socio.';
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final color = member.status == MemberStatus.active ? const Color(0xFF168B68) : const Color(0xFFD27A2C);
+    return AlertDialog(
+      title: const Text('Editar socio'),
+      content: SizedBox(
+        width: 420,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(widget.member.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(widget.member.email),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _numberController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Número de socio'),
+                validator: (value) => int.tryParse(value ?? '') == null || int.parse(value!) <= 0
+                    ? 'Introduce un número válido'
+                    : null,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<MemberStatus>(
+                initialValue: _status,
+                decoration: const InputDecoration(labelText: 'Estado'),
+                items: MemberStatus.values
+                    .map((status) => DropdownMenuItem(
+                          value: status,
+                          child: Text(_statusLabel(status)),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) setState(() => _status = value);
+                },
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<MembershipType>(initialValue: _membershipType, decoration: const InputDecoration(labelText: 'Tipo de socio'), items: MembershipType.values.map((type) => DropdownMenuItem(value: type, child: Text(_membershipTypeLabel(type)))).toList(), onChanged: (value) { if (value != null) setState(() => _membershipType = value); }),
+              const SizedBox(height: 12),
+              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Alta'), subtitle: Text(_formatDate(_joinDate)), trailing: IconButton(onPressed: _isSaving ? null : _selectJoinDate, icon: const Icon(Icons.calendar_today_outlined))),
+              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Renovación'), subtitle: Text(_renewalDate == null ? 'Sin fecha' : _formatDate(_renewalDate!)), trailing: Row(mainAxisSize: MainAxisSize.min, children: [if (_renewalDate != null) IconButton(onPressed: _isSaving ? null : () => setState(() => _renewalDate = null), icon: const Icon(Icons.clear)), IconButton(onPressed: _isSaving ? null : _selectRenewalDate, icon: const Icon(Icons.calendar_today_outlined))])),
+              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Baja'), subtitle: Text(_leaveDate == null ? 'Sin fecha' : _formatDate(_leaveDate!)), trailing: Row(mainAxisSize: MainAxisSize.min, children: [if (_leaveDate != null) IconButton(onPressed: _isSaving ? null : () => setState(() => _leaveDate = null), icon: const Icon(Icons.clear)), IconButton(onPressed: _isSaving ? null : _selectLeaveDate, icon: const Icon(Icons.calendar_today_outlined))])),
+              TextFormField(controller: _addressController, decoration: const InputDecoration(labelText: 'Dirección postal')),
+              const SizedBox(height: 12),
+              Row(children: [
+                Expanded(child: TextFormField(controller: _postalCodeController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Código postal'))),
+                const SizedBox(width: 12),
+                Expanded(child: TextFormField(controller: _cityController, decoration: const InputDecoration(labelText: 'Localidad'))),
+              ]),
+              const SizedBox(height: 12),
+              TextFormField(controller: _provinceController, decoration: const InputDecoration(labelText: 'Provincia')),
+              const SizedBox(height: 12),
+              TextFormField(controller: _notesController, maxLines: 3, decoration: const InputDecoration(labelText: 'Notas')),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: _isSaving ? null : _save,
+          child: _isSaving
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : const Text('Guardar'),
+        ),
+      ],
+    );
+  }
+}
+
+class _MemberTile extends StatelessWidget {
+  const _MemberTile({required this.member, required this.onEdit});
+
+  final Member member;
+  final VoidCallback onEdit;
+
+  String _statusLabel(MemberStatus status) {
+    switch (status) {
+      case MemberStatus.active:
+        return 'Activo';
+      case MemberStatus.pending:
+        return 'Pendiente';
+      case MemberStatus.expired:
+        return 'Caducado';
+      case MemberStatus.cancelled:
+        return 'Cancelado';
+      case MemberStatus.suspended:
+        return 'Suspendido';
+      case MemberStatus.deceased:
+        return 'Fallecido';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = member.status == MemberStatus.active;
+    final color = isActive ? const Color(0xFF168B68) : const Color(0xFFD27A2C);
     return ListTile(
-      leading: CircleAvatar(backgroundColor: const Color(0xFFE8EFEC), child: Text(member.memberNumber.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF14213D)))),
+      leading: CircleAvatar(
+        backgroundColor: const Color(0xFFE8EFEC),
+        child: Text(
+          member.memberNumber.toString(),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF14213D)),
+        ),
+      ),
       title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.w700)),
       subtitle: Text(member.email),
-      trailing: Chip(label: Text(member.status.name == 'active' ? 'Activo' : 'Pendiente'), backgroundColor: color.withValues(alpha: 0.12), side: BorderSide.none, labelStyle: TextStyle(color: color, fontWeight: FontWeight.w700)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Chip(
+            label: Text(_statusLabel(member.status)),
+            backgroundColor: color.withValues(alpha: 0.12),
+            side: BorderSide.none,
+            labelStyle: TextStyle(color: color, fontWeight: FontWeight.w700),
+          ),
+          IconButton(
+            tooltip: 'Editar socio',
+            onPressed: onEdit,
+            icon: const Icon(Icons.edit_outlined),
+          ),
+        ],
+      ),
     );
   }
 }

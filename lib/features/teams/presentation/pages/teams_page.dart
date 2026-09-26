@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadida gestión de edición y activación/desactivación de equipos. Sin cambios de esquema Supabase.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -28,6 +29,34 @@ class TeamsPage extends ConsumerStatefulWidget {
 }
 
 class _TeamsPageState extends ConsumerState<TeamsPage> {
+  Future<void> _editTeam(BuildContext context, Team team) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => _TeamFormDialog(team: team),
+    );
+    if (result == true && mounted) ref.invalidate(teamsProvider);
+  }
+
+  Future<void> _toggleActive(BuildContext context, Team team) async {
+    final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
+      title: Text(team.isActive ? 'Desactivar equipo' : 'Activar equipo'),
+      content: Text(team.isActive ? 'El equipo seguirá existiendo y conservará su histórico.' : '¿Quieres volver a activar este equipo?'),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancelar')),
+        FilledButton(onPressed: () => Navigator.of(context).pop(true), child: Text(team.isActive ? 'Desactivar' : 'Activar')),
+      ],
+    ));
+    if (confirmed != true || !context.mounted) return;
+    final clubId = ref.read(authControllerProvider).clubId;
+    if (clubId == null) return;
+    try {
+      await ref.read(teamRepositoryProvider).setTeamActive(clubId: clubId, teamId: team.id, isActive: !team.isActive);
+      ref.invalidate(teamsProvider);
+    } on PostgrestException catch (error) {
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final teams = ref.watch(teamsProvider);
@@ -40,6 +69,7 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Expanded(child: Text('Equipos y temporadas', style: Theme.of(context).textTheme.headlineMedium)),
+              OutlinedButton.icon(onPressed: () => _showSeasonManager(context), icon: const Icon(Icons.calendar_month_outlined), label: const Text('Temporadas')), const SizedBox(width: 10),
               FilledButton.icon(onPressed: () => _showCreateTeamDialog(context), icon: const Icon(Icons.add), label: const Text('Nuevo equipo')),
             ]),
             const SizedBox(height: 8),
@@ -55,7 +85,11 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
                       return GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns, crossAxisSpacing: 16, mainAxisSpacing: 16, childAspectRatio: 1.55),
                         itemCount: items.length,
-                        itemBuilder: (context, index) => _TeamCard(team: items[index]),
+                        itemBuilder: (context, index) => _TeamCard(
+                                team: items[index],
+                                onEdit: () => _editTeam(context, items[index]),
+                                onToggleActive: () => _toggleActive(context, items[index]),
+                              ),
                       );
                     }),
             )),
@@ -65,28 +99,45 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
     );
   }
 
+  Future<void> _showSeasonManager(BuildContext context) async {
+    final result = await showDialog<bool>(context: context, builder: (_) => const _SeasonManagerDialog());
+    if (result == true && mounted) {
+      ref.invalidate(seasonsProvider);
+      ref.invalidate(teamsProvider);
+    }
+  }
+
   Future<void> _showCreateTeamDialog(BuildContext context) async {
-    final result = await showDialog<bool>(context: context, builder: (_) => const _CreateTeamDialog());
+    final result = await showDialog<bool>(context: context, builder: (_) => const _TeamFormDialog());
     if (result == true && mounted) {
       ref.invalidate(teamsProvider);
     }
   }
 }
 
-class _CreateTeamDialog extends ConsumerStatefulWidget {
-  const _CreateTeamDialog();
-
+class _TeamFormDialog extends ConsumerStatefulWidget {
+  const _TeamFormDialog({this.team});
+  final Team? team;
   @override
-  ConsumerState<_CreateTeamDialog> createState() => _CreateTeamDialogState();
+  ConsumerState<_TeamFormDialog> createState() => _TeamFormDialogState();
 }
 
-class _CreateTeamDialogState extends ConsumerState<_CreateTeamDialog> {
+class _TeamFormDialogState extends ConsumerState<_TeamFormDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _categoryController = TextEditingController();
   Season? _selectedSeason;
   bool _isSaving = false;
+
+  bool get _isEditing => widget.team != null;
   String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.team?.name ?? '';
+    _categoryController.text = widget.team?.category ?? '';
+  }
 
   @override
   void dispose() {
@@ -96,12 +147,33 @@ class _CreateTeamDialogState extends ConsumerState<_CreateTeamDialog> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate() || _selectedSeason == null) return;
+    if (!_formKey.currentState!.validate()) return;
     final clubId = ref.read(authControllerProvider).clubId;
     if (clubId == null) return;
+    final season = _selectedSeason;
+    if (season == null) {
+      setState(() => _errorMessage = 'Selecciona una temporada');
+      return;
+    }
     setState(() { _isSaving = true; _errorMessage = null; });
     try {
-      await ref.read(teamRepositoryProvider).createTeam(clubId: clubId, name: _nameController.text.trim(), category: _categoryController.text.trim(), seasonId: _selectedSeason!.id, seasonName: _selectedSeason!.name);
+      if (_isEditing) {
+        await ref.read(teamRepositoryProvider).updateTeam(
+          clubId: clubId,
+          teamId: widget.team!.id,
+          name: _nameController.text.trim(),
+          category: _categoryController.text.trim(),
+          seasonId: season.id,
+        );
+      } else {
+        await ref.read(teamRepositoryProvider).createTeam(
+          clubId: clubId,
+          name: _nameController.text.trim(),
+          category: _categoryController.text.trim(),
+          seasonId: season.id,
+          seasonName: season.name,
+        );
+      }
       if (mounted) Navigator.of(context).pop(true);
     } on PostgrestException catch (error) {
       setState(() { _isSaving = false; _errorMessage = error.message.contains('duplicate') ? 'Ya existe un equipo con ese nombre en la temporada.' : error.message; });
@@ -114,7 +186,7 @@ class _CreateTeamDialogState extends ConsumerState<_CreateTeamDialog> {
   Widget build(BuildContext context) {
     final seasons = ref.watch(seasonsProvider);
     return AlertDialog(
-      title: const Text('Nuevo equipo'),
+      title: Text(_isEditing ? 'Editar equipo' : 'Nuevo equipo'),
       content: SizedBox(width: 420, child: Form(key: _formKey, child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
         TextFormField(controller: _nameController, decoration: const InputDecoration(labelText: 'Nombre del equipo'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null),
         const SizedBox(height: 12),
@@ -124,7 +196,13 @@ class _CreateTeamDialogState extends ConsumerState<_CreateTeamDialog> {
           loading: () => const LinearProgressIndicator(),
           error: (error, stack) => const Align(alignment: Alignment.centerLeft, child: Text('No se han podido cargar las temporadas.')),
           data: (items) => DropdownButtonFormField<Season>(
-            initialValue: _selectedSeason,
+            initialValue: _selectedSeason ??
+                (widget.team == null
+                    ? null
+                    : items.cast<Season?>().firstWhere(
+                        (season) => season!.name == widget.team!.seasonName,
+                        orElse: () => null,
+                      )),
             decoration: const InputDecoration(labelText: 'Temporada'),
             items: items.map((season) => DropdownMenuItem(value: season, child: Text(season.name))).toList(),
             onChanged: (season) => setState(() => _selectedSeason = season),
@@ -141,28 +219,185 @@ class _CreateTeamDialogState extends ConsumerState<_CreateTeamDialog> {
   }
 }
 
+class _SeasonManagerDialog extends ConsumerStatefulWidget {
+  const _SeasonManagerDialog();
+  @override
+  ConsumerState<_SeasonManagerDialog> createState() => _SeasonManagerDialogState();
+}
+class _SeasonManagerDialogState extends ConsumerState<_SeasonManagerDialog> {
+  Future<void> _edit(Season season) async {
+    final result = await showDialog<bool>(context: context, builder: (_) => _SeasonFormDialog(season: season));
+    if (result == true && mounted) setState(() {});
+  }
+  Future<void> _new() async {
+    final result = await showDialog<bool>(context: context, builder: (_) => const _SeasonFormDialog());
+    if (result == true && mounted) setState(() {});
+  }
+  @override
+  Widget build(BuildContext context) {
+    final seasons = ref.watch(seasonsProvider);
+    return AlertDialog(
+      title: const Text('Temporadas'),
+      content: SizedBox(width: 460, height: 360, child: seasons.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, _) => const Center(child: Text('No se han podido cargar las temporadas.')),
+        data: (items) => ListView.separated(
+          itemCount: items.length,
+          separatorBuilder: (_, index) => const Divider(height: 1),
+          itemBuilder: (context, index) => ListTile(
+            leading: const Icon(Icons.calendar_today_outlined),
+            title: Text(items[index].name),
+            trailing: IconButton(tooltip: 'Editar temporada', onPressed: () => _edit(items[index]), icon: const Icon(Icons.edit_outlined)),
+          ),
+        ),
+      )),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cerrar')),
+        FilledButton.icon(onPressed: _new, icon: const Icon(Icons.add), label: const Text('Nueva temporada')),
+      ],
+    );
+  }
+}
+
+class _SeasonFormDialog extends ConsumerStatefulWidget {
+  const _SeasonFormDialog({this.season});
+  final Season? season;
+  @override
+  ConsumerState<_SeasonFormDialog> createState() => _SeasonFormDialogState();
+}
+class _SeasonFormDialogState extends ConsumerState<_SeasonFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  late DateTime _startDate;
+  bool _isSaving = false;
+  String? _errorMessage;
+  bool get _isEditing => widget.season != null;
+  @override
+  void initState() {
+    super.initState();
+    _nameController.text = widget.season?.name ?? '';
+    _startDate = widget.season?.startDate ?? DateTime(DateTime.now().year, 7, 1);
+  }
+  @override
+  void dispose() { _nameController.dispose(); super.dispose(); }
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    final clubId = ref.read(authControllerProvider).clubId;
+    if (clubId == null) return;
+    setState(() { _isSaving = true; _errorMessage = null; });
+    try {
+      final repository = ref.read(teamRepositoryProvider);
+      if (_isEditing) {
+        await repository.updateSeason(clubId: clubId, seasonId: widget.season!.id, name: _nameController.text.trim(), startDate: _startDate);
+      } else {
+        await repository.createSeason(clubId: clubId, name: _nameController.text.trim(), startDate: _startDate);
+      }
+      if (mounted) Navigator.of(context).pop(true);
+    } on PostgrestException catch (error) {
+      if (mounted) setState(() { _isSaving = false; _errorMessage = error.message.contains('duplicate') ? 'Ya existe una temporada con ese nombre.' : error.message; });
+    } catch (_) {
+      if (mounted) setState(() { _isSaving = false; _errorMessage = 'No se ha podido guardar la temporada.'; });
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(_isEditing ? 'Editar temporada' : 'Nueva temporada'),
+      content: SizedBox(width: 420, child: Form(key: _formKey, child: Column(mainAxisSize: MainAxisSize.min, children: [
+        TextFormField(controller: _nameController, decoration: const InputDecoration(labelText: 'Nombre', hintText: '2026/2027'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null),
+        const SizedBox(height: 12),
+        InputDatePickerFormField(initialDate: _startDate, firstDate: DateTime(2000), lastDate: DateTime(2100), fieldLabelText: 'Fecha de inicio', onDateSubmitted: (date) => _startDate = date, onDateSaved: (date) => _startDate = date),
+        if (_errorMessage != null) ...[const SizedBox(height: 12), Align(alignment: Alignment.centerLeft, child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)))],
+      ]))),
+      actions: [
+        TextButton(onPressed: _isSaving ? null : () => Navigator.of(context).pop(), child: const Text('Cancelar')),
+        FilledButton(onPressed: _isSaving ? null : _save, child: _isSaving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Guardar')),
+      ],
+    );
+  }
+}
+
 class _TeamCard extends StatelessWidget {
-  const _TeamCard({required this.team});
+  const _TeamCard({
+    required this.team,
+    required this.onEdit,
+    required this.onToggleActive,
+  });
 
   final Team team;
+  final VoidCallback onEdit;
+  final VoidCallback onToggleActive;
 
   @override
   Widget build(BuildContext context) {
-    return Card(child: InkWell(
-      onTap: () => context.go('/teams/${team.id}/players', extra: team.name),
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [
-        const CircleAvatar(backgroundColor: Color(0xFFE8EFEC), child: Icon(Icons.groups_outlined, color: Color(0xFF168B68))),
-        const Spacer(),
-        Chip(label: Text(team.isActive ? 'Activo' : 'Inactivo'), backgroundColor: const Color(0xFFE8EFEC), side: BorderSide.none, labelStyle: const TextStyle(color: Color(0xFF168B68), fontWeight: FontWeight.w700)),
-      ]),
-      const Spacer(),
-      Text(team.name, style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: 4),
-      Text(team.category),
-      const SizedBox(height: 10),
-      Row(children: [const Icon(Icons.calendar_today_outlined, size: 15, color: Color(0xFF77838F)), const SizedBox(width: 6), Text(team.seasonName, style: const TextStyle(fontSize: 13))]),
-    ]))));
+    return Card(
+      child: InkWell(
+        onTap: () => context.go('/teams/${team.id}/players', extra: team.name),
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Color(0xFFE8EFEC),
+                    child: Icon(Icons.groups_outlined, color: Color(0xFF168B68)),
+                  ),
+                  const Spacer(),
+                  PopupMenuButton<String>(
+                    tooltip: 'Acciones del equipo',
+                    onSelected: (value) {
+                      if (value == 'edit') onEdit();
+                      if (value == 'toggle') onToggleActive();
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: ListTile(
+                          leading: Icon(Icons.edit_outlined),
+                          title: Text('Editar'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'toggle',
+                        child: ListTile(
+                          leading: Icon(Icons.power_settings_new_outlined),
+                          title: Text(team.isActive ? 'Desactivar' : 'Activar'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Chip(
+                    label: Text(team.isActive ? 'Activo' : 'Inactivo'),
+                    backgroundColor: const Color(0xFFE8EFEC),
+                    side: BorderSide.none,
+                    labelStyle: const TextStyle(
+                      color: Color(0xFF168B68),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Text(team.name, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 4),
+              Text(team.category),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_today_outlined, size: 15, color: Color(0xFF77838F)),
+                  const SizedBox(width: 6),
+                  Text(team.seasonName, style: const TextStyle(fontSize: 13)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

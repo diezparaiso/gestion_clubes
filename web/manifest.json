@@ -1,11 +1,11 @@
-{
-    "name": "gestion_clubes",
-    "short_name": "gestion_clubes",
-    "start_url": ".",
+{\n    "x_gpt_modified_by": "GPT-5.6 LUNA 2026-09-26",
+    "name": "Gestión Clubes",
+    "short_name": "Gestión Clubes",
+    "start_url": "./",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#b71c1c",
+    "theme_color": "#b71c1c",
+    "description": "Gestión integral de clubes deportivos.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

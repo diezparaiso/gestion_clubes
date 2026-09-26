@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Comparte el enlace público del club y corrige anotación duplicada.
 
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/club_repository.dart';
@@ -62,7 +65,6 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) => Scaffold(
     appBar: AppBar(title: const Text('Configuración')),
     body: ListView(
@@ -119,7 +121,24 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
                     const SizedBox(height: 16),
                     Text(_error!, style: const TextStyle(color: Colors.red)),
                   ],
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: OutlinedButton.icon(
+                      onPressed: () async {
+                        final url = Uri.base.replace(path: '/club/${widget.club.slug}').toString();
+                        await Clipboard.setData(ClipboardData(text: url));
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Enlace público del club copiado.')),
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.link_outlined),
+                      label: const Text('Copiar enlace público'),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   Align(
                     alignment: Alignment.centerRight,
                     child: FilledButton.icon(

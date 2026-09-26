@@ -1,3 +1,5 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Incluye todos los roles del enum del club en la gestión de miembros.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Evita setState tras cerrar los diálogos durante operaciones asíncronas.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -249,6 +251,8 @@ class _ChangeRoleDialogState extends ConsumerState<_ChangeRoleDialog> {
     'staff',
     'member',
     'player',
+    'parent_guardian',
+    'follower',
   ];
 
   @override
@@ -304,7 +308,7 @@ class _ChangeRoleDialogState extends ConsumerState<_ChangeRoleDialog> {
                       );
                     }
                   } finally {
-                    setState(() => _loading = false);
+                    if (mounted) setState(() => _loading = false);
                   }
                 },
           child: _loading
@@ -343,6 +347,8 @@ class _InviteMemberDialogState extends ConsumerState<_InviteMemberDialog> {
     'staff',
     'member',
     'player',
+    'parent_guardian',
+    'follower',
   ];
 
   @override

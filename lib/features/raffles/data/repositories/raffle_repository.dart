@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Restaura el repositorio de rifas y conserva validaciones de entrada y aislamiento por club.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -59,7 +60,7 @@ class RaffleRepository {
 
   Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt}) async {
     if (!SupabaseService.isConfigured) {
-      final raffle = Raffle(id: 'raffle-${_demoRaffles.length + 1}', title: title, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);
+      final raffle = Raffle(id: 'raffle-new', title: title, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);
       _demoRaffles.insert(0, raffle);
       return raffle;
     }
