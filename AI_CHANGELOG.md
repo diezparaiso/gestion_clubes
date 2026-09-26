@@ -196,3 +196,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Añadidos a `memberships`: dirección, código postal, localidad, provincia y país.
 - El alta y edición de socios ya permiten introducir y guardar estos datos.
 - Añadida migración `024_member_postal_address.sql`; queda pendiente de aplicar en el Supabase remoto.
+
+### 2026-09-26 — GPT-5.6 LUNA — integridad de miembros del club
+- El repositorio de miembros valida club activo, email y roles antes de llamar a Supabase.
+- Se normalizan los emails a minúsculas.
+- Se evita acceder al cliente Supabase cuando la aplicación está en modo demo.
+- No se modifica el esquema ni el sistema de pagos en este bloque.
