@@ -36,3 +36,11 @@ This file is the permanent handoff log between AI assistants working on this rep
   - Prevents the demo/offline mode from requiring an initialized Supabase client.
 - No database schema change.
 - Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — event date/time integrity
+- `lib/features/events/presentation/pages/events_page.dart`
+  - Replaced the fixed `now + 7 days` event timestamp with selectable start/end date and time.
+  - Prevents saving an event whose end is not after its start.
+- No database schema change.
+- Stripe/payment implementation remains untouched.
