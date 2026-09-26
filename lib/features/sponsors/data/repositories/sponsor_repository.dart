@@ -5,18 +5,17 @@ import '../../../../core/services/supabase_service.dart';
 import '../../domain/entities/sponsor.dart';
 
 class SponsorRepository {
-  final SupabaseClient _supabase;
+  final SupabaseClient? _supabase;
 
   SponsorRepository(this._supabase);
 
-  /// Obtiene todos los patrocinadores del club (para managers)
   Future<List<Sponsor>> getClubSponsors(String clubId) async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return _demoSponsors();
     }
 
     try {
-      final response = await _supabase
+      final response = await _supabase!
           .from('sponsors')
           .select()
           .eq('club_id', clubId)
@@ -30,14 +29,13 @@ class SponsorRepository {
     }
   }
 
-  /// Obtiene patrocinadores activos del club
   Future<List<Sponsor>> getActiveSponsors(String clubId) async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return _demoSponsors().where((s) => s.isActive && !s.isExpired).toList();
     }
 
     try {
-      final response = await _supabase
+      final response = await _supabase!
           .from('sponsors')
           .select()
           .eq('club_id', clubId)
@@ -52,14 +50,13 @@ class SponsorRepository {
     }
   }
 
-  /// Obtiene patrocinadores públicos de un club (por slug)
   Future<List<Sponsor>> getPublicSponsors(String clubSlug) async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return _demoSponsors().where((s) => s.isPublic && s.isActive).toList();
     }
 
     try {
-      final response = await _supabase.rpc(
+      final response = await _supabase!.rpc(
         'get_public_sponsors',
         params: {'target_club_slug': clubSlug},
       );
@@ -72,7 +69,6 @@ class SponsorRepository {
     }
   }
 
-  /// Crea un nuevo patrocinador
   Future<String> createSponsor({
     required String clubId,
     required String name,
@@ -85,12 +81,12 @@ class SponsorRepository {
     required String? benefits,
     required bool isPublic,
   }) async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return 'sponsor-${DateTime.now().millisecondsSinceEpoch}';
     }
 
     try {
-      final result = await _supabase.rpc(
+      final result = await _supabase!.rpc(
         'create_sponsor',
         params: {
           'p_club_id': clubId,
@@ -117,7 +113,6 @@ class SponsorRepository {
     }
   }
 
-  /// Actualiza un patrocinador
   Future<void> updateSponsor({
     required String sponsorId,
     required String name,
@@ -129,12 +124,12 @@ class SponsorRepository {
     required String status,
     required bool isPublic,
   }) async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return;
     }
 
     try {
-      final result = await _supabase.rpc(
+      final result = await _supabase!.rpc(
         'update_sponsor',
         params: {
           'p_sponsor_id': sponsorId,
@@ -158,7 +153,6 @@ class SponsorRepository {
     }
   }
 
-  /// Datos demo
   List<Sponsor> _demoSponsors() {
     return [
       Sponsor(
@@ -216,25 +210,23 @@ class SponsorRepository {
   }
 }
 
-/// Provider del repositorio
-final sponsorRepositoryProvider = Provider((ref) {
-  final supabase = Supabase.instance.client;
+final sponsorRepositoryProvider = Provider<SponsorRepository>((ref) {
+  final supabase = SupabaseService.isConfigured
+      ? Supabase.instance.client
+      : null;
   return SponsorRepository(supabase);
 });
 
-/// Provider para patrocinadores de un club
 final clubSponsorsProvider =
     FutureProvider.family<List<Sponsor>, String>((ref, clubId) {
   return ref.watch(sponsorRepositoryProvider).getClubSponsors(clubId);
 });
 
-/// Provider para patrocinadores activos
 final activeSponsorsProvider =
     FutureProvider.family<List<Sponsor>, String>((ref, clubId) {
   return ref.watch(sponsorRepositoryProvider).getActiveSponsors(clubId);
 });
 
-/// Provider para patrocinadores públicos
 final publicSponsorsProvider =
     FutureProvider.family<List<Sponsor>, String>((ref, clubSlug) {
   return ref.watch(sponsorRepositoryProvider).getPublicSponsors(clubSlug);
