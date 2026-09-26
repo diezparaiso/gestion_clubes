@@ -69,6 +69,7 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
               Expanded(child: Text('Equipos y temporadas', style: Theme.of(context).textTheme.headlineMedium)),
+              OutlinedButton.icon(onPressed: () => _showSeasonManager(context), icon: const Icon(Icons.calendar_month_outlined), label: const Text('Temporadas')), const SizedBox(width: 10),
               FilledButton.icon(onPressed: () => _showCreateTeamDialog(context), icon: const Icon(Icons.add), label: const Text('Nuevo equipo')),
             ]),
             const SizedBox(height: 8),
@@ -96,6 +97,14 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _showSeasonManager(BuildContext context) async {
+    final result = await showDialog<bool>(context: context, builder: (_) => const _SeasonManagerDialog());
+    if (result == true && mounted) {
+      ref.invalidate(seasonsProvider);
+      ref.invalidate(teamsProvider);
+    }
   }
 
   Future<void> _showCreateTeamDialog(BuildContext context) async {
@@ -202,6 +211,100 @@ class _TeamFormDialogState extends ConsumerState<_TeamFormDialog> {
         ),
         if (_errorMessage != null) ...[const SizedBox(height: 16), Align(alignment: Alignment.centerLeft, child: Text(_errorMessage!, style: TextStyle(color: Colors.red)))],
       ])))),
+      actions: [
+        TextButton(onPressed: _isSaving ? null : () => Navigator.of(context).pop(), child: const Text('Cancelar')),
+        FilledButton(onPressed: _isSaving ? null : _save, child: _isSaving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Guardar')),
+      ],
+    );
+  }
+}
+
+class _SeasonManagerDialog extends ConsumerStatefulWidget {
+  const _SeasonManagerDialog();
+  @override
+  ConsumerState<_SeasonManagerDialog> createState() => _SeasonManagerDialogState();
+}
+class _SeasonManagerDialogState extends ConsumerState<_SeasonManagerDialog> {
+  Future<void> _edit(Season season) async {
+    final result = await showDialog<bool>(context: context, builder: (_) => _SeasonFormDialog(season: season));
+    if (result == true && mounted) setState(() {});
+  }
+  Future<void> _new() async {
+    final result = await showDialog<bool>(context: context, builder: (_) => const _SeasonFormDialog());
+    if (result == true && mounted) setState(() {});
+  }
+  @override
+  Widget build(BuildContext context) {
+    final seasons = ref.watch(seasonsProvider);
+    return AlertDialog(
+      title: const Text('Temporadas'),
+      content: SizedBox(width: 460, height: 360, child: seasons.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (_, __) => const Center(child: Text('No se han podido cargar las temporadas.')),
+        data: (items) => ListView.separated(
+          itemCount: items.length,
+          separatorBuilder: (_, index) => const Divider(height: 1),
+          itemBuilder: (context, index) => ListTile(
+            leading: const Icon(Icons.calendar_today_outlined),
+            title: Text(items[index].name),
+            trailing: IconButton(tooltip: 'Editar temporada', onPressed: () => _edit(items[index]), icon: const Icon(Icons.edit_outlined)),
+          ),
+        ),
+      )),
+      actions: [
+        TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('Cerrar')),
+        FilledButton.icon(onPressed: _new, icon: const Icon(Icons.add), label: const Text('Nueva temporada')),
+      ],
+    );
+  }
+}
+
+class _SeasonFormDialog extends ConsumerStatefulWidget {
+  const _SeasonFormDialog({this.season});
+  final Season? season;
+  @override
+  ConsumerState<_SeasonFormDialog> createState() => _SeasonFormDialogState();
+}
+class _SeasonFormDialogState extends ConsumerState<_SeasonFormDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  DateTime _startDate = DateTime(DateTime.now().year, 7, 1);
+  bool _isSaving = false;
+  String? _errorMessage;
+  bool get _isEditing => widget.season != null;
+  @override
+  void initState() { super.initState(); _nameController.text = widget.season?.name ?? ''; }
+  @override
+  void dispose() { _nameController.dispose(); super.dispose(); }
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    final clubId = ref.read(authControllerProvider).clubId;
+    if (clubId == null) return;
+    setState(() { _isSaving = true; _errorMessage = null; });
+    try {
+      final repository = ref.read(teamRepositoryProvider);
+      if (_isEditing) {
+        await repository.updateSeason(clubId: clubId, seasonId: widget.season!.id, name: _nameController.text.trim(), startDate: _startDate);
+      } else {
+        await repository.createSeason(clubId: clubId, name: _nameController.text.trim(), startDate: _startDate);
+      }
+      if (mounted) Navigator.of(context).pop(true);
+    } on PostgrestException catch (error) {
+      if (mounted) setState(() { _isSaving = false; _errorMessage = error.message.contains('duplicate') ? 'Ya existe una temporada con ese nombre.' : error.message; });
+    } catch (_) {
+      if (mounted) setState(() { _isSaving = false; _errorMessage = 'No se ha podido guardar la temporada.'; });
+    }
+  }
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text(_isEditing ? 'Editar temporada' : 'Nueva temporada'),
+      content: SizedBox(width: 420, child: Form(key: _formKey, child: Column(mainAxisSize: MainAxisSize.min, children: [
+        TextFormField(controller: _nameController, decoration: const InputDecoration(labelText: 'Nombre', hintText: '2026/2027'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null),
+        const SizedBox(height: 12),
+        InputDatePickerFormField(initialDate: _startDate, firstDate: DateTime(2000), lastDate: DateTime(2100), fieldLabelText: 'Fecha de inicio', onDateSubmitted: (date) => _startDate = date, onDateSaved: (date) => _startDate = date),
+        if (_errorMessage != null) ...[const SizedBox(height: 12), Align(alignment: Alignment.centerLeft, child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)))],
+      ]))),
       actions: [
         TextButton(onPressed: _isSaving ? null : () => Navigator.of(context).pop(), child: const Text('Cancelar')),
         FilledButton(onPressed: _isSaving ? null : _save, child: _isSaving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Guardar')),
