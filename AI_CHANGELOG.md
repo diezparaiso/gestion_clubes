@@ -28,3 +28,11 @@ This file is the permanent handoff log between AI assistants working on this rep
   - Replaced the public reservation function so valid numbers are 1..total_numbers.
 - Important: these migration files are repository changes only and have not been executed against live Supabase.
 - Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — sponsor demo-mode robustness
+- `lib/features/sponsors/data/repositories/sponsor_repository.dart`
+  - Made the Supabase client nullable and only accesses `Supabase.instance.client` when Supabase is configured.
+  - Prevents the demo/offline mode from requiring an initialized Supabase client.
+- No database schema change.
+- Stripe/payment implementation remains untouched.
