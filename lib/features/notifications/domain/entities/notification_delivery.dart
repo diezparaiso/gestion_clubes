@@ -4,6 +4,8 @@ class NotificationDelivery {
   final String profileId;
   final DateTime? readAt;
   final DateTime createdAt;
+  final String? title;
+  final String? body;
 
   const NotificationDelivery({
     required this.id,
@@ -11,6 +13,8 @@ class NotificationDelivery {
     required this.profileId,
     required this.readAt,
     required this.createdAt,
+    this.title,
+    this.body,
   });
 
   factory NotificationDelivery.fromJson(Map<String, dynamic> json) {
@@ -22,6 +26,8 @@ class NotificationDelivery {
           ? DateTime.parse(json['read_at'] as String)
           : null,
       createdAt: DateTime.parse(json['created_at'] as String),
+      title: (json['notifications'] as Map<String, dynamic>?)?['title'] as String?,
+      body: (json['notifications'] as Map<String, dynamic>?)?['body'] as String?,
     );
   }
 
@@ -31,6 +37,8 @@ class NotificationDelivery {
     'profile_id': profileId,
     'read_at': readAt?.toIso8601String(),
     'created_at': createdAt.toIso8601String(),
+    'title': title,
+    'body': body,
   };
 
   NotificationDelivery copyWith({
@@ -39,6 +47,8 @@ class NotificationDelivery {
     String? profileId,
     DateTime? readAt,
     DateTime? createdAt,
+    String? title,
+    String? body,
   }) {
     return NotificationDelivery(
       id: id ?? this.id,
@@ -46,6 +56,8 @@ class NotificationDelivery {
       profileId: profileId ?? this.profileId,
       readAt: readAt ?? this.readAt,
       createdAt: createdAt ?? this.createdAt,
+      title: title ?? this.title,
+      body: body ?? this.body,
     );
   }
 
