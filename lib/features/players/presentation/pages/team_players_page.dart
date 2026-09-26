@@ -139,11 +139,6 @@ class _CreatePlayerDialogState extends ConsumerState<_CreatePlayerDialog> {
     _guardianPhoneController.dispose();
     _guardianEmailController.dispose();
     _guardianRelationshipController.dispose();
-    _phoneController.dispose();
-    _guardianNameController.dispose();
-    _guardianPhoneController.dispose();
-    _guardianEmailController.dispose();
-    _guardianRelationshipController.dispose();
     _jerseyController.dispose();
     super.dispose();
   }
