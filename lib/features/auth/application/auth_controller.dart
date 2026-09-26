@@ -183,6 +183,10 @@ class AuthController extends Notifier<AuthState> {
     }
   }
 
+  void clearPasswordChangeRequirement() {
+    state = state.copyWith(mustChangePassword: false);
+  }
+
   Future<void> signOut() async {
     if (SupabaseService.isConfigured) await Supabase.instance.client.auth.signOut();
     state = const AuthState();
