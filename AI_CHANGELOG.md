@@ -95,3 +95,7 @@ Before changing a file, read this log and the existing AI markers. After changin
 - Creating players without an existing profile/account: requires a broader account/profile workflow and must be reviewed before touching schema/RLS.
 - Full player creation, guardian relationships, player photos/storage approval, complete staff assignment, users/roles administration, seasons CRUD and permission matrix remain pending where the current repository does not expose a safe existing-column workflow.
 - No Supabase migrations, schema, RLS, Storage policies, Edge Functions or Stripe/payment implementation were changed.
+### 2026-09-26 — GPT-5.6 LUNA — season management
+- Added season create/edit using existing `club_id`, `name` and `start_date` fields only.
+- Added season manager UI from the Teams page.
+- No Supabase migrations/schema/RLS/Storage/Edge Functions or Stripe changes.
