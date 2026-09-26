@@ -107,7 +107,6 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
   @override
   void dispose() {
     _numberController.dispose();
-    _notesController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
@@ -193,6 +192,7 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
   @override
   void dispose() {
     _numberController.dispose();
+    _notesController.dispose();
     super.dispose();
   }
 
