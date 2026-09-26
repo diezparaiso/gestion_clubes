@@ -103,8 +103,6 @@ class TeamRepository {
     }
     final season = await Supabase.instance.client.from('seasons').select('id').eq('id', seasonId).eq('club_id', clubId).maybeSingle();
     if (season == null) throw const PostgrestException(message: 'La temporada no pertenece al club activo.');
-    final season = await Supabase.instance.client.from('seasons').select('id').eq('id', seasonId).eq('club_id', clubId).maybeSingle();
-    if (season == null) throw const PostgrestException(message: 'La temporada no pertenece al club activo.');
     final row = await Supabase.instance.client.from('teams').update({
       'name': normalizedName,
       'category': normalizedCategory,
