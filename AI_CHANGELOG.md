@@ -441,3 +441,7 @@ This file is the permanent handoff log between AI assistants working on this rep
 - La renovación mensual real sigue dependiendo de club_payments_backend/Stripe y su webhook.
 - No se ejecuta ninguna migración sobre Supabase remoto.
 - Pagos/Stripe no modificados en este bloque.
+
+### 2026-09-26 — GPT-5.6 LUNA — remates del módulo de rifas
+- La página pública distingue correctamente la modalidad mensual y muestra el día de renovación.
+- La notificación del resultado mensual usa directamente el ID recién creado, evitando asociaciones ambiguas en concurrencia.
