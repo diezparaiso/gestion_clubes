@@ -115,3 +115,15 @@ Before changing a file, read this log and the existing AI markers. After changin
   - Kept existing edit flow for jersey number and active/inactive state.
 - Supabase: no migration or live database change was executed. The implementation currently assumes the existing `players.profile_id` relationship implied by the current nested query; this must be verified against the live schema before broader player/guardian/photo work.
 - Stripe: untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — season data integrity fix
+- `lib/features/teams/domain/entities/season.dart`
+  - Preserves nullable `startDate` from Supabase.
+- `lib/features/teams/data/repositories/team_repository.dart`
+  - Reads `start_date` when listing, creating and updating seasons.
+- `lib/features/teams/presentation/pages/teams_page.dart`
+  - Existing season edit now initializes the date from the stored value instead of defaulting to July 1 of the current year.
+- Supabase live database: not executed through a live connector; no schema change was required.
+- Stripe: untouched.
+- Marker: MODIFICADO POR GPT-5.6 LUNA.
