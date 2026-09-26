@@ -1,25 +1,25 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Hace seguro el repositorio de notificaciones en modo demo.\nimport 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/services/supabase_service.dart';
 import '../../domain/entities/notification_delivery.dart';
 
 class NotificationDeliveryRepository {
-  final SupabaseClient _supabase;
+  final SupabaseClient? _supabase;
 
   NotificationDeliveryRepository(this._supabase);
 
   /// Obtiene todas las notificaciones no leídas del usuario actual
   Future<List<NotificationDelivery>> getUnreadDeliveries() async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return _demoDeliveries();
     }
 
     try {
-      final userId = _supabase.auth.currentUser?.id;
+      final userId = _supabase!.auth.currentUser?.id;
       if (userId == null) throw Exception('Usuario no autenticado');
 
-      final response = await _supabase
+      final response = await _supabase!
           .from('notification_deliveries')
           .select('id, notification_id, profile_id, read_at, created_at, notifications!inner(title, body)')
           .eq('profile_id', userId)
@@ -38,7 +38,7 @@ class NotificationDeliveryRepository {
   Future<List<NotificationDelivery>> getAllDeliveries({
     int limit = 50,
   }) async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return _demoDeliveries();
     }
 
@@ -63,7 +63,7 @@ class NotificationDeliveryRepository {
 
   /// Marca una entrega como leída
   Future<void> markAsRead(String deliveryId) async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return;
     }
 
@@ -79,7 +79,7 @@ class NotificationDeliveryRepository {
 
   /// Marca todas las entregas como leídas
   Future<void> markAllAsRead() async {
-    if (!SupabaseService.isConfigured) {
+    if (!SupabaseService.isConfigured || _supabase == null) {
       return;
     }
 
@@ -127,6 +127,6 @@ class NotificationDeliveryRepository {
 
 /// Provider de Riverpod
 final notificationDeliveryRepositoryProvider = Provider((ref) {
-  final supabase = Supabase.instance.client;
+  final supabase = SupabaseService.isConfigured ? Supabase.instance.client : null;
   return NotificationDeliveryRepository(supabase);
 });
