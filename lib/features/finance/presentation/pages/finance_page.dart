@@ -73,7 +73,7 @@ class _FinancePageState extends ConsumerState<FinancePage> {
                     final matchesCategory = _categoryFilter == null || item.category == _categoryFilter;
                     return matchesText && matchesType && matchesCategory;
                   }).toList();
-                  return _FinanceContent(transactions: filtered, openingBalance: balance);
+                  return _FinanceContent(transactions: items, visibleTransactions: filtered, openingBalance: balance);
                 },
               ),
             )),
@@ -110,9 +110,10 @@ class _FinancePageState extends ConsumerState<FinancePage> {
 }
 
 class _FinanceContent extends StatelessWidget {
-  const _FinanceContent({required this.transactions, required this.openingBalance});
+  const _FinanceContent({required this.transactions, required this.visibleTransactions, required this.openingBalance});
 
   final List<FinancialTransaction> transactions;
+  final List<FinancialTransaction> visibleTransactions;
   final double openingBalance;
 
   @override
@@ -130,9 +131,9 @@ class _FinanceContent extends StatelessWidget {
       const SizedBox(height: 12),
       Expanded(child: Card(child: ListView.separated(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        itemCount: transactions.length,
+        itemCount: visibleTransactions.length,
         separatorBuilder: (_, index) => const Divider(height: 1),
-        itemBuilder: (context, index) => _TransactionTile(transaction: transactions[index]),
+        itemBuilder: (context, index) => _TransactionTile(transaction: visibleTransactions[index]),
       ))),
     ]);
   }
