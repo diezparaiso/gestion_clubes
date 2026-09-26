@@ -109,6 +109,10 @@ class _FinancePageState extends ConsumerState<FinancePage> {
   }
 }
 
+String _categoryLabel(String category) => switch (category) {
+  'membership' => 'Cuotas', 'sponsorship' => 'Patrocinio', 'raffle' => 'Rifa', 'event' => 'Evento', 'equipment' => 'Equipamiento', 'federation' => 'Federación', 'facilities' => 'Instalaciones', 'salaries' => 'Salarios', 'supplies' => 'Suministros', _ => 'Otros',
+};
+
 class _FinanceContent extends StatelessWidget {
   const _FinanceContent({required this.transactions, required this.visibleTransactions, required this.openingBalance});
 
