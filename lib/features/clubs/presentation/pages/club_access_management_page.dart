@@ -155,7 +155,7 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
   @override
   Widget build(BuildContext context) {
     final role = ref.watch(authControllerProvider).role;
-    if (role != 'club_president' && role != 'club_secretary') return const Scaffold(body: Center(child: Text('No tienes permiso para gestionar accesos.')));
+    if (role != 'club_president') return const Scaffold(body: Center(child: Text('Solo el presidente puede gestionar los accesos del club.')));
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Usuarios y permisos'),
       floatingActionButton: FloatingActionButton.extended(onPressed: _saving ? null : _createUser, icon: const Icon(Icons.person_add_alt_1), label: const Text('Dar de alta')),
