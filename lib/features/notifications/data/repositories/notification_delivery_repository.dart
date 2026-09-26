@@ -12,9 +12,9 @@ class NotificationDeliveryRepository {
   Future<List<NotificationDelivery>> getUnreadDeliveries() async {
     if (!SupabaseService.isConfigured || _supabase == null) return _demoDeliveries();
     try {
-      final userId = _supabase!.auth.currentUser?.id;
+      final userId = _supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('Usuario no autenticado');
-      final response = await _supabase!.from('notification_deliveries')
+      final response = await _supabase.from('notification_deliveries')
           .select('id, notification_id, profile_id, read_at, created_at, notifications!inner(title, body)')
           .eq('profile_id', userId).isFilter('read_at', null).order('created_at', ascending: false);
       return (response as List).map((e) => NotificationDelivery.fromJson(e as Map<String, dynamic>)).toList();
@@ -24,9 +24,9 @@ class NotificationDeliveryRepository {
   Future<List<NotificationDelivery>> getAllDeliveries({int limit = 50}) async {
     if (!SupabaseService.isConfigured || _supabase == null) return _demoDeliveries();
     try {
-      final userId = _supabase!.auth.currentUser?.id;
+      final userId = _supabase.auth.currentUser?.id;
       if (userId == null) throw Exception('Usuario no autenticado');
-      final response = await _supabase!.from('notification_deliveries')
+      final response = await _supabase.from('notification_deliveries')
           .select('id, notification_id, profile_id, read_at, created_at, notifications!inner(title, body)')
           .eq('profile_id', userId).order('created_at', ascending: false).limit(limit);
       return (response as List).map((e) => NotificationDelivery.fromJson(e as Map<String, dynamic>)).toList();
@@ -36,14 +36,14 @@ class NotificationDeliveryRepository {
   Future<void> markAsRead(String deliveryId) async {
     if (!SupabaseService.isConfigured || _supabase == null) return;
     try {
-      await _supabase!.rpc('mark_notification_delivery_read', params: {'p_delivery_id': deliveryId});
+      await _supabase.rpc('mark_notification_delivery_read', params: {'p_delivery_id': deliveryId});
     } on PostgrestException catch (e) { throw Exception('Error al marcar como leído: ${e.message}'); }
   }
 
   Future<void> markAllAsRead() async {
     if (!SupabaseService.isConfigured || _supabase == null) return;
     try {
-      await _supabase!.rpc('mark_all_notification_deliveries_read');
+      await _supabase.rpc('mark_all_notification_deliveries_read');
     } on PostgrestException catch (e) { throw Exception('Error al marcar todas como leídas: ${e.message}'); }
   }
 
