@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Refuerza validación de club y publicación de noticias.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Completa CRUD de noticias y controla publicación.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -9,18 +10,21 @@ final postRepositoryProvider = Provider<PostRepository>((ref) => PostRepository(
 
 class PostRepository {
   Future<List<Post>> listPosts(String clubId) async {
+    if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoPosts);
     final rows = await Supabase.instance.client.from('posts').select('id, title, body, status, image_url, published_at, created_at').eq('club_id', clubId).order('created_at', ascending: false);
     return rows.map(Post.fromJson).toList();
   }
 
   Future<List<Post>> listPublicPosts(String clubSlug) async {
+    if (clubSlug.trim().isEmpty) throw const FormatException('El club no es válido.');
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoPosts.where((post) => post.status == PostStatus.published));
     final rows = await Supabase.instance.client.rpc<List<dynamic>>('get_public_posts', params: {'target_club_slug': clubSlug});
     return rows.map((row) => Post.fromJson(row as Map<String, dynamic>)).toList();
   }
 
   Future<Post> createPost({required String clubId, required String title, required String body, required PostStatus status}) async {
+    if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
     final normalizedTitle = title.trim();
     final normalizedBody = body.trim();
     if (normalizedTitle.isEmpty || normalizedBody.isEmpty) throw FormatException('El título y el contenido son obligatorios.');
