@@ -111,14 +111,14 @@ class _NotificationDeliveryCard extends StatelessWidget {
           ),
         ),
         title: Text(
-          delivery.isRead ? 'Notificación leída' : 'Notificación nueva',
+          delivery.title ?? (delivery.isRead ? 'Notificación leída' : 'Notificación nueva'),
           style: TextStyle(
             fontWeight: delivery.isRead ? FontWeight.w500 : FontWeight.w800,
             color: delivery.isRead ? Colors.grey.shade600 : Colors.black,
           ),
         ),
         subtitle: Text(
-          '${delivery.createdAt.day}/${delivery.createdAt.month}/${delivery.createdAt.year} '
+          '${delivery.body ?? ''}\n${delivery.createdAt.day}/${delivery.createdAt.month}/${delivery.createdAt.year} '
           '${delivery.createdAt.hour}:${delivery.createdAt.minute.toString().padLeft(2, '0')}',
           style: TextStyle(
             color: delivery.isRead ? Colors.grey.shade500 : Colors.black54,
