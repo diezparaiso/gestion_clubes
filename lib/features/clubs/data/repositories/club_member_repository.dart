@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Refuerza validación de club, email y roles y evita cliente Supabase en modo demo.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida club también en consultas de miembros.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -12,6 +13,7 @@ class ClubMemberRepository {
 
   /// Obtiene todos los miembros del club (para managers)
   Future<List<ClubMember>> getClubMembers(String clubId) async {
+    _validateClubId(clubId);
     if (!SupabaseService.isConfigured) {
       return _demoMembers();
     }
@@ -44,12 +46,16 @@ class ClubMemberRepository {
 
   /// Obtiene solo los miembros activos
   Future<List<ClubMember>> getActiveClubMembers(String clubId) async {
+    _validateClubId(clubId);
     if (!SupabaseService.isConfigured) {
       return _demoMembers().where((m) => m.isActive).toList();
     }
 
+    final supabase = _supabase;
+    if (supabase == null) return _demoMembers().where((m) => m.isActive).toList();
+
     try {
-      final response = await _supabase
+      final response = await supabase
           .from('club_memberships')
           .select('''
             id, club_id, profile_id, role, is_active, created_at, updated_at,
