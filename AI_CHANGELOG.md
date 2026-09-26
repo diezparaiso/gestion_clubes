@@ -61,3 +61,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/news/presentation/pages/posts_page.dart`: añade edición, borrado confirmado y soporte visual para borradas/archivadas.
 - Sin cambios de esquema; live Supabase no ejecutado desde este workflow.
 - Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — raffle UI consistency
+- `lib/features/raffles/presentation/pages/public_raffle_page.dart`: corrige la cuadrícula pública para ofrecer exactamente los números 1..total_numbers, coherente con la validación de Supabase.
+- `lib/features/raffles/presentation/pages/raffles_page.dart`: valida que precio y cantidad de números sean mayores que cero antes del alta.
+- Sin cambios de esquema en este bloque. Stripe/payment implementation remains untouched.
