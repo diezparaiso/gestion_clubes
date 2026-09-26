@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): cierre funcional del módulo de rifas.
 enum RaffleType { cesta, sorteoPuro, mensual }
 
 enum RaffleStatus { draft, scheduled, active, soldOut, closed, drawn, cancelled }
