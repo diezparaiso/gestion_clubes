@@ -156,3 +156,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - team_repository.dart valida nombres de temporada/equipo y categoría antes de guardar.
 - La edición de equipos comprueba la pertenencia de la temporada al club activo.
 - Stripe/payment implementation remains untouched.
+
+### 2026-09-26 — GPT-5.6 LUNA — analyzer cleanup
+- sponsor_repository.dart elimina aserciones `!` redundantes tras comprobar el cliente Supabase.
+- team_staff_repository.dart y post_repository.dart usan interpolación de cadenas donde correspondía.
+- Cambios únicamente de código Dart; sin cambios de esquema ni pagos.
