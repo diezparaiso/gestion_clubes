@@ -83,6 +83,69 @@ class RaffleRepository {
   ];
 }
 
+  Future<List<MonthlyRaffleResult>> listMonthlyResults(String raffleId) async {
+    if (!SupabaseService.isConfigured) return const [];
+    final rows = await Supabase.instance.client
+        .from('raffle_monthly_results')
+        .select('id, raffle_id, draw_month, winning_number, winner_profile_id, prize_amount, notes')
+        .eq('raffle_id', raffleId)
+        .order('draw_month', ascending: false);
+    return rows.map(MonthlyRaffleResult.fromJson).toList();
+  }
+
+  Future<MonthlyRaffleResult> registerMonthlyResult({
+    required String raffleId,
+    required DateTime month,
+    required int winningNumber,
+    required double prizeAmount,
+    String? notes,
+  }) async {
+    if (!SupabaseService.isConfigured) {
+      return MonthlyRaffleResult(
+        id: 'demo-monthly-result',
+        raffleId: raffleId,
+        drawMonth: month,
+        winningNumber: winningNumber,
+        prizeAmount: prizeAmount,
+        notes: notes,
+      );
+    }
+    final row = await Supabase.instance.client.rpc<Map<String, dynamic>>(
+      'register_monthly_result',
+      params: {
+        'target_raffle_id': raffleId,
+        'target_month': DateTime(month.year, month.month, 1).toIso8601String().substring(0, 10),
+        'target_winning_number': winningNumber,
+        'target_prize_amount': prizeAmount,
+        'target_notes': notes?.trim().isEmpty == true ? null : notes?.trim(),
+      },
+    );
+    final resultId = row['id'] as String;
+    return MonthlyRaffleResult(
+      id: resultId,
+      raffleId: raffleId,
+      drawMonth: month,
+      winningNumber: row['winning_number'] as int,
+      prizeAmount: prizeAmount,
+      winnerProfileId: row['winner_profile_id'] as String?,
+      notes: notes,
+    );
+  }
+
+  Future<Map<String, dynamic>?> getMyMonthlySubscription({
+    required String raffleId,
+    required String profileId,
+  }) async {
+    if (!SupabaseService.isConfigured) return null;
+    return await Supabase.instance.client
+        .from('raffle_monthly_subscriptions')
+        .select('id, raffle_id, profile_id, number, amount, currency, status, current_period_start, current_period_end')
+        .eq('raffle_id', raffleId)
+        .eq('profile_id', profileId)
+        .maybeSingle();
+  }
+
+
   Future<RaffleDraw> setBasketWinner({required String raffleId, required int winningNumber}) async {
     if (!SupabaseService.isConfigured) {
       return RaffleDraw(id: 'manual-$raffleId', raffleId: raffleId, winningNumber: winningNumber, drawnAt: DateTime.now(), method: 'president_selected');
