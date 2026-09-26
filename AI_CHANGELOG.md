@@ -142,3 +142,15 @@ Before changing a file, read this log and the existing AI markers. After changin
 - Supabase live database: no direct execution; changes use columns already defined in `002_memberships.sql`.
 - Stripe: untouched.
 - Marker: MODIFICADO POR GPT-5.6 LUNA.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — staff assignment phase 1
+- `lib/features/staff/data/repositories/team_staff_repository.dart`
+  - Added staff assignment using the existing `profiles` and `team_staff` tables and existing columns.
+  - Prevents assignment when the account email does not correspond to an existing profile.
+- `lib/features/staff/presentation/pages/team_staff_page.dart`
+  - Added "Añadir personal" flow with account email and role/function.
+  - Existing edit and active/inactive flow remains available.
+- Supabase live database: no direct execution; no schema change required.
+- Stripe: untouched.
+- Marker: MODIFICADO POR GPT-5.6 LUNA.
