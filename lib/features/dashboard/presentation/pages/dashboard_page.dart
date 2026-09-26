@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../auth/application/auth_controller.dart';
 import '../../application/dashboard_stats_provider.dart';
 
-class DashboardPage extends ConsumerStatefulWidget {
+// MODIFICADO POR GPT-5.6 LUNA\nclass DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
   @override
@@ -171,7 +171,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     final metrics = [
       (Icons.account_balance_wallet_outlined, 'Saldo actual', _formatCurrency(stats?.balance ?? 0), 'Disponible', const Color(0xFF168B68)),
       (Icons.people_alt_outlined, 'Socios activos', '${stats?.memberCount ?? 0}', 'Directorio del club', const Color(0xFF3276B1)),
-      (Icons.confirmation_number_outlined, 'Rifas activas', '2', '34 participaciones nuevas', const Color(0xFFD27A2C)),
+      (Icons.groups_outlined, 'Equipos', '${stats?.teamCount ?? 0}', 'Equipos del club', const Color(0xFFD27A2C)),
     ];
     return GridView.builder(
       shrinkWrap: true,
@@ -217,10 +217,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
   Widget _buildQuickActions(bool isDesktop) {
     final actions = [
-      (Icons.person_add_alt_1_outlined, 'Nuevo socio', const Color(0xFF168B68)),
-      (Icons.add_chart_outlined, 'Registrar ingreso', const Color(0xFF3276B1)),
-      (Icons.receipt_long_outlined, 'Registrar gasto', const Color(0xFFD27A2C)),
-      (Icons.local_activity_outlined, 'Crear rifa', const Color(0xFF8B5E9E)),
+      (Icons.person_add_alt_1_outlined, 'Nuevo socio', const Color(0xFF168B68), '/members'),
+      (Icons.add_chart_outlined, 'Registrar ingreso', const Color(0xFF3276B1), '/finance'),
+      (Icons.receipt_long_outlined, 'Registrar gasto', const Color(0xFFD27A2C), '/finance'),
+      (Icons.local_activity_outlined, 'Crear rifa', const Color(0xFF8B5E9E), '/raffles'),
     ];
     return Wrap(
       spacing: 12,
@@ -229,7 +229,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         return SizedBox(
           width: isDesktop ? 190 : double.infinity,
           child: OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: () => context.go(action.$4),
             icon: Icon(action.$1, size: 20, color: action.$3),
             label: Text(action.$2),
             style: OutlinedButton.styleFrom(
