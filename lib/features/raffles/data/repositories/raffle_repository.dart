@@ -57,7 +57,7 @@ class RaffleRepository {
     return RaffleDraw.fromJson(row);
   }
 
-  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida invariantes de negocio antes del alta.
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida invariantes de negocio antes del alta y activa las rifas nuevas.
   Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt}) async {
     final normalizedTitle = title.trim();
     if (normalizedTitle.isEmpty) throw const FormatException('El título de la rifa es obligatorio.');
@@ -66,14 +66,14 @@ class RaffleRepository {
     if (!endAt.isAfter(DateTime.now())) throw const FormatException('La fecha de finalización debe ser futura.');
 
     if (!SupabaseService.isConfigured) {
-      final raffle = Raffle(id: 'raffle-${_demoRaffles.length + 1}', title: normalizedTitle, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);
+      final raffle = Raffle(id: 'raffle-${_demoRaffles.length + 1}', title: normalizedTitle, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.active, endAt: endAt);
       _demoRaffles.insert(0, raffle);
       return raffle;
     }
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) throw const AuthException('La sesión ha expirado.');
     final slug = normalizedTitle.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
-    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': normalizedTitle, 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at').single();
+    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': normalizedTitle, 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'status': 'active', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at').single();
     return Raffle.fromJson(row);
   }
 
