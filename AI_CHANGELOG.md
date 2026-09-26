@@ -1,3 +1,9 @@
+### 2026-09-26 — GPT-5.6 LUNA — correcciones tras validación local de Flutter
+- Corregidas las llamadas a Supabase Auth para usar los parámetros nombrados exigidos por el SDK actual.
+- Reordenadas las directivas de imports/interoperabilidad del banner AdSense Web para cumplir el analizador Dart.
+- Corregida la ruta relativa de SupabaseService en my_raffles_page.dart.
+- No se ejecuta ninguna migración en Supabase remoto y no se modifica Payments/Stripe.
+
 ### 2026-09-26 — GPT-5.6 LUNA — rifa mensual y trazabilidad de renovaciones
 - Añadida modalidad `mensual` al modelo de rifas.
 - La configuración mensual permite fijar el día del ciclo mensual (1–28).
