@@ -21,7 +21,7 @@ class NotificationDeliveryRepository {
 
       final response = await _supabase
           .from('notification_deliveries')
-          .select()
+          .select('id, notification_id, profile_id, read_at, created_at, notifications!inner(title, body)')
           .eq('profile_id', userId)
           .isFilter('read_at', null)
           .order('created_at', ascending: false);
@@ -48,7 +48,7 @@ class NotificationDeliveryRepository {
 
       final response = await _supabase
           .from('notification_deliveries')
-          .select()
+          .select('id, notification_id, profile_id, read_at, created_at, notifications!inner(title, body)')
           .eq('profile_id', userId)
           .order('created_at', ascending: false)
           .limit(limit);
