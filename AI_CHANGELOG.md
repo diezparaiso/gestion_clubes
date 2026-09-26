@@ -1,3 +1,15 @@
+### 2026-09-26 — GPT-5.6 LUNA — rifa mensual y trazabilidad de renovaciones
+- Añadida modalidad `mensual` al modelo de rifas.
+- La configuración mensual permite fijar el día del ciclo mensual (1–28).
+- Preparadas tablas para suscripciones mensuales y resultados históricos por mes.
+- El número queda vinculado al socio/perfil y no puede duplicarse dentro de la misma rifa mensual.
+- Preparada RPC para registrar cada resultado mensual, importe del premio, ganador y observaciones.
+- El resultado mensual genera una notificación dirigida al ganador.
+- La estructura contempla IDs de cliente/suscripción del proveedor de pagos para futuras renovaciones automáticas.
+- La renovación automática real queda pendiente de activar el backend/proveedor de pagos recurrentes; no se simula como si estuviera funcionando.
+- También queda pendiente conectar el comprobante de pago con un proveedor de correo transaccional real.
+- No se ejecutan migraciones en Supabase remoto.
+
 ### 2026-09-26 — GPT-5.6 LUNA — modalidades de rifas
 - Añadidas las modalidades `cesta` y `sorteoPuro`.
 - La configuración permite indicar modalidad, cantidad de números, precio y fecha final.
