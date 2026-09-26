@@ -73,16 +73,20 @@ class _MembersPageState extends ConsumerState<MembersPage> {
               const SizedBox(height: 8),
               const Text('Consulta y administra las personas vinculadas al club.'),
               const SizedBox(height: 24),
-              TextField(
-                controller: _searchController,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  hintText: 'Buscar por nombre, email o número',
-                  prefixIcon: Icon(Icons.search),
-                ),
-              )),
-                const SizedBox(width: 12),
-                DropdownButton<MemberStatus?>(
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: (_) => setState(() {}),
+                      decoration: const InputDecoration(
+                        hintText: 'Buscar por nombre, email o número',
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  DropdownButton<MemberStatus?>(
                   value: _statusFilter,
                   hint: const Text('Estado'),
                   items: [const DropdownMenuItem<MemberStatus?>(value: null, child: Text('Todos los estados')), ...MemberStatus.values.map((status) => DropdownMenuItem<MemberStatus?>(value: status, child: Text(_statusLabel(status))))],
@@ -94,8 +98,9 @@ class _MembersPageState extends ConsumerState<MembersPage> {
                   hint: const Text('Tipo'),
                   items: [const DropdownMenuItem<MembershipType?>(value: null, child: Text('Todos los tipos')), ...MembershipType.values.map((type) => DropdownMenuItem<MembershipType?>(value: type, child: Text(_membershipTypeLabel(type))))],
                   onChanged: (value) => setState(() => _membershipTypeFilter = value),
-                ),
-              ]),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
               Expanded(
                 child: members.when(
