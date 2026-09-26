@@ -74,3 +74,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/players/presentation/pages/team_players_page.dart`: pasa el `club_id` de la sesión al repositorio.
 - Se trata de una corrección de datos obligatorios ya existentes; no requiere cambios de esquema.
 - Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — raffle creation invariants
+- `lib/features/raffles/data/repositories/raffle_repository.dart`: valida título, precio, rango de números y fecha de finalización antes de crear una rifa.
+- `lib/features/raffles/presentation/pages/raffles_page.dart`: muestra los errores de validación al usuario.
+- Sin cambios de esquema. Stripe/payment implementation remains untouched.
