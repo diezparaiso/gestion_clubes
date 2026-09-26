@@ -175,3 +175,15 @@ Before changing a file, read this log and the existing AI markers. After changin
 - No database schema change.
 - Stripe: untouched.
 - Marker: MODIFICADO POR GPT-5.6 LUNA.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — notification content
+- `lib/features/notifications/domain/entities/notification_delivery.dart`
+  - Added optional title/body from the related notification.
+- `lib/features/notifications/data/repositories/notification_delivery_repository.dart`
+  - Delivery queries now join the related notification content.
+- `lib/features/notifications/presentation/pages/notifications_page.dart`
+  - The inbox now displays the actual notification title and body instead of generic labels.
+- Supabase live database: no schema change; existing `notifications` relation used.
+- Stripe: untouched.
+- Marker: MODIFICADO POR GPT-5.6 LUNA.
