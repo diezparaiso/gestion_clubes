@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../core/services/supabase_service.dart';
+import '../../../../core/services/supabase_service.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/raffle_repository.dart';
 
