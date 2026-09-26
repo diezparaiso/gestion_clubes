@@ -154,3 +154,15 @@ Before changing a file, read this log and the existing AI markers. After changin
 - Supabase live database: no direct execution; no schema change required.
 - Stripe: untouched.
 - Marker: MODIFICADO POR GPT-5.6 LUNA.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — club role integrity
+- `lib/features/clubs/domain/entities/club_member.dart`
+  - Aligned the `isManager` helper with the actual Supabase authorization function: president and secretary.
+- `lib/features/clubs/presentation/pages/club_members_page.dart`
+  - Added the remaining defined roles `parent_guardian` and `follower` to role management.
+- `supabase/migrations/020_president_role_integrity.sql`
+  - Replaces the role-change RPC so an active club cannot be left without a president when changing another president's role.
+- Supabase live database: migration prepared in repository; not executed through a live Supabase connector.
+- Stripe: untouched.
+- Marker: MODIFICADO POR GPT-5.6 LUNA.
