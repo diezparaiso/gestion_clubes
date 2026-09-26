@@ -1,4 +1,6 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Incluye el slug público para permitir compartir la rifa desde la gestión.\n\nimport 'package:flutter_riverpod/flutter_riverpod.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Incluye el slug público para permitir compartir la rifa desde la gestión.
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/services/supabase_service.dart';
