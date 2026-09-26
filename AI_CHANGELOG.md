@@ -429,3 +429,15 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `dashboard_page.dart`: corregido el import relativo de `club_export_service.dart` desde `presentation/pages` y protegidos los `ScaffoldMessenger` posteriores a operaciones asíncronas usando el `State.context` con `mounted`.
 - `members_page.dart`: protegido el `ScaffoldMessenger` posterior al diálogo asíncrono y corregida la documentación que contenía `<...>` como texto HTML.
 - Sin cambios de esquema, Supabase remoto ni Payments.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — cierre funcional de rifas mensuales y trazabilidad de pagos
+- Corregida 034_raffle_types_and_secure_draw.sql para aceptar también el tipo mensual, haciendo compatibles las migraciones 034 y 035.
+- raffle_repository.dart: completadas consultas de modalidad mensual, histórico de resultados, suscripciones del socio y participaciones pagadas.
+- raffle_detail_page.dart: añadido registro manual del resultado de cada mes e histórico con número, premio y ganador identificable.
+- Añadida my_raffles_page.dart y ruta /my-raffles para que el socio consulte sus suscripciones mensuales y comprobantes.
+- Añadida 036_raffle_payment_receipts.sql: referencia de pago, fecha de pago, perfil, número de recibo y RPC restringida a service_role para que el backend de pagos confirme una participación.
+- El comprobante queda preparado para generarse después de un pago real; no se simula un cobro ni una renovación automática.
+- La renovación mensual real sigue dependiendo de club_payments_backend/Stripe y su webhook.
+- No se ejecuta ninguna migración sobre Supabase remoto.
+- Pagos/Stripe no modificados en este bloque.
