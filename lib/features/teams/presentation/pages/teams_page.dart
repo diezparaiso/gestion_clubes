@@ -58,7 +58,7 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final teams = ref.watch(teamsProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Equipos')),
@@ -99,7 +99,7 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
   }
 
   Future<void> _showCreateTeamDialog(BuildContext context) async {
-    final result = await showDialog<bool>(context: context, builder: (_) => const _CreateTeamDialog());
+    final result = await showDialog<bool>(context: context, builder: (_) => const _TeamFormDialog());
     if (result == true && mounted) {
       ref.invalidate(teamsProvider);
     }
@@ -138,12 +138,33 @@ class _TeamFormDialogState extends ConsumerState<_TeamFormDialog> {
   }
 
   Future<void> _save() async {
-    if (!_formKey.currentState!.validate() || _selectedSeason == null) return;
+    if (!_formKey.currentState!.validate()) return;
     final clubId = ref.read(authControllerProvider).clubId;
     if (clubId == null) return;
+    final season = _selectedSeason;
+    if (season == null) {
+      setState(() => _errorMessage = 'Selecciona una temporada');
+      return;
+    }
     setState(() { _isSaving = true; _errorMessage = null; });
     try {
-      await ref.read(teamRepositoryProvider).createTeam(clubId: clubId, name: _nameController.text.trim(), category: _categoryController.text.trim(), seasonId: _selectedSeason!.id, seasonName: _selectedSeason!.name);
+      if (_isEditing) {
+        await ref.read(teamRepositoryProvider).updateTeam(
+          clubId: clubId,
+          teamId: widget.team!.id,
+          name: _nameController.text.trim(),
+          category: _categoryController.text.trim(),
+          seasonId: season.id,
+        );
+      } else {
+        await ref.read(teamRepositoryProvider).createTeam(
+          clubId: clubId,
+          name: _nameController.text.trim(),
+          category: _categoryController.text.trim(),
+          seasonId: season.id,
+          seasonName: season.name,
+        );
+      }
       if (mounted) Navigator.of(context).pop(true);
     } on PostgrestException catch (error) {
       setState(() { _isSaving = false; _errorMessage = error.message.contains('duplicate') ? 'Ya existe un equipo con ese nombre en la temporada.' : error.message; });
@@ -166,7 +187,13 @@ class _TeamFormDialogState extends ConsumerState<_TeamFormDialog> {
           loading: () => const LinearProgressIndicator(),
           error: (error, stack) => const Align(alignment: Alignment.centerLeft, child: Text('No se han podido cargar las temporadas.')),
           data: (items) => DropdownButtonFormField<Season>(
-            initialValue: _selectedSeason,
+            initialValue: _selectedSeason ??
+                (widget.team == null
+                    ? null
+                    : items.cast<Season?>().firstWhere(
+                        (season) => season!.name == widget.team!.seasonName,
+                        orElse: () => null,
+                      )),
             decoration: const InputDecoration(labelText: 'Temporada'),
             items: items.map((season) => DropdownMenuItem(value: season, child: Text(season.name))).toList(),
             onChanged: (season) => setState(() => _selectedSeason = season),
