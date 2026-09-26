@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Refuerza validación financiera y evita operaciones con club_id vacío.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida categorías financieras y normaliza la descripción.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,8 +28,9 @@ class FinanceRepository {
     final normalizedDescription = description.trim();
     if (normalizedDescription.isEmpty) throw const FormatException('La descripción es obligatoria.');
     if (!amount.isFinite || amount <= 0) throw const FormatException('El importe debe ser mayor que 0.');
+    if (!_validCategories.contains(category)) throw const FormatException('La categoría financiera no es válida.');
     if (!SupabaseService.isConfigured) {
-      _demoTransactions.insert(0, FinancialTransaction(id: 'transaction-${_demoTransactions.length + 1}', type: type, category: category, amount: amount, description: description, date: DateTime.now()));
+      _demoTransactions.insert(0, FinancialTransaction(id: 'transaction-${_demoTransactions.length + 1}', type: type, category: category, amount: amount, description: normalizedDescription, date: DateTime.now()));
       return;
     }
     final userId = Supabase.instance.client.auth.currentUser?.id;
@@ -50,6 +52,11 @@ class FinanceRepository {
     if (account == null) throw const PostgrestException(message: 'No hay una cuenta financiera activa configurada.');
     return account['id'] as String;
   }
+
+  static const _validCategories = {
+    'membership', 'sponsorship', 'raffle', 'event', 'equipment', 'federation',
+    'facilities', 'salaries', 'supplies', 'other',
+  };
 
   static final _demoTransactions = <FinancialTransaction>[
     FinancialTransaction(id: 'transaction-1', type: TransactionType.income, category: 'Cuotas', amount: 2450, description: 'Cuotas de socios', date: DateTime(2026, 9, 2)),
