@@ -41,7 +41,7 @@ class PostRepository {
     if (normalizedTitle.isEmpty || normalizedBody.isEmpty) throw FormatException('El título y el contenido son obligatorios.');
     if (!SupabaseService.isConfigured) {
       final index = _demoPosts.indexWhere((post) => post.id == postId);
-      if (index < 0) throw const StateError('Noticia no encontrada.');
+      if (index < 0) throw StateError('Noticia no encontrada.');
       final previous = _demoPosts[index];
       _demoPosts[index] = Post(id: previous.id, title: normalizedTitle, body: normalizedBody, status: status, imageUrl: previous.imageUrl, publishedAt: status == PostStatus.published ? (previous.publishedAt ?? DateTime.now()) : null, createdAt: previous.createdAt);
       return;
