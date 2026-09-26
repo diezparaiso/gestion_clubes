@@ -29,6 +29,16 @@ class TeamsPage extends ConsumerStatefulWidget {
 }
 
 class _TeamsPageState extends ConsumerState<TeamsPage> {
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): búsqueda y filtro local de equipos.
+  final _searchController = TextEditingController();
+  bool _showInactive = true;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _editTeam(BuildContext context, Team team) async {
     final result = await showDialog<bool>(
       context: context,
@@ -72,26 +82,42 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
               OutlinedButton.icon(onPressed: () => _showSeasonManager(context), icon: const Icon(Icons.calendar_month_outlined), label: const Text('Temporadas')), const SizedBox(width: 10),
               FilledButton.icon(onPressed: () => _showCreateTeamDialog(context), icon: const Icon(Icons.add), label: const Text('Nuevo equipo')),
             ]),
+            const SizedBox(height: 12),
+            Row(children: [
+              Expanded(child: TextField(
+                controller: _searchController,
+                decoration: const InputDecoration(prefixIcon: Icon(Icons.search), labelText: 'Buscar equipo o categoría', border: OutlineInputBorder()),
+                onChanged: (_) => setState(() {}),
+              )),
+              const SizedBox(width: 12),
+              FilterChip(label: const Text('Mostrar inactivos'), selected: _showInactive, onSelected: (value) => setState(() => _showInactive = value)),
+            ]),
             const SizedBox(height: 8),
             const Text('Organiza las plantillas del club por categoría y temporada.'),
             const SizedBox(height: 24),
             Expanded(child: teams.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => const Center(child: Text('No se han podido cargar los equipos.')),
-              data: (items) => items.isEmpty
-                  ? const Center(child: Text('Todavía no hay equipos creados.'))
-                  : LayoutBuilder(builder: (context, constraints) {
+              data: (items) {
+                final query = _searchController.text.trim().toLowerCase();
+                final filtered = items.where((team) {
+                  final matchesText = query.isEmpty || team.name.toLowerCase().contains(query) || team.category.toLowerCase().contains(query) || team.seasonName.toLowerCase().contains(query);
+                  return matchesText && (_showInactive || team.isActive);
+                }).toList();
+                if (filtered.isEmpty) return Center(child: Text(items.isEmpty ? 'Todavía no hay equipos creados.' : 'No hay equipos que coincidan con el filtro.'));
+                return LayoutBuilder(builder: (context, constraints) {
                       final columns = constraints.maxWidth >= 800 ? 3 : constraints.maxWidth >= 500 ? 2 : 1;
                       return GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns, crossAxisSpacing: 16, mainAxisSpacing: 16, childAspectRatio: 1.55),
-                        itemCount: items.length,
+                        itemCount: filtered.length,
                         itemBuilder: (context, index) => _TeamCard(
-                                team: items[index],
-                                onEdit: () => _editTeam(context, items[index]),
-                                onToggleActive: () => _toggleActive(context, items[index]),
+                                team: filtered[index],
+                                onEdit: () => _editTeam(context, filtered[index]),
+                                onToggleActive: () => _toggleActive(context, filtered[index]),
                               ),
                       );
-                    }),
+                });
+              },
             )),
           ]),
         ),
