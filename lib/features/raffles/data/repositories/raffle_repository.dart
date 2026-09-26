@@ -9,13 +9,13 @@ final raffleRepositoryProvider = Provider<RaffleRepository>((ref) => RaffleRepos
 class RaffleRepository {
   Future<List<Raffle>> listRaffles(String clubId) async {
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoRaffles);
-    final rows = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at').eq('club_id', clubId).order('created_at', ascending: false);
+    final rows = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at, slug, clubs!inner(slug)').eq('club_id', clubId).order('created_at', ascending: false);
     return rows.map(Raffle.fromJson).toList();
   }
 
   Future<Raffle> getRaffle({required String clubId, required String raffleId}) async {
     if (!SupabaseService.isConfigured) return _demoRaffles.firstWhere((raffle) => raffle.id == raffleId, orElse: () => _demoRaffles.first);
-    final row = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at').eq('club_id', clubId).eq('id', raffleId).single();
+    final row = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at, slug, clubs!inner(slug)').eq('club_id', clubId).eq('id', raffleId).single();
     return Raffle.fromJson(row);
   }
 
@@ -73,7 +73,7 @@ class RaffleRepository {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) throw const AuthException('La sesión ha expirado.');
     final slug = normalizedTitle.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
-    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': normalizedTitle, 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'status': 'active', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at').single();
+    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': normalizedTitle, 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'status': 'active', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at, slug, clubs!inner(slug)').single();
     return Raffle.fromJson(row);
   }
 
