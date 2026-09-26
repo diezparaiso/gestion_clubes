@@ -22,7 +22,7 @@ class TeamStaffRepository {
     DateTime? startDate,
   }) async {
     if (!SupabaseService.isConfigured) {
-      final staff = TeamStaff(id: 'staff-' + (_demoStaff.length + 1).toString(), name: email.trim(), role: role.trim(), isActive: true);
+      final staff = TeamStaff(id: 'staff-${_demoStaff.length + 1}', name: email.trim(), role: role.trim(), isActive: true);
       _demoStaff.add(staff);
       return staff;
     }
