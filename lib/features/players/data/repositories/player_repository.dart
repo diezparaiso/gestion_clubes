@@ -11,7 +11,7 @@ class PlayerRepository {
     if (!SupabaseService.isConfigured) return _demoPlayers;
     final rows = await Supabase.instance.client
         .from('team_players')
-        .select('id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))')
+        .select('id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(profiles!inner(first_name, last_name))')
         .eq('team_id', teamId)
         .order('jersey_number');
     return rows.map(Player.fromJson).toList();
@@ -25,6 +25,11 @@ class PlayerRepository {
     required String firstName,
     required String lastName,
     required String email,
+    required String phone,
+    required String guardianName,
+    required String guardianPhone,
+    required String guardianEmail,
+    required String guardianRelationship,
     required int? jerseyNumber,
   }) async {
     if (!SupabaseService.isConfigured) {
@@ -34,6 +39,11 @@ class PlayerRepository {
         name: '$firstName $lastName'.trim(),
         jerseyNumber: jerseyNumber,
         isActive: true,
+        phone: phone.isEmpty ? null : phone,
+        guardianName: guardianName.isEmpty ? null : guardianName,
+        guardianPhone: guardianPhone.isEmpty ? null : guardianPhone,
+        guardianEmail: guardianEmail.isEmpty ? null : guardianEmail,
+        guardianRelationship: guardianRelationship.isEmpty ? null : guardianRelationship,
       );
       _demoPlayers.add(player);
       return player;
@@ -85,6 +95,11 @@ class PlayerRepository {
           'player_id': playerId,
           'jersey_number': jerseyNumber,
           'is_active': true,
+          'phone': phone.isEmpty ? null : phone,
+          'guardian_name': guardianName.isEmpty ? null : guardianName,
+          'guardian_phone': guardianPhone.isEmpty ? null : guardianPhone,
+          'guardian_email': guardianEmail.isEmpty ? null : guardianEmail,
+          'guardian_relationship': guardianRelationship.isEmpty ? null : guardianRelationship,
         })
         .select(
           'id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))',
@@ -99,6 +114,11 @@ class PlayerRepository {
     required String clubId,
     required String teamId,
     required String playerId,
+    required String phone,
+    required String guardianName,
+    required String guardianPhone,
+    required String guardianEmail,
+    required String guardianRelationship,
     required int? jerseyNumber,
     required bool isActive,
   }) async {
@@ -111,6 +131,11 @@ class PlayerRepository {
         name: current.name,
         jerseyNumber: jerseyNumber,
         isActive: isActive,
+        phone: phone.isEmpty ? null : phone,
+        guardianName: guardianName.isEmpty ? null : guardianName,
+        guardianPhone: guardianPhone.isEmpty ? null : guardianPhone,
+        guardianEmail: guardianEmail.isEmpty ? null : guardianEmail,
+        guardianRelationship: guardianRelationship.isEmpty ? null : guardianRelationship,
       );
       _demoPlayers[index] = updated;
       return updated;
@@ -130,6 +155,11 @@ class PlayerRepository {
         .update({
           'jersey_number': jerseyNumber,
           'is_active': isActive,
+          'phone': phone.isEmpty ? null : phone,
+          'guardian_name': guardianName.isEmpty ? null : guardianName,
+          'guardian_phone': guardianPhone.isEmpty ? null : guardianPhone,
+          'guardian_email': guardianEmail.isEmpty ? null : guardianEmail,
+          'guardian_relationship': guardianRelationship.isEmpty ? null : guardianRelationship,
         })
         .eq('id', playerId)
         .eq('team_id', teamId)
