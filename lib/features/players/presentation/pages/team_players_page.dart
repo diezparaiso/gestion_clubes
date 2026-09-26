@@ -54,9 +54,8 @@ class _TeamPlayersPageState extends ConsumerState<TeamPlayersPage> {
     final teamName = widget.teamName;
     final players = ref.watch(teamPlayersProvider(teamId));
     return Scaffold(
-      appBar: const ClubNavigationAppBar(title: 'Jugadores'),
-        //
-        title: Text(teamName),
+      appBar: ClubNavigationAppBar(
+        title: teamName,
         actions: [
           IconButton(
             onPressed: () => context.go('/teams/$teamId/staff', extra: teamName),
