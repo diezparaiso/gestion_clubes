@@ -81,8 +81,6 @@ class RaffleRepository {
     const RaffleTicket(id: 'raffle-1-ticket-12', number: 12, buyerName: 'Luis Martín', buyerEmail: 'luis@example.com', paymentStatus: 'pending'),
     const RaffleTicket(id: 'raffle-1-ticket-42', number: 42, buyerName: 'Marta López', buyerEmail: 'marta@example.com', paymentStatus: 'paid'),
   ];
-}
-
   Future<List<MonthlyRaffleResult>> listMonthlyResults(String raffleId) async {
     if (!SupabaseService.isConfigured) return const [];
     final rows = await Supabase.instance.client
