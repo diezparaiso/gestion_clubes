@@ -15,8 +15,9 @@ class SponsorRepository {
       return _demoSponsors();
     }
 
+    final supabase = _supabase;
     try {
-      final response = await _supabase!
+      final response = await supabase!
           .from('sponsors')
           .select()
           .eq('club_id', clubId)
@@ -56,8 +57,9 @@ class SponsorRepository {
       return _demoSponsors().where((s) => s.isPublic && s.isActive).toList();
     }
 
+    final supabase = _supabase;
     try {
-      final response = await _supabase!.rpc(
+      final response = await supabase.rpc(
         'get_public_sponsors',
         params: {'target_club_slug': clubSlug},
       );
@@ -86,8 +88,9 @@ class SponsorRepository {
       return 'sponsor-${DateTime.now().millisecondsSinceEpoch}';
     }
 
+    final supabase = _supabase;
     try {
-      final result = await _supabase!.rpc(
+      final result = await supabase.rpc(
         'create_sponsor',
         params: {
           'p_club_id': clubId,
