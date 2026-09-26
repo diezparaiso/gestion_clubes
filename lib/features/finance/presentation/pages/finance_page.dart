@@ -8,10 +8,18 @@ import '../../../../core/utils/csv_exporter.dart';
 import '../../data/repositories/finance_repository.dart';
 import '../../domain/entities/financial_transaction.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Usa el saldo inicial real del repositorio y valida movimientos.
+
 final transactionsProvider = FutureProvider<List<FinancialTransaction>>((ref) {
   final clubId = ref.watch(authControllerProvider).clubId;
   if (clubId == null) return Future.value(const []);
   return ref.watch(financeRepositoryProvider).listTransactions(clubId);
+});
+
+final openingBalanceProvider = FutureProvider<double>((ref) {
+  final clubId = ref.watch(authControllerProvider).clubId;
+  if (clubId == null) return Future.value(0);
+  return ref.watch(financeRepositoryProvider).getOpeningBalance(clubId);
 });
 
 class FinancePage extends ConsumerWidget {
@@ -20,6 +28,7 @@ class FinancePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactions = ref.watch(transactionsProvider);
+    final openingBalance = ref.watch(openingBalanceProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Tesorería')),
       body: RefreshIndicator(
@@ -39,7 +48,11 @@ class FinancePage extends ConsumerWidget {
             Expanded(child: transactions.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => const Center(child: Text('No se han podido cargar los movimientos.')),
-              data: (items) => _FinanceContent(transactions: items),
+              data: (items) => openingBalance.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (error, stack) => const Center(child: Text('No se ha podido cargar el saldo inicial.')),
+                data: (balance) => _FinanceContent(transactions: items, openingBalance: balance),
+              ),
             )),
           ]),
         ),
@@ -49,7 +62,10 @@ class FinancePage extends ConsumerWidget {
 
   Future<void> _showTransactionDialog(BuildContext context, WidgetRef ref) async {
     final saved = await showDialog<bool>(context: context, builder: (_) => const _TransactionDialog());
-    if (saved == true) ref.invalidate(transactionsProvider);
+    if (saved == true) {
+      ref.invalidate(transactionsProvider);
+      ref.invalidate(openingBalanceProvider);
+    }
   }
 
   Future<void> _exportTransactions(BuildContext context, WidgetRef ref) async {
@@ -71,9 +87,10 @@ class FinancePage extends ConsumerWidget {
 }
 
 class _FinanceContent extends StatelessWidget {
-  const _FinanceContent({required this.transactions});
+  const _FinanceContent({required this.transactions, required this.openingBalance});
 
   final List<FinancialTransaction> transactions;
+  final double openingBalance;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +98,7 @@ class _FinanceContent extends StatelessWidget {
     final expense = transactions.where((item) => item.type == TransactionType.expense).fold<double>(0, (sum, item) => sum + item.amount);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Wrap(spacing: 16, runSpacing: 16, children: [
-        _FinanceMetric(label: 'Saldo', value: _formatCurrency(7180 + income - expense), color: const Color(0xFF168B68)),
+        _FinanceMetric(label: 'Saldo', value: _formatCurrency(openingBalance + income - expense), color: const Color(0xFF168B68)),
         _FinanceMetric(label: 'Ingresos', value: _formatCurrency(income), color: const Color(0xFF3276B1)),
         _FinanceMetric(label: 'Gastos', value: _formatCurrency(expense), color: const Color(0xFFD27A2C)),
       ]),
@@ -197,7 +214,10 @@ class _TransactionDialogState extends ConsumerState<_TransactionDialog> {
                   controller: _amountController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   decoration: const InputDecoration(labelText: 'Importe', suffixText: '€'),
-                  validator: (value) => double.tryParse((value ?? '').replaceAll(',', '.')) == null ? 'Introduce un importe válido' : null,
+                  validator: (value) {
+                    final amount = double.tryParse((value ?? '').replaceAll(',', '.'));
+                    return amount == null || amount <= 0 ? 'Introduce un importe mayor que 0' : null;
+                  },
                 ),
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
