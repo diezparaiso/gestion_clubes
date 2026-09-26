@@ -127,3 +127,18 @@ Before changing a file, read this log and the existing AI markers. After changin
 - Supabase live database: not executed through a live connector; no schema change was required.
 - Stripe: untouched.
 - Marker: MODIFICADO POR GPT-5.6 LUNA.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — member management completion
+- `lib/features/members/domain/entities/member.dart`
+  - Added the existing Supabase `deceased` status and membership type model.
+  - Added existing membership fields: join date, renewal date, leave date and notes.
+- `lib/features/members/data/repositories/member_repository.dart`
+  - Reads and writes the existing membership fields from `memberships`.
+  - New members receive the existing `join_date` default explicitly.
+- `lib/features/members/presentation/pages/members_page.dart`
+  - Member editing now exposes status, membership type, join/renewal/leave dates and notes.
+  - No new Supabase columns were introduced.
+- Supabase live database: no direct execution; changes use columns already defined in `002_memberships.sql`.
+- Stripe: untouched.
+- Marker: MODIFICADO POR GPT-5.6 LUNA.
