@@ -303,3 +303,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `events_page.dart`: búsqueda local por título, ubicación y descripción.
 - Añadido filtro para mostrar solo eventos públicos.
 - Sin cambios de esquema, RLS ni Payments.
+
+### 2026-09-26 — GPT-5.6 LUNA — búsqueda y filtro de rifas
+- `raffles_page.dart`: añadido buscador local por título y filtro por estado.
+- Se reutilizan los estados existentes de `RaffleStatus`.
+- Sin cambios de esquema, RLS ni Payments.
