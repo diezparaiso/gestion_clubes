@@ -116,7 +116,7 @@ class TeamRepository {
     Team(id: 'team-c', name: 'Alevín', category: 'Alevín', seasonName: '2026/2027', isActive: true),
   ];
 
-  static const _demoSeasons = [
+  static final _demoSeasons = <Season>[
     Season(id: 'season-current', name: '2026/2027'),
     Season(id: 'season-previous', name: '2025/2026'),
   ];
