@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Incluye todos los roles del enum del club en la gestión de miembros.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -345,6 +346,8 @@ class _InviteMemberDialogState extends ConsumerState<_InviteMemberDialog> {
     'staff',
     'member',
     'player',
+    'parent_guardian',
+    'follower',
   ];
 
   @override
