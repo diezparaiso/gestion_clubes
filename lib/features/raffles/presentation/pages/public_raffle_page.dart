@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Corrige el rango visual de números y la reserva pública.\n\nimport 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -56,7 +56,7 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
             const SizedBox(height: 4),
             Text('${raffle.totalNumbers - occupiedCount} disponibles de ${raffle.totalNumbers}'),
             const SizedBox(height: 20),
-            Wrap(spacing: 8, runSpacing: 8, children: List.generate(raffle.totalNumbers, (index) => _numberTile(raffle, index))),
+            Wrap(spacing: 8, runSpacing: 8, children: List.generate(raffle.totalNumbers, (index) => _numberTile(raffle, index + 1))),
           ]))),
           const SizedBox(height: 16),
           FilledButton.icon(onPressed: _selectedNumbers.isEmpty ? null : _showReservationDialog, icon: const Icon(Icons.confirmation_number_outlined), label: Text(_selectedNumbers.isEmpty ? 'Selecciona números' : 'Reservar ${_selectedNumbers.length} número(s)')),
