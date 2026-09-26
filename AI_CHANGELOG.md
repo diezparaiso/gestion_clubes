@@ -67,3 +67,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/raffles/presentation/pages/public_raffle_page.dart`: corrige la cuadrícula pública para ofrecer exactamente los números 1..total_numbers, coherente con la validación de Supabase.
 - `lib/features/raffles/presentation/pages/raffles_page.dart`: valida que precio y cantidad de números sean mayores que cero antes del alta.
 - Sin cambios de esquema en este bloque. Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — player club_id integrity
+- `lib/features/players/data/repositories/player_repository.dart`: corrige el alta para informar `club_id` tanto en `players` como en `team_players`, y limita la reutilización de un jugador al club activo.
+- `lib/features/players/presentation/pages/team_players_page.dart`: pasa el `club_id` de la sesión al repositorio.
+- Se trata de una corrección de datos obligatorios ya existentes; no requiere cambios de esquema.
+- Stripe/payment implementation remains untouched.
