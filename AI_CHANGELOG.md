@@ -171,3 +171,7 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Endurecida la edición de jugadores y personal: ahora se verifica que el equipo pertenece al club activo antes de modificar la asignación.
 - La pantalla de edición obtiene el `clubId` de la sesión antes de guardar.
 - Sin cambios de esquema Supabase ni de pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — gestión completa de roles de miembros
+- Añadidos `parent_guardian` y `follower` al selector de invitación, ya soportados por el enum `club_role` y por el selector de cambio de rol.
+- Sin cambios de esquema ni de pagos.
