@@ -10,6 +10,7 @@ import '../../application/dashboard_stats_provider.dart';
 // MODIFICADO POR GPT-5.6 LUNA
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Elimina actividad ficticia del dashboard.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade exportación completa de gestión a Excel.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra el rol real del acceso seleccionado.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -115,7 +116,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               child: Text('PM', style: TextStyle(color: Color(0xFF14213D), fontWeight: FontWeight.w800)),
             ),
             title: Text(authState.email ?? 'Usuario', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis),
-            subtitle: const Text('Presidente', style: TextStyle(color: Color(0xFF9BA9BC))),
+            subtitle: Text(authState.roleLabel, style: const TextStyle(color: Color(0xFF9BA9BC))),
             trailing: IconButton(onPressed: () => ref.read(authControllerProvider.notifier).signOut(), tooltip: 'Cerrar sesión', icon: const Icon(Icons.logout_rounded, color: Color(0xFF9BA9BC))),
           ),
         ],
