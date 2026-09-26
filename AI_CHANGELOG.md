@@ -44,3 +44,13 @@ This file is the permanent handoff log between AI assistants working on this rep
   - Prevents saving an event whose end is not after its start.
 - No database schema change.
 - Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — notification target integrity
+- `supabase/migrations/023_notification_target_integrity.sql`
+  - Adds the missing `members` target handling.
+  - Uses the actual schema roles (`club_president`, `club_secretary`) for managers.
+  - Restricts recipients to active memberships/staff.
+  - Keeps delivery deduplication via the existing unique constraint.
+- Repository migration only; live Supabase has not been executed from this workflow.
+- Stripe/payment implementation remains untouched.
