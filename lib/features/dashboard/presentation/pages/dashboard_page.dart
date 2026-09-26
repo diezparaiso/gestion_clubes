@@ -5,7 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../../auth/application/auth_controller.dart';
 import '../../application/dashboard_stats_provider.dart';
 
-// MODIFICADO POR GPT-5.6 LUNA\nclass DashboardPage extends ConsumerStatefulWidget {
+// MODIFICADO POR GPT-5.6 LUNA
+class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
   @override
