@@ -51,6 +51,8 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
           Text(raffle.clubName ?? widget.clubSlug, style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 8),
           Text(raffle.title, style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(height: 6),
+          Text(raffle.type == RaffleType.cesta ? 'Rifa tipo Cesta · elige tu número' : 'Sorteo puro · elige tu número y el sistema sorteará el ganador'),
           if (raffle.description != null) ...[const SizedBox(height: 8), Text(raffle.description!)],
           const SizedBox(height: 20),
           Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -72,7 +74,7 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
   Widget _numberTile(Raffle raffle, int number) {
     final isOccupied = raffle.occupiedNumbers.contains(number) || _reservedNumbers.contains(number);
     final isSelected = _selectedNumbers.contains(number);
-    return SizedBox(width: 48, height: 42, child: OutlinedButton(onPressed: isOccupied ? null : () => setState(() => isSelected ? _selectedNumbers.remove(number) : _selectedNumbers.add(number)), style: OutlinedButton.styleFrom(padding: EdgeInsets.zero, backgroundColor: isSelected ? Theme.of(context).colorScheme.primaryContainer : null), child: Text(number.toString().padLeft(2, '0'))));
+    return SizedBox(width: 48, height: 42, child: OutlinedButton(onPressed: isOccupied ? null : () => setState(() => isSelected ? _selectedNumbers.remove(number) : _selectedNumbers.add(number)), style: OutlinedButton.styleFrom(padding: EdgeInsets.zero, backgroundColor: isOccupied ? Colors.grey.shade300 : (isSelected ? Theme.of(context).colorScheme.primaryContainer : null), foregroundColor: isOccupied ? Colors.grey.shade600 : null, disabledForegroundColor: Colors.grey.shade600), child: Text(number.toString().padLeft(2, '0'))));
   }
 
   Future<void> _showReservationDialog() async {
