@@ -131,3 +131,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Fixed a malformed literal \\n sequence at the beginning of `public_raffle_page.dart` that commented out the Flutter imports and caused the large analyzer cascade, including the router type error.
 - Fixed the non-const `AuthException` invocation in `post_repository.dart`.
 - No payment/Stripe changes and no live Supabase execution.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — final analyzer error repair
+- Removed an invalid `const StateError` invocation in `post_repository.dart`.
+- The remaining analyzer messages are informational/warnings only and are not blocking errors.
