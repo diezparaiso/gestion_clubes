@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../../core/services/supabase_service.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/raffle_repository.dart';
 
@@ -12,6 +13,9 @@ class MyRafflesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    if (!SupabaseService.isConfigured) {
+      return const Scaffold(body: Center(child: Text('El área de rifas del socio estará disponible al conectar Supabase y el sistema de pagos.')));
+    }
     final profileId = Supabase.instance.client.auth.currentUser?.id;
     if (profileId == null) {
       return const Scaffold(body: Center(child: Text('Inicia sesión para consultar tus rifas.')));
