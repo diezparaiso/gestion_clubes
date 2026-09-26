@@ -21,6 +21,7 @@ import '../features/players/presentation/pages/team_players_page.dart';
 import '../features/raffles/presentation/pages/raffles_page.dart';
 import '../features/raffles/presentation/pages/public_raffle_page.dart';
 import '../features/raffles/presentation/pages/raffle_detail_page.dart';
+import '../features/raffles/presentation/pages/my_raffles_page.dart';
 import '../features/raffles/domain/entities/raffle.dart';
 import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
@@ -107,6 +108,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/finance',
         name: 'finance',
         builder: (context, state) => const FinancePage(),
+      ),
+      GoRoute(
+        path: '/my-raffles',
+        name: 'my-raffles',
+        builder: (context, state) => const MyRafflesPage(),
       ),
       GoRoute(
         path: '/raffles',
