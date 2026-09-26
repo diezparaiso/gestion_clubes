@@ -313,7 +313,16 @@ class _EditPlayerDialogState extends ConsumerState<_EditPlayerDialog> {
       _errorMessage = null;
     });
     try {
+      final clubId = ref.read(authControllerProvider).clubId;
+      if (clubId == null) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = 'No hay un club activo en la sesión.';
+        });
+        return;
+      }
       await ref.read(playerRepositoryProvider).updateTeamPlayer(
+        clubId: clubId,
         teamId: widget.teamId,
         playerId: widget.player.id,
         jerseyNumber: _jerseyController.text.trim().isEmpty
