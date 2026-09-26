@@ -17,7 +17,7 @@ class PlayerRepository {
     return rows.map(Player.fromJson).toList();
   }
 
-  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta/asignación de jugadores, coherencia club_id y edición de dorsal/estado.
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta/asignación de jugadores, coherencia club_id, validación de equipo y edición de dorsal/estado.
   // El alta reutiliza una cuenta existente de profiles y las tablas players/team_players.
   Future<Player> createAndAssignPlayer({
     required String clubId,
@@ -40,6 +40,16 @@ class PlayerRepository {
     }
 
     final client = Supabase.instance.client;
+    final team = await client
+        .from('teams')
+        .select('id')
+        .eq('id', teamId)
+        .eq('club_id', clubId)
+        .maybeSingle();
+    if (team == null) {
+      throw const PostgrestException(message: 'El equipo no pertenece al club activo.');
+    }
+
     final profile = await client
         .from('profiles')
         .select('id')
