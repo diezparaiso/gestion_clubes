@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/team_repository.dart';
@@ -30,12 +29,15 @@ class TeamsPage extends ConsumerStatefulWidget {
 }
 
 class _TeamsPageState extends ConsumerState<TeamsPage> {
-  Future<void> _edit(BuildContext context, WidgetRef ref) async {
-    final result = await showDialog<bool>(context: context, builder: (_) => _TeamFormDialog(team: team));
-    if (result == true) ref.invalidate(teamsProvider);
+  Future<void> _editTeam(BuildContext context, Team team) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => _TeamFormDialog(team: team),
+    );
+    if (result == true && mounted) ref.invalidate(teamsProvider);
   }
 
-  Future<void> _toggleActive(BuildContext context, WidgetRef ref) async {
+  Future<void> _toggleActive(BuildContext context, Team team) async {
     final confirmed = await showDialog<bool>(context: context, builder: (context) => AlertDialog(
       title: Text(team.isActive ? 'Desactivar equipo' : 'Activar equipo'),
       content: Text(team.isActive ? 'El equipo seguirá existiendo y conservará su histórico.' : '¿Quieres volver a activar este equipo?'),
@@ -82,7 +84,11 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
                       return GridView.builder(
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: columns, crossAxisSpacing: 16, mainAxisSpacing: 16, childAspectRatio: 1.55),
                         itemCount: items.length,
-                        itemBuilder: (context, index) => _TeamCard(team: items[index]),
+                        itemBuilder: (context, index) => _TeamCard(
+                                team: items[index],
+                                onEdit: () => _editTeam(context, items[index]),
+                                onToggleActive: () => _toggleActive(context, items[index]),
+                              ),
                       );
                     }),
             )),
@@ -177,28 +183,87 @@ class _TeamFormDialogState extends ConsumerState<_TeamFormDialog> {
   }
 }
 
-class _TeamCard extends ConsumerWidget {
-  const _TeamCard({required this.team});
+class _TeamCard extends StatelessWidget {
+  const _TeamCard({
+    required this.team,
+    required this.onEdit,
+    required this.onToggleActive,
+  });
 
   final Team team;
+  final VoidCallback onEdit;
+  final VoidCallback onToggleActive;
 
   @override
   Widget build(BuildContext context) {
-    return Card(child: InkWell(
-      onTap: () => context.go('/teams/${team.id}/players', extra: team.name),
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [
-        const CircleAvatar(backgroundColor: Color(0xFFE8EFEC), child: Icon(Icons.groups_outlined, color: Color(0xFF168B68))),
-        const Spacer(),
-        Chip(label: Text(team.isActive ? 'Activo' : 'Inactivo'), backgroundColor: const Color(0xFFE8EFEC), side: BorderSide.none, labelStyle: const TextStyle(color: Color(0xFF168B68), fontWeight: FontWeight.w700)),
-      ]),
-      const Spacer(),
-      Text(team.name, style: Theme.of(context).textTheme.titleLarge),
-      const SizedBox(height: 4),
-      Text(team.category),
-      const SizedBox(height: 10),
-      Row(children: [const Icon(Icons.calendar_today_outlined, size: 15, color: Color(0xFF77838F)), const SizedBox(width: 6), Text(team.seasonName, style: const TextStyle(fontSize: 13))]),
-    ]))));
+    return Card(
+      child: InkWell(
+        onTap: () => context.go('/teams/${team.id}/players', extra: team.name),
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Color(0xFFE8EFEC),
+                    child: Icon(Icons.groups_outlined, color: Color(0xFF168B68)),
+                  ),
+                  const Spacer(),
+                  PopupMenuButton<String>(
+                    tooltip: 'Acciones del equipo',
+                    onSelected: (value) {
+                      if (value == 'edit') onEdit();
+                      if (value == 'toggle') onToggleActive();
+                    },
+                    itemBuilder: (context) => [
+                      const PopupMenuItem(
+                        value: 'edit',
+                        child: ListTile(
+                          leading: Icon(Icons.edit_outlined),
+                          title: Text('Editar'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                      PopupMenuItem(
+                        value: 'toggle',
+                        child: ListTile(
+                          leading: Icon(Icons.power_settings_new_outlined),
+                          title: Text(team.isActive ? 'Desactivar' : 'Activar'),
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Chip(
+                    label: Text(team.isActive ? 'Activo' : 'Inactivo'),
+                    backgroundColor: const Color(0xFFE8EFEC),
+                    side: BorderSide.none,
+                    labelStyle: const TextStyle(
+                      color: Color(0xFF168B68),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Text(team.name, style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 4),
+              Text(team.category),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  const Icon(Icons.calendar_today_outlined, size: 15, color: Color(0xFF77838F)),
+                  const SizedBox(width: 6),
+                  Text(team.seasonName, style: const TextStyle(fontSize: 13)),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
