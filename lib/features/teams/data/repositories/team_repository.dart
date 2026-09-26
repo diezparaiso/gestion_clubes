@@ -27,7 +27,7 @@ class TeamRepository {
   // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): CRUD de temporadas con columnas existentes.
   Future<Season> createSeason({required String clubId, required String name, required DateTime startDate}) async {
     if (!SupabaseService.isConfigured) {
-      final season = Season(id: 'season-${_demoSeasons.length + 1}', name: name.trim());
+      final season = Season(id: 'season-${_demoSeasons.length + 1}', name: name.trim(), startDate: startDate);
       _demoSeasons.add(season);
       return season;
     }
@@ -43,14 +43,14 @@ class TeamRepository {
     if (!SupabaseService.isConfigured) {
       final index = _demoSeasons.indexWhere((season) => season.id == seasonId);
       if (index < 0) throw StateError('Temporada no encontrada.');
-      final updated = Season(id: seasonId, name: name.trim());
+      final updated = Season(id: seasonId, name: name.trim(), startDate: startDate);
       _demoSeasons[index] = updated;
       return updated;
     }
     final row = await Supabase.instance.client.from('seasons').update({
       'name': name.trim(),
       'start_date': startDate.toIso8601String().split('T').first,
-    }).eq('id', seasonId).eq('club_id', clubId).select('id, name').single();
+    }).eq('id', seasonId).eq('club_id', clubId).select('id, name, start_date').single();
     return Season.fromJson(row);
   }
 
@@ -117,7 +117,7 @@ class TeamRepository {
   ];
 
   static final _demoSeasons = <Season>[
-    Season(id: 'season-current', name: '2026/2027'),
-    Season(id: 'season-previous', name: '2025/2026'),
+    Season(id: 'season-current', name: '2026/2027', startDate: DateTime(2026, 7, 1)),
+    Season(id: 'season-previous', name: '2025/2026', startDate: DateTime(2025, 7, 1)),
   ];
 }
