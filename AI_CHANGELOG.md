@@ -187,3 +187,12 @@ Before changing a file, read this log and the existing AI markers. After changin
 - Supabase live database: no schema change; existing `notifications` relation used.
 - Stripe: untouched.
 - Marker: MODIFICADO POR GPT-5.6 LUNA.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — raffle ticket integrity
+- `supabase/migrations/021_raffle_ticket_integrity.sql`
+  - Adds database-level validation that raffle ticket numbers are between 1 and the raffle's configured `total_numbers`.
+  - Verifies the ticket and raffle belong to the same club.
+- Supabase live database: migration prepared in repository; not executed through a live Supabase connector.
+- Stripe: untouched.
+- Marker: MODIFICADO POR GPT-5.6 LUNA.
