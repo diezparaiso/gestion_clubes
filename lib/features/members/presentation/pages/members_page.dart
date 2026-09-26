@@ -191,6 +191,10 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _numberController;
   late final TextEditingController _notesController;
+  late final TextEditingController _addressController;
+  late final TextEditingController _postalCodeController;
+  late final TextEditingController _cityController;
+  late final TextEditingController _provinceController;
   late MemberStatus _status;
   late MembershipType _membershipType;
   late DateTime _joinDate;
@@ -204,6 +208,10 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
     super.initState();
     _numberController = TextEditingController(text: widget.member.memberNumber.toString());
     _notesController = TextEditingController(text: widget.member.notes ?? '');
+    _addressController = TextEditingController(text: widget.member.address ?? '');
+    _postalCodeController = TextEditingController(text: widget.member.postalCode ?? '');
+    _cityController = TextEditingController(text: widget.member.city ?? '');
+    _provinceController = TextEditingController(text: widget.member.province ?? '');
     _status = widget.member.status;
     _membershipType = widget.member.membershipType;
     _joinDate = widget.member.joinDate;
@@ -215,6 +223,10 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
   void dispose() {
     _numberController.dispose();
     _notesController.dispose();
+    _addressController.dispose();
+    _postalCodeController.dispose();
+    _cityController.dispose();
+    _provinceController.dispose();
     super.dispose();
   }
 
@@ -287,6 +299,10 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
         renewalDate: _renewalDate,
         leaveDate: _leaveDate,
         notes: _notesController.text,
+        address: _addressController.text,
+        postalCode: _postalCodeController.text,
+        city: _cityController.text,
+        province: _provinceController.text,
       );
       if (mounted) Navigator.of(context).pop(true);
     } on PostgrestException catch (error) {
@@ -351,6 +367,16 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
               ListTile(contentPadding: EdgeInsets.zero, title: const Text('Alta'), subtitle: Text(_formatDate(_joinDate)), trailing: IconButton(onPressed: _isSaving ? null : _selectJoinDate, icon: const Icon(Icons.calendar_today_outlined))),
               ListTile(contentPadding: EdgeInsets.zero, title: const Text('Renovación'), subtitle: Text(_renewalDate == null ? 'Sin fecha' : _formatDate(_renewalDate!)), trailing: Row(mainAxisSize: MainAxisSize.min, children: [if (_renewalDate != null) IconButton(onPressed: _isSaving ? null : () => setState(() => _renewalDate = null), icon: const Icon(Icons.clear)), IconButton(onPressed: _isSaving ? null : _selectRenewalDate, icon: const Icon(Icons.calendar_today_outlined))])),
               ListTile(contentPadding: EdgeInsets.zero, title: const Text('Baja'), subtitle: Text(_leaveDate == null ? 'Sin fecha' : _formatDate(_leaveDate!)), trailing: Row(mainAxisSize: MainAxisSize.min, children: [if (_leaveDate != null) IconButton(onPressed: _isSaving ? null : () => setState(() => _leaveDate = null), icon: const Icon(Icons.clear)), IconButton(onPressed: _isSaving ? null : _selectLeaveDate, icon: const Icon(Icons.calendar_today_outlined))])),
+              TextFormField(controller: _addressController, decoration: const InputDecoration(labelText: 'Dirección postal')),
+              const SizedBox(height: 12),
+              Row(children: [
+                Expanded(child: TextFormField(controller: _postalCodeController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Código postal'))),
+                const SizedBox(width: 12),
+                Expanded(child: TextFormField(controller: _cityController, decoration: const InputDecoration(labelText: 'Localidad'))),
+              ]),
+              const SizedBox(height: 12),
+              TextFormField(controller: _provinceController, decoration: const InputDecoration(labelText: 'Provincia')),
+              const SizedBox(height: 12),
               TextFormField(controller: _notesController, maxLines: 3, decoration: const InputDecoration(labelText: 'Notas')),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 16),
