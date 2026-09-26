@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Edición de rol/estado del personal. Sin cambios de esquema.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta, edición y activación del personal usando team_staff existente.
 
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/team_staff_repository.dart';
@@ -24,6 +24,13 @@ class TeamStaffPage extends ConsumerStatefulWidget {
 }
 
 class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
+  Future<void> _newStaff() async {
+    final clubId = ref.read(authControllerProvider).clubId;
+    if (clubId == null) return;
+    final result = await showDialog<bool>(context: context, builder: (_) => _CreateStaffDialog(clubId: clubId, teamId: widget.teamId));
+    if (result == true && mounted) ref.invalidate(teamStaffProvider(widget.teamId));
+  }
+
   Future<void> _editStaff(TeamStaff staff) async {
     final result = await showDialog<bool>(
       context: context,
@@ -42,7 +49,10 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Cuerpo técnico', style: Theme.of(context).textTheme.headlineMedium),
+          Row(children: [
+            Expanded(child: Text('Cuerpo técnico', style: Theme.of(context).textTheme.headlineMedium)),
+            FilledButton.icon(onPressed: _newStaff, icon: const Icon(Icons.person_add_alt_1), label: const Text('Añadir personal')),
+          ]),
           const SizedBox(height: 8),
           const Text('Entrenadores y personal asignado a este equipo.'),
           const SizedBox(height: 24),
@@ -70,6 +80,65 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
   }
 }
 
+
+
+class _CreateStaffDialog extends ConsumerStatefulWidget {
+  const _CreateStaffDialog({required this.clubId, required this.teamId});
+  final String clubId;
+  final String teamId;
+  @override
+  ConsumerState<_CreateStaffDialog> createState() => _CreateStaffDialogState();
+}
+
+class _CreateStaffDialogState extends ConsumerState<_CreateStaffDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _emailController = TextEditingController();
+  final _roleController = TextEditingController();
+  bool _isSaving = false;
+  String? _errorMessage;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _roleController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() { _isSaving = true; _errorMessage = null; });
+    try {
+      await ref.read(teamStaffRepositoryProvider).createAndAssignStaff(
+        clubId: widget.clubId,
+        teamId: widget.teamId,
+        email: _emailController.text.trim(),
+        role: _roleController.text.trim(),
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } on PostgrestException catch (error) {
+      if (mounted) setState(() { _isSaving = false; _errorMessage = error.message.contains('duplicate') ? 'Esa persona ya tiene ese cargo en este equipo.' : error.message; });
+    } catch (_) {
+      if (mounted) setState(() { _isSaving = false; _errorMessage = 'No se ha podido asignar el personal.'; });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Añadir personal'),
+      content: SizedBox(width: 420, child: Form(key: _formKey, child: Column(mainAxisSize: MainAxisSize.min, children: [
+        TextFormField(controller: _emailController, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email de la cuenta'), validator: (value) => value == null || !value.contains('@') ? 'Introduce un email válido' : null),
+        const SizedBox(height: 12),
+        TextFormField(controller: _roleController, decoration: const InputDecoration(labelText: 'Cargo / función'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null),
+        if (_errorMessage != null) ...[const SizedBox(height: 16), Align(alignment: Alignment.centerLeft, child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)))],
+      ]))),
+      actions: [
+        TextButton(onPressed: _isSaving ? null : () => Navigator.of(context).pop(), child: const Text('Cancelar')),
+        FilledButton(onPressed: _isSaving ? null : _save, child: _isSaving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Guardar')),
+      ],
+    );
+  }
+}
 
 class _EditStaffDialog extends ConsumerStatefulWidget {
   const _EditStaffDialog({required this.teamId, required this.staff});
