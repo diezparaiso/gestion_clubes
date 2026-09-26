@@ -8,17 +8,30 @@ import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/raffle_repository.dart';
 import '../../domain/entities/raffle.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadida búsqueda y filtro local por estado de rifa.
+
 final rafflesProvider = FutureProvider<List<Raffle>>((ref) {
   final clubId = ref.watch(authControllerProvider).clubId;
   if (clubId == null) return Future.value(const []);
   return ref.watch(raffleRepositoryProvider).listRaffles(clubId);
 });
 
-class RafflesPage extends ConsumerWidget {
+class RafflesPage extends ConsumerStatefulWidget {
   const RafflesPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RafflesPage> createState() => _RafflesPageState();
+}
+
+class _RafflesPageState extends ConsumerState<RafflesPage> {
+  final _searchController = TextEditingController();
+  RaffleStatus? _statusFilter;
+
+  @override
+  void dispose() { _searchController.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
     final raffles = ref.watch(rafflesProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('Rifas')),
@@ -26,8 +39,18 @@ class RafflesPage extends ConsumerWidget {
         Row(children: [Expanded(child: Text('Rifas del club', style: Theme.of(context).textTheme.headlineMedium)), FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nueva rifa'))]),
         const SizedBox(height: 8),
         const Text('Gestiona campañas y participaciones en modo simulado.'),
+        const SizedBox(height: 16),
+        Row(children: [
+          Expanded(child: TextField(controller: _searchController, onChanged: (_) => setState(() {}), decoration: const InputDecoration(hintText: 'Buscar rifa', prefixIcon: Icon(Icons.search)))),
+          const SizedBox(width: 12),
+          DropdownButton<RaffleStatus?>(value: _statusFilter, hint: const Text('Estado'), items: [const DropdownMenuItem<RaffleStatus?>(value: null, child: Text('Todos')), ...RaffleStatus.values.map((status) => DropdownMenuItem<RaffleStatus?>(value: status, child: Text(_RaffleCard._statusLabel(status))))], onChanged: (value) => setState(() => _statusFilter = value)),
+        ]),
         const SizedBox(height: 24),
-        Expanded(child: raffles.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar las rifas.')), data: (items) => items.isEmpty ? const Center(child: Text('Todavía no hay rifas creadas.')) : ListView.separated(itemCount: items.length, separatorBuilder: (_, index) => const SizedBox(height: 12), itemBuilder: (context, index) => _RaffleCard(raffle: items[index])))),
+        Expanded(child: raffles.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar las rifas.')), data: (items) {
+          final query = _searchController.text.trim().toLowerCase();
+          final filtered = items.where((raffle) => (query.isEmpty || raffle.title.toLowerCase().contains(query)) && (_statusFilter == null || raffle.status == _statusFilter)).toList();
+          return filtered.isEmpty ? Center(child: Text(items.isEmpty ? 'Todavía no hay rifas creadas.' : 'No hay rifas que coincidan.')) : ListView.separated(itemCount: filtered.length, separatorBuilder: (_, index) => const SizedBox(height: 12), itemBuilder: (context, index) => _RaffleCard(raffle: filtered[index]));
+        })),
       ])),
     );
   }
