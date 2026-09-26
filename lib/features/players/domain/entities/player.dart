@@ -22,17 +22,18 @@ class Player {
   final String? guardianRelationship;
 
   factory Player.fromJson(Map<String, dynamic> json) {
-    final profile = json['players']?['profiles'] as Map<String, dynamic>? ?? const {};
+    final player = json['players'] as Map<String, dynamic>? ?? const {};
+    final profile = player['profiles'] as Map<String, dynamic>? ?? const {};
     return Player(
       id: json['id'] as String,
       name: '${profile['first_name'] ?? ''} ${profile['last_name'] ?? ''}'.trim(),
       jerseyNumber: json['jersey_number'] as int?,
       isActive: json['is_active'] as bool? ?? true,
-      phone: json['phone'] as String?,
-      guardianName: json['guardian_name'] as String?,
-      guardianPhone: json['guardian_phone'] as String?,
-      guardianEmail: json['guardian_email'] as String?,
-      guardianRelationship: json['guardian_relationship'] as String?,
+      phone: player['phone'] as String?,
+      guardianName: player['guardian_name'] as String?,
+      guardianPhone: player['guardian_phone'] as String?,
+      guardianEmail: player['guardian_email'] as String?,
+      guardianRelationship: player['guardian_relationship'] as String?,
     );
   }
 }
