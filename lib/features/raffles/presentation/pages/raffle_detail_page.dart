@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade copia del enlace público para compartir la rifa por WhatsApp.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Pasa el club activo al acceso de participaciones y sorteo.
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -46,7 +47,9 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
           final raffle = raffleSnapshot.data!;
           if (_ticketsRaffleId != raffle.id) {
             _ticketsRaffleId = raffle.id;
-            _tickets = ref.read(raffleRepositoryProvider).listTickets(raffle.id);
+            _tickets = widget.clubId == null
+                ? Future.error(const AuthException('La sesión ha expirado.'))
+                : ref.read(raffleRepositoryProvider).listTickets(clubId: widget.clubId!, raffleId: raffle.id);
           }
           return Scaffold(
         appBar: AppBar(title: Text(raffle.title), actions: [if (raffle.clubSlug != null && raffle.slug != null) IconButton(tooltip: 'Copiar enlace público', onPressed: () => _copyPublicLink(context, raffle), icon: const Icon(Icons.link_outlined))]),
@@ -89,7 +92,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
     if (confirmed != true || !mounted) return;
     setState(() => _drawing = true);
     try {
-      final draw = await ref.read(raffleRepositoryProvider).drawRaffle(raffleId: widget.raffle?.id ?? widget.raffleId);
+      final draw = await ref.read(raffleRepositoryProvider).drawRaffle(clubId: widget.clubId!, raffleId: widget.raffle?.id ?? widget.raffleId);
       if (mounted) setState(() { _draw = draw; _drawing = false; });
     } on PostgrestException catch (error) {
       if (mounted) { setState(() => _drawing = false); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message))); }
