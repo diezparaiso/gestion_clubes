@@ -185,3 +185,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - El repositorio de eventos valida club activo, título y descripción obligatorios y que `end_at` sea posterior a `start_at` antes del alta.
 - Normaliza título, descripción y ubicación antes de persistir.
 - Sin cambios de esquema ni de pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — validación de socios
+- El alta y edición de socios valida club activo y número de socio positivo.
+- El alta valida nombre, apellidos y email; la edición valida que renovación y baja no sean anteriores al alta.
+- Sin cambios de esquema ni de pagos.
