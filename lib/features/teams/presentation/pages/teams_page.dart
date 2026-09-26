@@ -268,12 +268,16 @@ class _SeasonFormDialog extends ConsumerStatefulWidget {
 class _SeasonFormDialogState extends ConsumerState<_SeasonFormDialog> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  DateTime _startDate = DateTime(DateTime.now().year, 7, 1);
+  late DateTime _startDate;
   bool _isSaving = false;
   String? _errorMessage;
   bool get _isEditing => widget.season != null;
   @override
-  void initState() { super.initState(); _nameController.text = widget.season?.name ?? ''; }
+  void initState() {
+    super.initState();
+    _nameController.text = widget.season?.name ?? '';
+    _startDate = widget.season?.startDate ?? DateTime(DateTime.now().year, 7, 1);
+  }
   @override
   void dispose() { _nameController.dispose(); super.dispose(); }
   Future<void> _save() async {
