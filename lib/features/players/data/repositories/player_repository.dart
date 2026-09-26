@@ -94,6 +94,7 @@ class PlayerRepository {
     return Player.fromJson(row);
   }
 
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Verifica el equipo antes de editar una asignación.
   Future<Player> updateTeamPlayer({
     required String teamId,
     required String playerId,
@@ -113,7 +114,16 @@ class PlayerRepository {
       _demoPlayers[index] = updated;
       return updated;
     }
-    final row = await Supabase.instance.client
+    final client = Supabase.instance.client;
+    final team = await client
+        .from('teams')
+        .select('id')
+        .eq('id', teamId)
+        .maybeSingle();
+    if (team == null) {
+      throw const PostgrestException(message: 'El equipo no existe o no está disponible.');
+    }
+    final row = await client
         .from('team_players')
         .update({
           'jersey_number': jerseyNumber,
