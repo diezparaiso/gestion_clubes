@@ -80,3 +80,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/raffles/data/repositories/raffle_repository.dart`: valida título, precio, rango de números y fecha de finalización antes de crear una rifa.
 - `lib/features/raffles/presentation/pages/raffles_page.dart`: muestra los errores de validación al usuario.
 - Sin cambios de esquema. Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — public content polish
+- lib/features/events/presentation/pages/public_events_page.dart: muestra fecha y hora de inicio y fin usando los datos reales del evento.
+- lib/features/news/presentation/pages/public_posts_page.dart: muestra image_url cuando existe, manteniendo el contenido público basado en el RPC existente.
+- lib/features/raffles/data/repositories/raffle_repository.dart: corrige una inserción accidental de validaciones de creación dentro de getPublicRaffle; las validaciones quedan únicamente en createRaffle.
+- Sin cambios de esquema en este bloque. Stripe/payment implementation remains untouched.
