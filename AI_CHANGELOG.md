@@ -190,3 +190,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - El alta y edición de socios valida club activo y número de socio positivo.
 - El alta valida nombre, apellidos y email; la edición valida que renovación y baja no sean anteriores al alta.
 - Sin cambios de esquema ni de pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — domicilio postal de socios
+- Se confirma que la versión anterior no permitía introducir dirección postal del socio.
+- Añadidos a `memberships`: dirección, código postal, localidad, provincia y país.
+- El alta y edición de socios ya permiten introducir y guardar estos datos.
+- Añadida migración `024_member_postal_address.sql`; queda pendiente de aplicar en el Supabase remoto.
