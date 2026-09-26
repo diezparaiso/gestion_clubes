@@ -20,6 +20,11 @@ class RaffleRepository {
   }
 
   Future<Raffle> getPublicRaffle({required String clubSlug, required String raffleSlug}) async {
+    final normalizedTitle = title.trim();
+    if (normalizedTitle.isEmpty) throw const FormatException('El título de la rifa es obligatorio.');
+    if (!ticketPrice.isFinite || ticketPrice <= 0) throw const FormatException('El precio debe ser mayor que 0.');
+    if (totalNumbers < 1 || totalNumbers > 100000) throw const FormatException('El total de números debe estar entre 1 y 100000.');
+    if (!endAt.isAfter(DateTime.now())) throw const FormatException('La fecha de finalización debe ser futura.');
     if (!SupabaseService.isConfigured) {
       final raffle = _demoRaffles.firstWhere((item) => item.slug == raffleSlug, orElse: () => _demoRaffles.first);
       return Raffle(id: raffle.id, title: raffle.title, ticketPrice: raffle.ticketPrice, totalNumbers: raffle.totalNumbers, status: raffle.status, endAt: raffle.endAt, clubName: 'Club Deportivo Paraíso', clubSlug: clubSlug, slug: raffleSlug, description: 'Participa en la rifa del club.', occupiedNumbers: {3, 7, 12, 25, 42, 68});
@@ -57,16 +62,16 @@ class RaffleRepository {
     return RaffleDraw.fromJson(row);
   }
 
-  Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt}) async {
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida invariantes de negocio antes del alta.\n  Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt}) async {
     if (!SupabaseService.isConfigured) {
-      final raffle = Raffle(id: 'raffle-${_demoRaffles.length + 1}', title: title, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);
+      final raffle = Raffle(id: 'raffle-${_demoRaffles.length + 1}', title: normalizedTitle, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);
       _demoRaffles.insert(0, raffle);
       return raffle;
     }
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) throw const AuthException('La sesión ha expirado.');
-    final slug = title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
-    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': title.trim(), 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at').single();
+    final slug = normalizedTitle.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
+    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': normalizedTitle, 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at').single();
     return Raffle.fromJson(row);
   }
 
