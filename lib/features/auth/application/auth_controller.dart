@@ -64,6 +64,7 @@ class AuthState {
     this.clubId,
     this.clubName,
     this.role,
+    this.mustChangePassword = false,
   });
 
   final AuthStatus status;
@@ -72,6 +73,7 @@ class AuthState {
   final String? clubId;
   final String? clubName;
   final String? role;
+  final bool mustChangePassword;
 
   String get roleLabel => ClubAccess(
     clubId: clubId ?? '',
@@ -86,6 +88,7 @@ class AuthState {
     String? clubId,
     String? clubName,
     String? role,
+    bool? mustChangePassword,
     bool clearError = false,
   }) {
     return AuthState(
@@ -95,6 +98,7 @@ class AuthState {
       clubId: clubId ?? this.clubId,
       clubName: clubName ?? this.clubName,
       role: role ?? this.role,
+      mustChangePassword: mustChangePassword ?? this.mustChangePassword,
     );
   }
 }
@@ -139,11 +143,21 @@ class AuthController extends Notifier<AuthState> {
   }
 
   Future<void> selectClub(ClubAccess club) async {
+    var mustChangePassword = false;
+    if (SupabaseService.isConfigured) {
+      final profile = await Supabase.instance.client
+          .from('profiles')
+          .select('must_change_password')
+          .eq('id', Supabase.instance.client.auth.currentUser!.id)
+          .maybeSingle();
+      mustChangePassword = profile?['must_change_password'] == true;
+    }
     state = state.copyWith(
       status: AuthStatus.signedIn,
       clubId: club.clubId,
       clubName: club.clubName,
       role: club.role,
+      mustChangePassword: mustChangePassword,
       clearError: true,
     );
   }
@@ -157,6 +171,7 @@ class AuthController extends Notifier<AuthState> {
         clubId: club.id,
         clubName: club.publicName,
         role: 'club_president',
+        mustChangePassword: false,
         clearError: true,
       );
     } on PostgrestException catch (error) {
