@@ -123,17 +123,21 @@ class _EditPlayerDialogState extends ConsumerState<_EditPlayerDialog> {
       );
       if (mounted) Navigator.of(context).pop(true);
     } on PostgrestException catch (error) {
-      if (mounted) setState(() {
-        _isSaving = false;
-        _errorMessage = error.message.contains('duplicate')
-            ? 'Ese dorsal ya está asignado.'
-            : error.message;
-      });
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = error.message.contains('duplicate')
+              ? 'Ese dorsal ya está asignado.'
+              : error.message;
+        });
+      }
     } catch (_) {
-      if (mounted) setState(() {
-        _isSaving = false;
-        _errorMessage = 'No se ha podido guardar el jugador.';
-      });
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = 'No se ha podido guardar el jugador.';
+        });
+      }
     }
   }
 
