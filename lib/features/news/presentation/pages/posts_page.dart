@@ -186,7 +186,7 @@ class _PostDialogState extends ConsumerState<_PostDialog> {
           onChanged: (value) => setState(() => _status = value ?? PostStatus.draft),
         ),
       ]),
-    )),
+    ))),
     actions: [
       TextButton(onPressed: _saving ? null : () => Navigator.of(context).pop(), child: const Text('Cancelar')),
       FilledButton(onPressed: _saving ? null : _save, child: _saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Guardar')),
