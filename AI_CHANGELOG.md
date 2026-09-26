@@ -327,3 +327,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Se corrige el cierre de paréntesis de Expanded en notifications_page.dart, que provocaba el error `Expected to find ')'` de `flutter analyze`.
 - Sin cambios de esquema, RLS ni Payments.
 - El proyecto debe volver a validarse localmente con `flutter analyze --no-pub`.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — contacto de jugador y progenitor/responsable
+- `team_players_page.dart`: el alta de jugador incorpora teléfono del jugador y datos opcionales del progenitor/responsable (nombre, teléfono, email y relación).
+- `player_repository.dart`: persiste y recupera esos datos y permite editarlos posteriormente.
+- `player.dart`: amplía la entidad con los datos de contacto.
+- Añadida `supabase/migrations/031_player_guardian_contact.sql` con las nuevas columnas y validaciones básicas; queda pendiente de aplicar en Supabase remoto.
+- Sin cambios en Payments.
