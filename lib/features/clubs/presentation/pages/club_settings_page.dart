@@ -128,7 +128,7 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
                       onPressed: () async {
                         final url = Uri.base.replace(path: '/club/${widget.club.slug}').toString();
                         await Clipboard.setData(ClipboardData(text: url));
-                        if (mounted) {
+                        if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Enlace público del club copiado.')),
                           );
