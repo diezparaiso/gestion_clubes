@@ -54,3 +54,10 @@ This file is the permanent handoff log between AI assistants working on this rep
   - Keeps delivery deduplication via the existing unique constraint.
 - Repository migration only; live Supabase has not been executed from this workflow.
 - Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — news CRUD completion
+- `lib/features/news/data/repositories/post_repository.dart`: añade actualización y borrado, valida título/contenido y mantiene coherencia de `published_at` según estado.
+- `lib/features/news/presentation/pages/posts_page.dart`: añade edición, borrado confirmado y soporte visual para borradas/archivadas.
+- Sin cambios de esquema; live Supabase no ejecutado desde este workflow.
+- Stripe/payment implementation remains untouched.
