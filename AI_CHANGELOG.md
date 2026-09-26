@@ -23,6 +23,15 @@ This file is the permanent handoff log between AI assistants working on this rep
 
 ## 2026-09-26 — GPT-5.6 LUNA — continued implementation
 
+### 2026-09-26 — GPT-5.6 LUNA — acceso a clubes existentes y rol real
+- `lib/features/auth/application/auth_controller.dart`: añade la carga de clubes con membresía activa, selección del club y conservación del rol `club_role` en el estado de autenticación.
+- `lib/features/clubs/presentation/pages/club_onboarding_page.dart`: muestra los clubes existentes del usuario y permite entrar directamente en ellos; mantiene la opción de crear un club nuevo.
+- `lib/features/dashboard/presentation/pages/dashboard_page.dart`: sustituye el texto fijo "Presidente" por el rol real del acceso seleccionado.
+- No se modifica el esquema ni se ejecuta nada sobre Supabase remoto.
+- Stripe/payment implementation remains untouched.
+
+
+
 - Previous work recorded above is preserved.
 - `supabase/migrations/021_raffle_ticket_integrity.sql`
   - Added validation for raffle ticket range and club ownership.
