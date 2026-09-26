@@ -140,7 +140,16 @@ class _CreatePlayerDialogState extends ConsumerState<_CreatePlayerDialog> {
     });
 
     try {
+      final clubId = ref.read(authControllerProvider).clubId;
+      if (clubId == null) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = 'No hay un club activo en la sesión.';
+        });
+        return;
+      }
       await ref.read(playerRepositoryProvider).createAndAssignPlayer(
+        clubId: clubId,
         teamId: widget.teamId,
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
