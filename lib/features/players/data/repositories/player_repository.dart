@@ -96,6 +96,7 @@ class PlayerRepository {
 
   // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Verifica el equipo antes de editar una asignación.
   Future<Player> updateTeamPlayer({
+    required String clubId,
     required String teamId,
     required String playerId,
     required int? jerseyNumber,
@@ -119,9 +120,10 @@ class PlayerRepository {
         .from('teams')
         .select('id')
         .eq('id', teamId)
+        .eq('club_id', clubId)
         .maybeSingle();
     if (team == null) {
-      throw const PostgrestException(message: 'El equipo no existe o no está disponible.');
+      throw const PostgrestException(message: 'El equipo no pertenece al club activo.');
     }
     final row = await client
         .from('team_players')
