@@ -317,3 +317,7 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Se incorpora a la interfaz el buscador, filtro por tipo y filtro por categoría que ya utilizaba la lógica de filtrado.
 - Las métricas financieras siguen calculándose sobre todos los movimientos.
 - Sin cambios de esquema, RLS ni Payments.
+
+### 2026-09-26 — GPT-5.6 LUNA — dashboard sin actividad ficticia
+- Se eliminan ejemplos ficticios del dashboard y se muestran métricas reales.
+- Sin cambios de esquema, RLS ni Payments.
