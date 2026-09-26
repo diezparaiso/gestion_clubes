@@ -8,6 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Reutiliza cuentas existentes; no crea credenciales ni modifica Stripe.
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
 import '../../data/repositories/player_repository.dart';
 import '../../domain/entities/player.dart';
 
@@ -53,7 +54,8 @@ class _TeamPlayersPageState extends ConsumerState<TeamPlayersPage> {
     final teamName = widget.teamName;
     final players = ref.watch(teamPlayersProvider(teamId));
     return Scaffold(
-      appBar: AppBar(
+      appBar: const ClubNavigationAppBar(title: 'Jugadores'),
+        //
         title: Text(teamName),
         actions: [
           IconButton(
