@@ -51,3 +51,5 @@ $$;
 
 revoke all on function public.has_club_permission(uuid, public.club_permission) from public;
 grant execute on function public.has_club_permission(uuid, public.club_permission) to authenticated;
+
+-- La gestión de accesos queda deliberadamente reservada al presidente.
