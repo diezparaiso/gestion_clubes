@@ -10,13 +10,13 @@ final raffleRepositoryProvider = Provider<RaffleRepository>((ref) => RaffleRepos
 class RaffleRepository {
   Future<List<Raffle>> listRaffles(String clubId) async {
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoRaffles);
-    final rows = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number').eq('club_id', clubId).order('created_at', ascending: false);
+    final rows = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number, monthly_day, subscription_enabled').eq('club_id', clubId).order('created_at', ascending: false);
     return rows.map(Raffle.fromJson).toList();
   }
 
   Future<Raffle> getRaffle({required String clubId, required String raffleId}) async {
     if (!SupabaseService.isConfigured) return _demoRaffles.firstWhere((raffle) => raffle.id == raffleId, orElse: () => _demoRaffles.first);
-    final row = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number').eq('club_id', clubId).eq('id', raffleId).single();
+    final row = await Supabase.instance.client.from('raffles').select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number, monthly_day, subscription_enabled').eq('club_id', clubId).eq('id', raffleId).single();
     return Raffle.fromJson(row);
   }
 
@@ -25,7 +25,7 @@ class RaffleRepository {
       final raffle = _demoRaffles.firstWhere((item) => item.slug == raffleSlug, orElse: () => _demoRaffles.first);
       return Raffle(id: raffle.id, title: raffle.title, ticketPrice: raffle.ticketPrice, totalNumbers: raffle.totalNumbers, status: raffle.status, endAt: raffle.endAt, type: raffle.type, winningNumber: raffle.winningNumber, clubName: 'Club Deportivo Paraíso', clubSlug: clubSlug, slug: raffleSlug, description: 'Participa en la rifa del club.', occupiedNumbers: {3, 7, 12, 25, 42, 68});
     }
-    final row = await Supabase.instance.client.from('raffles').select('id, title, description, image_url, ticket_price, total_numbers, status, end_at, slug, raffle_type, winning_number, clubs!inner(public_name, slug)').eq('clubs.slug', clubSlug).eq('slug', raffleSlug).eq('status', 'active').single();
+    final row = await Supabase.instance.client.from('raffles').select('id, title, description, image_url, ticket_price, total_numbers, status, end_at, slug, raffle_type, winning_number, monthly_day, subscription_enabled, clubs!inner(public_name, slug)').eq('clubs.slug', clubSlug).eq('slug', raffleSlug).eq('status', 'active').single();
     final tickets = await Supabase.instance.client.rpc<List<dynamic>>('get_public_raffle_numbers', params: {'target_club_slug': clubSlug, 'target_raffle_slug': raffleSlug});
     return Raffle.fromJson({...row, 'raffle_tickets': tickets});
   }
@@ -67,7 +67,7 @@ class RaffleRepository {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) throw const AuthException('La sesión ha expirado.');
     final slug = title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
-    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': title.trim(), 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'raffle_type': type.name, 'monthly_day': monthlyDay, 'subscription_enabled': type == RaffleType.mensual, 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number').single();
+    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': title.trim(), 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'raffle_type': type.name, 'monthly_day': monthlyDay, 'subscription_enabled': type == RaffleType.mensual, 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number, monthly_day, subscription_enabled').single();
     return Raffle.fromJson(row);
   }
 
