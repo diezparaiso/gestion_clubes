@@ -266,3 +266,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - El tercer indicador del dashboard deja de mostrar datos ficticios de rifas y usa el número real de equipos disponible en `dashboardStatsProvider`.
 - Se añade el marcador `MODIFICADO POR GPT-5.6 LUNA` al archivo tocado.
 - No se modifica Payments, Supabase ni el esquema de base de datos.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — búsqueda y filtro de equipos
+- `lib/features/teams/presentation/pages/teams_page.dart`: añadido buscador local por nombre, categoría o temporada.
+- Añadido filtro para mostrar u ocultar equipos inactivos.
+- La búsqueda no modifica Supabase ni el esquema de datos; filtra únicamente los equipos ya cargados.
+- Se mantiene el estado de edición/activación existente.
