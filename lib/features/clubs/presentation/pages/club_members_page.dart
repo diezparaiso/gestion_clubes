@@ -249,6 +249,8 @@ class _ChangeRoleDialogState extends ConsumerState<_ChangeRoleDialog> {
     'staff',
     'member',
     'player',
+    'parent_guardian',
+    'follower',
   ];
 
   @override
