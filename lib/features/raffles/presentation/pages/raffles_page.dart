@@ -1,4 +1,6 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida precio y cantidad de números antes de crear rifas.\n\nimport 'package:flutter/material.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida precio y cantidad de números antes de crear rifas.
+
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
