@@ -27,12 +27,21 @@ class MembersPage extends ConsumerStatefulWidget {
 
 class _MembersPageState extends ConsumerState<MembersPage> {
   final _searchController = TextEditingController();
+  MemberStatus? _statusFilter;
+  MembershipType? _membershipTypeFilter;
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
+
+  String _statusLabel(MemberStatus status) => switch (status) {
+    MemberStatus.active => 'Activo', MemberStatus.pending => 'Pendiente', MemberStatus.expired => 'Caducado', MemberStatus.cancelled => 'Cancelado', MemberStatus.deceased => 'Fallecido', MemberStatus.suspended => 'Suspendido',
+  };
+  String _membershipTypeLabel(MembershipType type) => switch (type) {
+    MembershipType.standard => 'Estándar', MembershipType.youth => 'Juvenil', MembershipType.family => 'Familiar', MembershipType.supporter => 'Simpatizante', MembershipType.other => 'Otro',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +80,22 @@ class _MembersPageState extends ConsumerState<MembersPage> {
                   hintText: 'Buscar por nombre, email o número',
                   prefixIcon: Icon(Icons.search),
                 ),
-              ),
+              )),
+                const SizedBox(width: 12),
+                DropdownButton<MemberStatus?>(
+                  value: _statusFilter,
+                  hint: const Text('Estado'),
+                  items: [const DropdownMenuItem<MemberStatus?>(value: null, child: Text('Todos los estados')), ...MemberStatus.values.map((status) => DropdownMenuItem<MemberStatus?>(value: status, child: Text(_statusLabel(status))))],
+                  onChanged: (value) => setState(() => _statusFilter = value),
+                ),
+                const SizedBox(width: 12),
+                DropdownButton<MembershipType?>(
+                  value: _membershipTypeFilter,
+                  hint: const Text('Tipo'),
+                  items: [const DropdownMenuItem<MembershipType?>(value: null, child: Text('Todos los tipos')), ...MembershipType.values.map((type) => DropdownMenuItem<MembershipType?>(value: type, child: Text(_membershipTypeLabel(type))))],
+                  onChanged: (value) => setState(() => _membershipTypeFilter = value),
+                ),
+              ]),
               const SizedBox(height: 16),
               Expanded(
                 child: members.when(
@@ -80,12 +104,12 @@ class _MembersPageState extends ConsumerState<MembersPage> {
                       const Center(child: Text('No se ha podido cargar el listado.')),
                   data: (items) {
                     final query = _searchController.text.toLowerCase();
-                    final filtered = items
-                        .where((member) =>
-                            member.name.toLowerCase().contains(query) ||
-                            member.email.toLowerCase().contains(query) ||
-                            member.memberNumber.toString().contains(query))
-                        .toList();
+                    final filtered = items.where((member) {
+                      final matchesSearch = member.name.toLowerCase().contains(query) || member.email.toLowerCase().contains(query) || member.memberNumber.toString().contains(query);
+                      final matchesStatus = _statusFilter == null || member.status == _statusFilter;
+                      final matchesType = _membershipTypeFilter == null || member.membershipType == _membershipTypeFilter;
+                      return matchesSearch && matchesStatus && matchesType;
+                    }).toList();
                     if (filtered.isEmpty) {
                       return const Center(
                         child: Text('No hay socios que coincidan con la búsqueda.'),
