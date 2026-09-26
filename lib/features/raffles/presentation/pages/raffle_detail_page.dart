@@ -84,7 +84,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
   }
 
   Future<void> _confirmDraw(List<RaffleTicket> tickets) async {
-    if (tickets.every((ticket) => ticket.paymentStatus != 'paid')) {
+    if (widget.clubId == null || widget.clubId!.trim().isEmpty) {\n      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No hay un club activo en la sesión.')));\n      return;\n    }\n    if (tickets.every((ticket) => ticket.paymentStatus != 'paid')) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Necesitas al menos una participación confirmada.')));
       return;
     }
