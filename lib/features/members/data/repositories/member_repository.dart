@@ -37,7 +37,37 @@ class MemberRepository {
     return Member.fromJson(row);
   }
 
-  static const _demoMembers = [
+
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Actualiza campos ya existentes de memberships.
+  // No requiere cambios de esquema Supabase.
+  Future<Member> updateMember({
+    required String clubId,
+    required String memberId,
+    required int memberNumber,
+    required MemberStatus status,
+  }) async {
+    if (!SupabaseService.isConfigured) {
+      final index = _demoMembers.indexWhere((member) => member.id == memberId);
+      if (index < 0) throw StateError('Socio no encontrado.');
+      final current = _demoMembers[index];
+      final updated = Member(
+        id: current.id,
+        memberNumber: memberNumber,
+        name: current.name,
+        email: current.email,
+        status: status,
+      );
+      _demoMembers[index] = updated;
+      return updated;
+    }
+    final row = await Supabase.instance.client.from('memberships').update({
+      'member_number': memberNumber,
+      'status': status.name,
+    }).eq('id', memberId).eq('club_id', clubId).select('id, member_number, status, profiles!inner(first_name, last_name, email)').single();
+    return Member.fromJson(row);
+  }
+
+  static final _demoMembers = <Member>[
     Member(id: 'member-100', memberNumber: 100, name: 'Ana García', email: 'ana@ejemplo.com', status: MemberStatus.active),
     Member(id: 'member-101', memberNumber: 101, name: 'Luis Martín', email: 'luis@ejemplo.com', status: MemberStatus.active),
     Member(id: 'member-103', memberNumber: 103, name: 'Marta López', email: 'marta@ejemplo.com', status: MemberStatus.pending),
