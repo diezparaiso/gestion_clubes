@@ -284,3 +284,7 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/finance/presentation/pages/finance_page.dart`: añadidos búsqueda local por descripción/categoría y filtro por ingresos/gastos.
 - El saldo inicial y los datos financieros siguen procediendo del repositorio; los filtros solo afectan al listado y sus métricas visibles.
 - Sin cambios de esquema, RLS ni Payments.
+
+### 2026-09-26 — GPT-5.6 LUNA — corrección de métricas con filtros de tesorería
+- Las métricas de saldo, ingresos y gastos mantienen el cálculo sobre todos los movimientos del club.
+- Los filtros solo afectan al listado visible, evitando presentar un saldo global incorrecto al buscar o filtrar.
