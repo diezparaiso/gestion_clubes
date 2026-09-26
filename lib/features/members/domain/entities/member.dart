@@ -15,6 +15,11 @@ class Member {
     this.renewalDate,
     this.leaveDate,
     this.notes,
+    this.address,
+    this.postalCode,
+    this.city,
+    this.province,
+    this.country = 'ES',
   });
 
   final String id;
@@ -27,6 +32,11 @@ class Member {
   final DateTime? renewalDate;
   final DateTime? leaveDate;
   final String? notes;
+  final String? address;
+  final String? postalCode;
+  final String? city;
+  final String? province;
+  final String country;
 
   factory Member.fromJson(Map<String, dynamic> json) {
     final profile = json['profiles'] as Map<String, dynamic>? ?? const {};
@@ -50,6 +60,11 @@ class Member {
       renewalDate: DateTime.tryParse(json['renewal_date']?.toString() ?? ''),
       leaveDate: DateTime.tryParse(json['leave_date']?.toString() ?? ''),
       notes: json['notes'] as String?,
+      address: json['address'] as String?,
+      postalCode: json['postal_code'] as String?,
+      city: json['city'] as String?,
+      province: json['province'] as String?,
+      country: json['country'] as String? ?? 'ES',
     );
   }
 }
