@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida coherencia de socios y fechas antes de persistir.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -19,12 +20,17 @@ class MemberRepository {
   }
 
   Future<Member> createMember({required String clubId, required int memberNumber, required String firstName, required String lastName, required String email}) async {
+    if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
+    if (memberNumber <= 0) throw const FormatException('El número de socio debe ser mayor que 0.');
+    final normalizedEmail = email.trim();
+    if (normalizedEmail.isEmpty || !normalizedEmail.contains('@')) throw const FormatException('El email no es válido.');
+    if (firstName.trim().isEmpty || lastName.trim().isEmpty) throw const FormatException('Nombre y apellidos son obligatorios.');
     if (!SupabaseService.isConfigured) {
       return Member(id: 'member-$memberNumber', memberNumber: memberNumber, name: '$firstName $lastName', email: email, status: MemberStatus.active, membershipType: MembershipType.standard, joinDate: DateTime.now());
     }
 
     final client = Supabase.instance.client;
-    final profile = await client.from('profiles').select('id').eq('email', email.trim()).maybeSingle();
+    final profile = await client.from('profiles').select('id').eq('email', normalizedEmail).maybeSingle();
     if (profile == null) throw const PostgrestException(message: 'No existe una cuenta con ese email. La persona debe registrarse antes de añadirla.');
 
     final row = await client.from('memberships').insert({
@@ -52,6 +58,10 @@ class MemberRepository {
     DateTime? leaveDate,
     String? notes,
   }) async {
+    if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
+    if (memberNumber <= 0) throw const FormatException('El número de socio debe ser mayor que 0.');
+    if (renewalDate != null && renewalDate.isBefore(joinDate)) throw const FormatException('La renovación no puede ser anterior al alta.');
+    if (leaveDate != null && leaveDate.isBefore(joinDate)) throw const FormatException('La baja no puede ser anterior al alta.');
     if (!SupabaseService.isConfigured) {
       final index = _demoMembers.indexWhere((member) => member.id == memberId);
       if (index < 0) throw StateError('Socio no encontrado.');
