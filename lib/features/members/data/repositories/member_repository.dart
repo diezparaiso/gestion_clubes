@@ -19,7 +19,7 @@ class MemberRepository {
     return rows.map(Member.fromJson).toList();
   }
 
-  Future<Member> createMember({required String clubId, required int memberNumber, required String firstName, required String lastName, required String email}) async {
+  Future<Member> createMember({required String clubId, required int memberNumber, required String firstName, required String lastName, required String email, String? address, String? postalCode, String? city, String? province, String? country}) async {
     if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
     if (memberNumber <= 0) throw const FormatException('El número de socio debe ser mayor que 0.');
     final normalizedEmail = email.trim();
@@ -40,6 +40,11 @@ class MemberRepository {
       'status': 'active',
       'membership_type': 'standard',
       'join_date': DateTime.now().toIso8601String().split('T').first,
+      'address': address?.trim().isEmpty == true ? null : address?.trim(),
+      'postal_code': postalCode?.trim().isEmpty == true ? null : postalCode?.trim(),
+      'city': city?.trim().isEmpty == true ? null : city?.trim(),
+      'province': province?.trim().isEmpty == true ? null : province?.trim(),
+      'country': country?.trim().isEmpty == true ? 'ES' : country!.trim().toUpperCase(),
     }).select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, address, postal_code, city, province, country, profiles!inner(first_name, last_name, email)').single();
     return Member.fromJson(row);
   }
