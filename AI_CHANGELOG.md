@@ -308,3 +308,7 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `raffles_page.dart`: añadido buscador local por título y filtro por estado.
 - Se reutilizan los estados existentes de `RaffleStatus`.
 - Sin cambios de esquema, RLS ni Payments.
+
+### 2026-09-26 — GPT-5.6 LUNA — corrección estructural de filtros de socios
+- Se corrige la estructura del Row de búsqueda y filtros en members_page.dart.
+- Sin cambios de esquema, RLS ni Payments.
