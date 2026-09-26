@@ -103,3 +103,15 @@ Before changing a file, read this log and the existing AI markers. After changin
 ### 2026-09-26 — GPT-5.6 LUNA — analyzer cleanup
 - Replaced the unnecessary double-underscore callback parameter in `teams_page.dart`.
 - Changed demo seasons storage from `const` to mutable `static final` so the offline/demo create/edit flow can update it.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — player CRUD phase 1
+- `lib/features/players/data/repositories/player_repository.dart`
+  - Added creation and team assignment using the existing `profiles`, `players` and `team_players` relationships already used by the application.
+  - Reuses an existing player record for the same profile when present.
+  - Added demo-mode creation support.
+- `lib/features/players/presentation/pages/team_players_page.dart`
+  - Added "Nuevo jugador" flow with name, surname, registered-account email and optional jersey number.
+  - Kept existing edit flow for jersey number and active/inactive state.
+- Supabase: no migration or live database change was executed. The implementation currently assumes the existing `players.profile_id` relationship implied by the current nested query; this must be verified against the live schema before broader player/guardian/photo work.
+- Stripe: untouched.
