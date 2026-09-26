@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Edición de número/estado del socio usando campos existentes.
+
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/member_repository.dart';
 import '../../domain/entities/member.dart';
@@ -58,7 +60,10 @@ class _MembersPageState extends ConsumerState<MembersPage> {
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   itemCount: filtered.length,
                   separatorBuilder: (_, index) => const Divider(height: 1),
-                  itemBuilder: (context, index) => _MemberTile(member: filtered[index]),
+                  itemBuilder: (context, index) => _MemberTile(
+                    member: filtered[index],
+                    onEdit: () => _showEditMemberDialog(context, filtered[index]),
+                  ),
                 ));
               },
             )),
@@ -66,6 +71,15 @@ class _MembersPageState extends ConsumerState<MembersPage> {
         ),
       ),
     );
+  }
+
+
+  Future<void> _showEditMemberDialog(BuildContext context, Member member) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => _EditMemberDialog(member: member),
+    );
+    if (result == true && mounted) ref.invalidate(membersProvider);
   }
 
   Future<void> _showCreateMemberDialog(BuildContext context) async {
@@ -142,19 +156,202 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
   }
 }
 
-class _MemberTile extends StatelessWidget {
-  const _MemberTile({required this.member});
+class _EditMemberDialog extends ConsumerStatefulWidget {
+  const _EditMemberDialog({required this.member});
 
   final Member member;
 
   @override
+  ConsumerState<_EditMemberDialog> createState() => _EditMemberDialogState();
+}
+
+class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
+  final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _numberController;
+  late MemberStatus _status;
+  bool _isSaving = false;
+  String? _errorMessage;
+
+  @override
+  void initState() {
+    super.initState();
+    _numberController = TextEditingController(text: widget.member.memberNumber.toString());
+    _status = widget.member.status;
+  }
+
+  @override
+  void dispose() {
+    _numberController.dispose();
+    super.dispose();
+  }
+
+  String _statusLabel(MemberStatus status) {
+    switch (status) {
+      case MemberStatus.active:
+        return 'Activo';
+      case MemberStatus.pending:
+        return 'Pendiente';
+      case MemberStatus.expired:
+        return 'Caducado';
+      case MemberStatus.cancelled:
+        return 'Cancelado';
+      case MemberStatus.suspended:
+        return 'Suspendido';
+    }
+  }
+
+  Future<void> _save() async {
+    if (!_formKey.currentState!.validate()) return;
+    final clubId = ref.read(authControllerProvider).clubId;
+    if (clubId == null) return;
+
+    setState(() {
+      _isSaving = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await ref.read(memberRepositoryProvider).updateMember(
+        clubId: clubId,
+        memberId: widget.member.id,
+        memberNumber: int.parse(_numberController.text),
+        status: _status,
+      );
+      if (mounted) Navigator.of(context).pop(true);
+    } on PostgrestException catch (error) {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = error.message.contains('duplicate')
+              ? 'Ese número de socio ya está asignado.'
+              : error.message;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _isSaving = false;
+          _errorMessage = 'No se ha podido guardar el socio.';
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final color = member.status == MemberStatus.active ? const Color(0xFF168B68) : const Color(0xFFD27A2C);
+    return AlertDialog(
+      title: const Text('Editar socio'),
+      content: SizedBox(
+        width: 420,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(widget.member.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 4),
+              Text(widget.member.email),
+              const SizedBox(height: 20),
+              TextFormField(
+                controller: _numberController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Número de socio'),
+                validator: (value) => int.tryParse(value ?? '') == null || int.parse(value!) <= 0
+                    ? 'Introduce un número válido'
+                    : null,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<MemberStatus>(
+                initialValue: _status,
+                decoration: const InputDecoration(labelText: 'Estado'),
+                items: MemberStatus.values
+                    .map((status) => DropdownMenuItem(
+                          value: status,
+                          child: Text(_statusLabel(status)),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  if (value != null) setState(() => _status = value);
+                },
+              ),
+              if (_errorMessage != null) ...[
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _isSaving ? null : () => Navigator.of(context).pop(),
+          child: const Text('Cancelar'),
+        ),
+        FilledButton(
+          onPressed: _isSaving ? null : _save,
+          child: _isSaving
+              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))
+              : const Text('Guardar'),
+        ),
+      ],
+    );
+  }
+}
+
+class _MemberTile extends StatelessWidget {
+  const _MemberTile({required this.member, required this.onEdit});
+
+  final Member member;
+  final VoidCallback onEdit;
+
+  String _statusLabel(MemberStatus status) {
+    switch (status) {
+      case MemberStatus.active:
+        return 'Activo';
+      case MemberStatus.pending:
+        return 'Pendiente';
+      case MemberStatus.expired:
+        return 'Caducado';
+      case MemberStatus.cancelled:
+        return 'Cancelado';
+      case MemberStatus.suspended:
+        return 'Suspendido';
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = member.status == MemberStatus.active;
+    final color = isActive ? const Color(0xFF168B68) : const Color(0xFFD27A2C);
     return ListTile(
-      leading: CircleAvatar(backgroundColor: const Color(0xFFE8EFEC), child: Text(member.memberNumber.toString(), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF14213D)))),
+      leading: CircleAvatar(
+        backgroundColor: const Color(0xFFE8EFEC),
+        child: Text(
+          member.memberNumber.toString(),
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Color(0xFF14213D)),
+        ),
+      ),
       title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.w700)),
       subtitle: Text(member.email),
-      trailing: Chip(label: Text(member.status.name == 'active' ? 'Activo' : 'Pendiente'), backgroundColor: color.withValues(alpha: 0.12), side: BorderSide.none, labelStyle: TextStyle(color: color, fontWeight: FontWeight.w700)),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Chip(
+            label: Text(_statusLabel(member.status)),
+            backgroundColor: color.withValues(alpha: 0.12),
+            side: BorderSide.none,
+            labelStyle: TextStyle(color: color, fontWeight: FontWeight.w700),
+          ),
+          IconButton(
+            tooltip: 'Editar socio',
+            onPressed: onEdit,
+            icon: const Icon(Icons.edit_outlined),
+          ),
+        ],
+      ),
     );
   }
 }
