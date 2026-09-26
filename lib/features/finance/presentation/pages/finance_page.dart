@@ -81,7 +81,7 @@ class _FinanceContent extends StatelessWidget {
     final expense = transactions.where((item) => item.type == TransactionType.expense).fold<double>(0, (sum, item) => sum + item.amount);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Wrap(spacing: 16, runSpacing: 16, children: [
-        _FinanceMetric(label: 'Saldo', value: _formatCurrency(8450 + income - expense), color: const Color(0xFF168B68)),
+        _FinanceMetric(label: 'Saldo', value: _formatCurrency(7180 + income - expense), color: const Color(0xFF168B68)),
         _FinanceMetric(label: 'Ingresos', value: _formatCurrency(income), color: const Color(0xFF3276B1)),
         _FinanceMetric(label: 'Gastos', value: _formatCurrency(expense), color: const Color(0xFFD27A2C)),
       ]),
@@ -171,7 +171,6 @@ class _TransactionDialogState extends ConsumerState<_TransactionDialog> {
     catch (_) { setState(() { _saving = false; _error = 'No se ha podido guardar el movimiento.'; }); }
   }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
