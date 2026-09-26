@@ -10,24 +10,50 @@ import '../../data/repositories/event_repository.dart';
 import '../../domain/entities/event.dart';
 import '../../../clubs/data/repositories/club_repository.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadida búsqueda y filtros locales de agenda.
+
 final eventsProvider = FutureProvider<List<ClubEvent>>((ref) {
   final clubId = ref.watch(authControllerProvider).clubId;
   if (clubId == null) return Future.value(const []);
   return ref.watch(eventRepositoryProvider).listEvents(clubId);
 });
 
-class EventsPage extends ConsumerWidget {
+class EventsPage extends ConsumerStatefulWidget {
   const EventsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<EventsPage> createState() => _EventsPageState();
+}
+
+class _EventsPageState extends ConsumerState<EventsPage> {
+  final _searchController = TextEditingController();
+  bool _publicOnly = false;
+
+  @override
+  void dispose() { _searchController.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
     final events = ref.watch(eventsProvider);
     return Scaffold(appBar: AppBar(title: const Text('Eventos')), body: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(children: [Expanded(child: Text('Agenda del club', style: Theme.of(context).textTheme.headlineMedium)), IconButton(tooltip: 'Copiar enlace público', onPressed: () async { final clubId = ref.read(authControllerProvider).clubId; if (clubId == null) return; final club = await ref.read(clubRepositoryProvider).getClubById(clubId); final url = Uri.base.replace(path: '/club/${club.slug}/events').toString(); await Clipboard.setData(ClipboardData(text: url)); if (!context.mounted) return; ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público de la agenda copiado.'))); }, icon: const Icon(Icons.link_outlined)), const SizedBox(width: 8), FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nuevo evento'))]),
       const SizedBox(height: 8),
       const Text('Organiza partidos, reuniones y actividades del club.'),
+      const SizedBox(height: 16),
+      Row(children: [
+        Expanded(child: TextField(controller: _searchController, onChanged: (_) => setState(() {}), decoration: const InputDecoration(hintText: 'Buscar evento, ubicación o descripción', prefixIcon: Icon(Icons.search)))),
+        const SizedBox(width: 12),
+        FilterChip(label: const Text('Solo públicos'), selected: _publicOnly, onSelected: (value) => setState(() => _publicOnly = value)),
+      ]),
       const SizedBox(height: 24),
-      Expanded(child: events.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar los eventos.')), data: (items) => items.isEmpty ? const Center(child: Text('Todavía no hay eventos.')) : ListView.separated(itemCount: items.length, separatorBuilder: (_, index) => const SizedBox(height: 12), itemBuilder: (context, index) => _EventCard(event: items[index])))),
+      Expanded(child: events.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar los eventos.')), data: (items) {
+        final query = _searchController.text.trim().toLowerCase();
+        final filtered = items.where((event) {
+          final text = '${event.title} ${event.location ?? ''} ${event.description}'.toLowerCase();
+          return (!_publicOnly || event.visibility == EventVisibility.public) && (query.isEmpty || text.contains(query));
+        }).toList();
+        return filtered.isEmpty ? Center(child: Text(items.isEmpty ? 'Todavía no hay eventos.' : 'No hay eventos que coincidan.')) : ListView.separated(itemCount: filtered.length, separatorBuilder: (_, index) => const SizedBox(height: 12), itemBuilder: (context, index) => _EventCard(event: filtered[index]));
+      })),
     ])));
   }
 
