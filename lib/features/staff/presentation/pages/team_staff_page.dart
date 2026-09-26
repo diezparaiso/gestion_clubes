@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta, edición y activación del personal usando team_staff existente.
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
 import '../../data/repositories/team_staff_repository.dart';
 import '../../domain/entities/team_staff.dart';
 
@@ -45,7 +46,8 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
     final teamName = widget.teamName;
     final staff = ref.watch(teamStaffProvider(teamId));
     return Scaffold(
-      appBar: AppBar(title: Text('$teamName · Personal')),
+      appBar: const ClubNavigationAppBar(title: 'Personal del equipo'),
+        //title: Text('$teamName · Personal')),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
