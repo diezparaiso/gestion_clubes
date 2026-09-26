@@ -26,6 +26,8 @@ as $$
 declare
   r public.raffles%rowtype;
   t public.raffle_tickets%rowtype;
+  winner_profile_id uuid;
+  notification_id uuid;
   result jsonb;
 begin
   select * into r from public.raffles where id = target_raffle_id for update;
@@ -43,6 +45,15 @@ begin
   update public.raffles
   set winning_number = target_winning_number, status = 'drawn'
   where id = r.id;
+
+  select id into winner_profile_id from public.profiles where lower(email) = lower(t.buyer_email) limit 1;
+  if winner_profile_id is not null then
+    insert into public.notifications (club_id, title, body, type, target)
+    values (r.club_id, '¡Has ganado la rifa!', 'El número ' || target_winning_number || ' ha resultado agraciado en ' || r.title || '.', 'raffle_winner', 'profile')
+    returning id into notification_id;
+    insert into public.notification_deliveries (notification_id, profile_id)
+    values (notification_id, winner_profile_id);
+  end if;
 
   insert into public.audit_logs (club_id, actor_profile_id, action, entity_type, entity_id, metadata)
   values (r.club_id, auth.uid(), 'raffle_manual_winner', 'raffle', r.id,
