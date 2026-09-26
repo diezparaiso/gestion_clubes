@@ -288,3 +288,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-26 — GPT-5.6 LUNA — corrección de métricas con filtros de tesorería
 - Las métricas de saldo, ingresos y gastos mantienen el cálculo sobre todos los movimientos del club.
 - Los filtros solo afectan al listado visible, evitando presentar un saldo global incorrecto al buscar o filtrar.
+
+### 2026-09-26 — GPT-5.6 LUNA — filtro de categoría en tesorería
+- Se completa el filtro de tesorería con selección de categoría.
+- Las categorías visibles reutilizan las categorías ya permitidas por el formulario financiero.
+- Sin cambios de esquema, RLS ni Payments.
