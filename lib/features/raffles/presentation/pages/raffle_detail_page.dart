@@ -21,10 +21,12 @@ class RaffleDetailPage extends ConsumerStatefulWidget {
 class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
   late Future<Raffle> _raffle;
   Future<List<RaffleTicket>>? _tickets;
+  Future<List<MonthlyRaffleResult>>? _monthlyResults;
   String? _ticketsRaffleId;
   RaffleDraw? _draw;
   bool _drawing = false;
   bool _manualSaving = false;
+  bool _monthlySaving = false;
 
   @override
   void initState() {
@@ -46,7 +48,11 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
           final raffle = raffleSnapshot.data!;
           if (_ticketsRaffleId != raffle.id) {
             _ticketsRaffleId = raffle.id;
-            _tickets = ref.read(raffleRepositoryProvider).listTickets(raffle.id);
+            final repository = ref.read(raffleRepositoryProvider);
+            _tickets = repository.listTickets(raffle.id);
+            if (raffle.type == RaffleType.mensual) {
+              _monthlyResults = repository.listMonthlyResults(raffle.id);
+            }
           }
           return Scaffold(
         appBar: ClubNavigationAppBar(title: raffle.title),
@@ -61,18 +67,149 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
               const SizedBox(height: 8),
               Text('${tickets.length} participaciones registradas. Solo las confirmadas participan en el sorteo.'),
               const SizedBox(height: 8),
-              Text(raffle.type == RaffleType.cesta ? 'Tipo Cesta: el presidente elige el número ganador al finalizar la rifa.' : 'Sorteo puro: el sistema selecciona el ganador con aleatoriedad criptográfica.'),
-              if (raffle.winningNumber != null && _draw == null) ...[const SizedBox(height: 20), _DrawResult(draw: RaffleDraw(id: 'stored', raffleId: raffle.id, winningNumber: raffle.winningNumber!, drawnAt: raffle.endAt, method: raffle.type == RaffleType.cesta ? 'president_selected' : 'cryptographic_random'))],
-              if (_draw != null) ...[const SizedBox(height: 20), _DrawResult(draw: _draw!)],
-              const SizedBox(height: 20),
-              if (tickets.isEmpty) const Card(child: Padding(padding: EdgeInsets.all(20), child: Text('Todavía no hay participaciones.')))
-              else ...tickets.map((ticket) => Card(child: ListTile(leading: CircleAvatar(child: Text(ticket.number.toString().padLeft(2, '0'))), title: Text(ticket.buyerName), subtitle: Text('${ticket.buyerEmail} · ${_statusLabel(ticket.paymentStatus)}'), trailing: ticket.paymentStatus == 'paid' ? const Icon(Icons.verified_outlined, color: Colors.green) : const Icon(Icons.schedule_outlined))))
+              if (raffle.type == RaffleType.mensual)
+                _monthlySection(raffle)
+              else ...[
+                Text(raffle.type == RaffleType.cesta ? 'Tipo Cesta: el presidente elige el número ganador al finalizar la rifa.' : 'Sorteo puro: el sistema selecciona el ganador con aleatoriedad criptográfica.'),
+                if (raffle.winningNumber != null && _draw == null) ...[
+                  const SizedBox(height: 20),
+                  _DrawResult(draw: RaffleDraw(id: 'stored', raffleId: raffle.id, winningNumber: raffle.winningNumber!, drawnAt: raffle.endAt, method: raffle.type == RaffleType.cesta ? 'president_selected' : 'cryptographic_random')),
+                ],
+                if (_draw != null) ...[const SizedBox(height: 20), _DrawResult(draw: _draw!)],
+                const SizedBox(height: 20),
+                if (tickets.isEmpty)
+                  const Card(child: Padding(padding: EdgeInsets.all(20), child: Text('Todavía no hay participaciones.')))
+                else
+                  ...tickets.map((ticket) => Card(
+                    child: ListTile(
+                      leading: CircleAvatar(child: Text(ticket.number.toString().padLeft(2, '0'))),
+                      title: Text(ticket.buyerName),
+                      subtitle: Text(ticket.buyerEmail + ' · ' + _statusLabel(ticket.paymentStatus)),
+                      trailing: ticket.paymentStatus == 'paid'
+                          ? const Icon(Icons.verified_outlined, color: Colors.green)
+                          : const Icon(Icons.schedule_outlined),
+                    ),
+                  )),
+              ]
             ]);
           },
         ),
       );
         },
       );
+
+  Widget _monthlySection(Raffle raffle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(
+              'Rifa mensual: renovación prevista el día ' +
+                  (raffle.monthlyDay?.toString() ?? '-') +
+                  '. La activación y renovación real dependen del proveedor de pagos.',
+            ),
+          ),
+        ),
+        const SizedBox(height: 16),
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Histórico mensual',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            FilledButton.icon(
+              onPressed: _monthlySaving ? null : () => _registerMonthlyResult(raffle),
+              icon: const Icon(Icons.emoji_events_outlined),
+              label: const Text('Registrar resultado'),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        FutureBuilder<List<MonthlyRaffleResult>>(
+          future: _monthlyResults,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(child: CircularProgressIndicator()),
+              );
+            }
+            if (snapshot.hasError) {
+              return const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('No se ha podido cargar el histórico mensual.'),
+                ),
+              );
+            }
+            final results = snapshot.data ?? const <MonthlyRaffleResult>[];
+            if (results.isEmpty) {
+              return const Card(
+                child: Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Text('Todavía no hay resultados mensuales registrados.'),
+                ),
+              );
+            }
+            return Column(
+              children: results.map((result) => Card(
+                child: ListTile(
+                  leading: const CircleAvatar(child: Icon(Icons.emoji_events_outlined)),
+                  title: Text(_monthLabel(result.drawMonth) + ' · número ' + result.winningNumber.toString()),
+                  subtitle: Text(
+                    'Premio: ' + result.prizeAmount.toStringAsFixed(2).replaceAll('.', ',') + ' €' +
+                    (result.winnerName == null || result.winnerName!.isEmpty ? '' : ' · Ganador: ' + result.winnerName!) +
+                    (result.notes == null || result.notes!.isEmpty ? '' : ' · ' + result.notes!),
+                  ),
+                ),
+              )).toList(),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Future<void> _registerMonthlyResult(Raffle raffle) async {
+    final data = await showDialog<_MonthlyResultData>(
+      context: context,
+      builder: (_) => const _MonthlyResultDialog(),
+    );
+    if (data == null || !mounted) return;
+    setState(() => _monthlySaving = true);
+    try {
+      await ref.read(raffleRepositoryProvider).registerMonthlyResult(
+        raffleId: raffle.id,
+        month: data.month,
+        winningNumber: data.winningNumber,
+        prizeAmount: data.prizeAmount,
+        notes: data.notes,
+      );
+      if (!mounted) return;
+      setState(() {
+        _monthlySaving = false;
+        _monthlyResults = ref.read(raffleRepositoryProvider).listMonthlyResults(raffle.id);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Resultado mensual registrado.')));
+    } on PostgrestException catch (error) {
+      if (!mounted) return;
+      setState(() => _monthlySaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _monthlySaving = false);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se ha podido registrar el resultado.')));
+    }
+  }
+
+  static String _monthLabel(DateTime date) {
+    const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    return months[date.month - 1] + ' ' + date.year.toString();
+  }
 
   Future<void> _setBasketWinner(Raffle raffle, List<RaffleTicket> tickets) async {
     if (DateTime.now().isBefore(raffle.endAt)) {
