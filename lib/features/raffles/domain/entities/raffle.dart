@@ -184,6 +184,7 @@ class MonthlyRaffleResult {
     required this.winningNumber,
     required this.prizeAmount,
     this.winnerProfileId,
+    this.winnerName,
     this.notes,
   });
 
@@ -193,6 +194,7 @@ class MonthlyRaffleResult {
   final int winningNumber;
   final double prizeAmount;
   final String? winnerProfileId;
+  final String? winnerName;
   final String? notes;
 
   factory MonthlyRaffleResult.fromJson(Map<String, dynamic> json) =>
@@ -203,6 +205,7 @@ class MonthlyRaffleResult {
         winningNumber: json['winning_number'] as int,
         prizeAmount: (json['prize_amount'] as num).toDouble(),
         winnerProfileId: json['winner_profile_id'] as String?,
+        winnerName: json['winner_name'] as String?,
         notes: json['notes'] as String?,
       );
 }
