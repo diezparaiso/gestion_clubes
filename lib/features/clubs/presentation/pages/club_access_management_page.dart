@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): módulo funcional de gestión de accesos del club.
 
@@ -156,7 +157,7 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
     final role = ref.watch(authControllerProvider).role;
     if (role != 'club_president' && role != 'club_secretary') return const Scaffold(body: Center(child: Text('No tienes permiso para gestionar accesos.')));
     return Scaffold(
-      appBar: AppBar(title: const Text('Usuarios y permisos')),
+      appBar: const ClubNavigationAppBar(title: 'Usuarios y permisos'),
       floatingActionButton: FloatingActionButton.extended(onPressed: _saving ? null : _createUser, icon: const Icon(Icons.person_add_alt_1), label: const Text('Dar de alta')),
       body: Padding(
         padding: const EdgeInsets.all(20),
