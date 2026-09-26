@@ -118,7 +118,7 @@ class AuthController extends Notifier<AuthState> {
     state = state.copyWith(status: AuthStatus.signingIn, clearError: true);
     try {
       if (SupabaseService.isConfigured) {
-        await Supabase.instance.client.auth.signInWithPassword(email, password);
+        await Supabase.instance.client.auth.signInWithPassword(email: email, password: password);
       }
       state = state.copyWith(status: AuthStatus.needsClub, email: email, clearError: true);
     } on AuthException catch (error) {
@@ -132,7 +132,7 @@ class AuthController extends Notifier<AuthState> {
     state = state.copyWith(status: AuthStatus.signingIn, clearError: true);
     try {
       if (SupabaseService.isConfigured) {
-        await Supabase.instance.client.auth.signUp(email, password);
+        await Supabase.instance.client.auth.signUp(email: email, password: password);
       }
       state = state.copyWith(status: AuthStatus.needsClub, email: email, clearError: true);
     } on AuthException catch (error) {
