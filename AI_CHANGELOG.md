@@ -202,3 +202,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Se normalizan los emails a minúsculas.
 - Se evita acceder al cliente Supabase cuando la aplicación está en modo demo.
 - No se modifica el esquema ni el sistema de pagos en este bloque.
+
+### 2026-09-26 — GPT-5.6 LUNA — validación de reservas públicas de rifas
+- El cliente valida enlace, cantidad de números, duplicados, números positivos, nombre y email antes del RPC.
+- Normaliza slug, nombre, email y teléfono antes de reservar.
+- No se modifica el sistema de pagos.
