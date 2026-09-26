@@ -240,7 +240,7 @@ class _SeasonManagerDialogState extends ConsumerState<_SeasonManagerDialog> {
       title: const Text('Temporadas'),
       content: SizedBox(width: 460, height: 360, child: seasons.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('No se han podido cargar las temporadas.')),
+        error: (_, _) => const Center(child: Text('No se han podido cargar las temporadas.')),
         data: (items) => ListView.separated(
           itemCount: items.length,
           separatorBuilder: (_, index) => const Divider(height: 1),
