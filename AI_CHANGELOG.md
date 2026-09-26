@@ -175,3 +175,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-26 — GPT-5.6 LUNA — gestión completa de roles de miembros
 - Añadidos `parent_guardian` y `follower` al selector de invitación, ya soportados por el enum `club_role` y por el selector de cambio de rol.
 - Sin cambios de esquema ni de pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — validación financiera adicional
+- Reforzada la validación del repositorio de tesorería: club activo obligatorio, descripción no vacía e importe finito y mayor que cero.
+- El alta Supabase reutiliza la descripción normalizada y mantiene la selección de cuenta financiera activa filtrada por `club_id`.
+- Sin cambios de esquema ni de pagos.
