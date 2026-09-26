@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Evita acceder al cliente de Supabase cuando la app funciona en modo demo.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
