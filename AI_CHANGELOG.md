@@ -341,3 +341,12 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Los teléfonos y datos del progenitor/responsable quedan almacenados en `players`, no en `team_players`, para que acompañen al jugador al cambiar de equipo.
 - La lectura usa la relación anidada de `players` y la edición actualiza el jugador asociado a la asignación.
 - Corregido también el modo demo para soportar los nuevos campos.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — exportación completa de gestión a Excel
+- Añadido icono de exportación en el resumen del área de gestión.
+- Genera un único XLSX con pestañas de Resumen, Tesorería, Socios, Equipos, Jugadores, Noticias, Eventos y Rifas.
+- En modo Supabase se exportan los registros del club activo de esas áreas.
+- En modo demo se exportan los datos demo existentes.
+- La descarga se realiza mediante el navegador; Chrome gestiona la ubicación final del archivo según su configuración de descargas.
+- Añadida dependencia `excel`; ejecutar `flutter pub get` tras actualizar el proyecto.
