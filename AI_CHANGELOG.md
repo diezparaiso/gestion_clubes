@@ -53,3 +53,45 @@ Branch: `feature/gpt-gestion-clubes`
 ## Handoff instruction for Claude
 
 Before changing a file, read this log and the existing AI markers. After changing it, add a concise marker identifying Claude, date, file and purpose. Never overwrite or remove another AI's historical marker.
+
+### 2026-09-26 — GPT-5.6 LUNA — continued implementation
+
+- `lib/features/teams/presentation/pages/teams_page.dart`
+  - Corrected the previous edit-flow implementation so the edit dialog actually calls `updateTeam`.
+  - Fixed the team action callbacks and duplicate import.
+  - Added edit and activate/deactivate actions to each team card.
+  - Existing Supabase columns only; no schema changes.
+
+- `lib/features/members/data/repositories/member_repository.dart`
+  - Added `updateMember(...)` for existing `memberships.member_number` and `memberships.status`.
+  - Demo data remains editable without Supabase.
+  - No schema changes.
+
+- `lib/features/members/presentation/pages/members_page.dart`
+  - Added member edit dialog for member number and membership status.
+  - Added visible edit action per member.
+  - No new database fields.
+
+- `lib/features/players/data/repositories/player_repository.dart`
+  - Added `updateTeamPlayer(...)` for existing `team_players.jersey_number` and `team_players.is_active`.
+  - No schema changes.
+
+- `lib/features/players/presentation/pages/team_players_page.dart`
+  - Added player edit dialog for jersey number and active/inactive state.
+  - Added visible edit action per player.
+  - No new database fields.
+
+- `lib/features/staff/data/repositories/team_staff_repository.dart`
+  - Added `updateTeamStaff(...)` for existing `team_staff.role` and `team_staff.is_active`.
+  - No schema changes.
+
+- `lib/features/staff/presentation/pages/team_staff_page.dart`
+  - Added staff edit dialog for role and active/inactive state.
+  - Added visible edit action per staff member.
+  - No new database fields.
+
+### Pending / intentionally not implemented
+
+- Creating players without an existing profile/account: requires a broader account/profile workflow and must be reviewed before touching schema/RLS.
+- Full player creation, guardian relationships, player photos/storage approval, complete staff assignment, users/roles administration, seasons CRUD and permission matrix remain pending where the current repository does not expose a safe existing-column workflow.
+- No Supabase migrations, schema, RLS, Storage policies, Edge Functions or Stripe/payment implementation were changed.
