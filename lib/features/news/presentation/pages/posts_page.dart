@@ -2,9 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:flutter/services.dart';
+
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Permite copiar el enlace público de noticias.
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/post_repository.dart';
 import '../../domain/entities/post.dart';
+import '../../../clubs/data/repositories/club_repository.dart';
 
 final postsProvider = FutureProvider<List<Post>>((ref) {
   final clubId = ref.watch(authControllerProvider).clubId;
@@ -25,6 +29,7 @@ class PostsPage extends ConsumerWidget {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Expanded(child: Text('Noticias del club', style: Theme.of(context).textTheme.headlineMedium)),
+            IconButton(tooltip: 'Copiar enlace público', onPressed: () async { final clubId = ref.read(authControllerProvider).clubId; if (clubId == null) return; final club = await ref.read(clubRepositoryProvider).getClubById(clubId); final url = Uri.base.replace(path: '/club/${club.slug}/news').toString(); await Clipboard.setData(ClipboardData(text: url)); if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público de noticias copiado.'))); }, icon: const Icon(Icons.link_outlined)), const SizedBox(width: 8),
             FilledButton.icon(onPressed: () => _showPostDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nueva noticia')),
           ]),
           const SizedBox(height: 8),
