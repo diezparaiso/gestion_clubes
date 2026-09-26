@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../data/club_export_service.dart';
+
 import '../../../auth/application/auth_controller.dart';
 import '../../application/dashboard_stats_provider.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Elimina actividad ficticia del dashboard.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade exportación completa de gestión a Excel.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -141,6 +144,11 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                       const Text('Aquí tienes el estado de tu club hoy.'),
                     ],
                   ),
+                ),
+                IconButton(
+                  onPressed: () => _exportClub(context),
+                  tooltip: 'Exportar gestión a Excel',
+                  icon: const Icon(Icons.file_download_outlined),
                 ),
                 IconButton(
                   onPressed: () => context.go('/notifications'),
@@ -297,6 +305,32 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         ),
       ],
     );
+  }
+
+  Future<void> _exportClub(BuildContext context) async {
+    final auth = ref.read(authControllerProvider);
+    final clubId = auth.clubId;
+    if (clubId == null || clubId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No hay un club activo para exportar.')),
+      );
+      return;
+    }
+    try {
+      await ClubExportService().exportClub(
+        clubId: clubId,
+        clubName: auth.clubName ?? 'club',
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Excel de gestión generado. Revisa la descarga del navegador.')),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No se ha podido exportar la gestión: $error')),
+      );
+    }
   }
 
   String _formatCurrency(double value) => '${value.toStringAsFixed(2).replaceAll('.', ',')} €';
