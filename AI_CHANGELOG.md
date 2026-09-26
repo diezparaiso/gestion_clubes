@@ -293,3 +293,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Se completa el filtro de tesorería con selección de categoría.
 - Las categorías visibles reutilizan las categorías ya permitidas por el formulario financiero.
 - Sin cambios de esquema, RLS ni Payments.
+
+### 2026-09-26 — GPT-5.6 LUNA — búsqueda y filtro de notificaciones
+- `lib/features/notifications/presentation/pages/notifications_page.dart`: añadido buscador local por título/cuerpo y filtro para mostrar solo no leídas.
+- Las acciones de marcar como leída y marcar todas siguen usando el repositorio existente.
+- Sin cambios de esquema, RLS ni Payments.
