@@ -180,3 +180,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Reforzada la validación del repositorio de tesorería: club activo obligatorio, descripción no vacía e importe finito y mayor que cero.
 - El alta Supabase reutiliza la descripción normalizada y mantiene la selección de cuenta financiera activa filtrada por `club_id`.
 - Sin cambios de esquema ni de pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — validación de eventos
+- El repositorio de eventos valida club activo, título y descripción obligatorios y que `end_at` sea posterior a `start_at` antes del alta.
+- Normaliza título, descripción y ubicación antes de persistir.
+- Sin cambios de esquema ni de pagos.
