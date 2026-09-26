@@ -1,3 +1,16 @@
+### 2026-09-26 — GPT-5.6 LUNA — modalidades de rifas
+- Añadidas las modalidades `cesta` y `sorteoPuro`.
+- La configuración permite indicar modalidad, cantidad de números, precio y fecha final.
+- Los números siguen seleccionándose individualmente desde el enlace público.
+- Los números ocupados se muestran explícitamente en gris en el cuadrante público.
+- Añadida unicidad de `raffle_id + number` para impedir números duplicados a nivel de base de datos.
+- En Cesta, el ganador solo puede fijarse después de la fecha final y debe corresponder a una participación confirmada.
+- En Sorteo puro, el ganador se selecciona mediante bytes aleatorios criptográficos de `pgcrypto`, con rechazo para evitar sesgo por módulo.
+- El resultado queda guardado en la rifa y auditado.
+- En Cesta se crea una notificación para el perfil cuyo email coincide con el participante ganador.
+- Migración preparada: `034_raffle_types_and_secure_draw.sql`. No ejecutada remotamente.
+- Payments/Stripe permanece sin cambios.
+
 ### 2026-09-26 — GPT-5.6 LUNA — perfil y cambio de contraseña
 - Añadido perfil de usuario con cambio de contraseña.
 - Los usuarios creados con contraseña inicial quedan obligados a cambiarla antes de acceder a la gestión.
