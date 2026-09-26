@@ -120,3 +120,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - lib/features/news/presentation/pages/posts_page.dart: botón simple para copiar el enlace público de noticias.
 - Se reutilizan las rutas públicas existentes; no se crea integración con WhatsApp ni backend adicional.
 - Pagos/Stripe no modificados.
+
+### 2026-09-26 — GPT-5.6 LUNA — repair after branch update
+- Repaired the public events page string literal that caused the Dart parser errors.
+- Repaired the post repository validation exception so it is valid with the current SDK.
+- Public raffle/router analyzer errors were reviewed; the reported router error is a cascade from the public raffle page analyzer failure, while the fetched branch source is structurally valid. No payment/Stripe changes.
