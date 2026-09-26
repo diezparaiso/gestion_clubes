@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Refuerza validación de consultas y creación de eventos.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida datos e intervalo temporal antes de crear eventos.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -9,12 +10,14 @@ final eventRepositoryProvider = Provider<EventRepository>((ref) => EventReposito
 
 class EventRepository {
   Future<List<ClubEvent>> listEvents(String clubId) async {
+    if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoEvents);
     final rows = await Supabase.instance.client.from('events').select('id, title, description, location, start_at, end_at, type, visibility').eq('club_id', clubId).order('start_at');
     return rows.map(ClubEvent.fromJson).toList();
   }
 
   Future<List<ClubEvent>> listPublicEvents(String clubSlug) async {
+    if (clubSlug.trim().isEmpty) throw const FormatException('El club no es válido.');
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoEvents.where((event) => event.visibility == EventVisibility.public));
     final rows = await Supabase.instance.client.rpc<List<dynamic>>('get_public_events', params: {'target_club_slug': clubSlug});
     return rows.map((row) => ClubEvent.fromJson(row as Map<String, dynamic>)).toList();
