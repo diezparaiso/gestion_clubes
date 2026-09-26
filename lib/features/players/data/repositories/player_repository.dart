@@ -17,9 +17,10 @@ class PlayerRepository {
     return rows.map(Player.fromJson).toList();
   }
 
-  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta/asignación de jugadores y edición de dorsal/estado.
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta/asignación de jugadores, coherencia club_id y edición de dorsal/estado.
   // El alta reutiliza una cuenta existente de profiles y las tablas players/team_players.
   Future<Player> createAndAssignPlayer({
+    required String clubId,
     required String teamId,
     required String firstName,
     required String lastName,
@@ -55,19 +56,21 @@ class PlayerRepository {
     final existingPlayer = await client
         .from('players')
         .select('id')
+        .eq('club_id', clubId)
         .eq('profile_id', profileId)
         .maybeSingle();
 
     final playerId = existingPlayer?['id'] as String? ??
         (await client
                 .from('players')
-                .insert({'profile_id': profileId})
+                .insert({'club_id': clubId, 'profile_id': profileId})
                 .select('id')
                 .single())['id'] as String;
 
     final row = await client
         .from('team_players')
         .insert({
+          'club_id': clubId,
           'team_id': teamId,
           'player_id': playerId,
           'jersey_number': jerseyNumber,
