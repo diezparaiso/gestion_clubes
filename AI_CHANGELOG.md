@@ -207,3 +207,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - El cliente valida enlace, cantidad de números, duplicados, números positivos, nombre y email antes del RPC.
 - Normaliza slug, nombre, email y teléfono antes de reservar.
 - No se modifica el sistema de pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — endurecimiento de eventos y noticias
+- Los repositorios validan club activo y slug público antes de consultar datos.
+- El alta de noticias valida también el club antes de persistir.
+- Se endurece la acción de copiar el enlace público de agenda frente a cambios de contexto asíncronos.
+- Sin cambios de esquema ni de pagos en este bloque.
