@@ -146,3 +146,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - team_staff_repository.dart valida que el equipo pertenece al club activo antes de asignar personal.
 - Evita asignaciones cruzadas entre clubes sin cambiar el esquema de Supabase.
 - Stripe/payment implementation remains untouched.
+
+### 2026-09-26 — GPT-5.6 LUNA — team and player integrity
+- team_repository.dart valida que la temporada pertenece al club activo al crear o editar un equipo.
+- player_repository.dart verifica la existencia del equipo antes de editar una asignación de jugador.
+- Sin cambios de esquema. Stripe/payment implementation remains untouched.
