@@ -166,3 +166,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Eliminados los avisos `use_build_context_synchronously` de copia de enlaces públicos en club y rifas.
 - Corregido el formato de fechas de socios mediante interpolación.
 - Sin cambios de esquema ni de pagos.
+
+### 2026-09-26 — GPT-5.6 LUNA — integridad de asignaciones de equipo
+- Endurecida la edición de jugadores y personal: ahora se verifica que el equipo pertenece al club activo antes de modificar la asignación.
+- La pantalla de edición obtiene el `clubId` de la sesión antes de guardar.
+- Sin cambios de esquema Supabase ni de pagos.
