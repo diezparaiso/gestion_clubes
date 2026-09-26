@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
 import '../../data/repositories/raffle_repository.dart';
 import '../../domain/entities/raffle.dart';
 
@@ -34,7 +35,7 @@ class _RafflesPageState extends ConsumerState<RafflesPage> {
   Widget build(BuildContext context) {
     final raffles = ref.watch(rafflesProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Rifas')),
+      appBar: const ClubNavigationAppBar(title: 'Rifas'),
       body: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [Expanded(child: Text('Rifas del club', style: Theme.of(context).textTheme.headlineMedium)), FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nueva rifa'))]),
         const SizedBox(height: 8),
