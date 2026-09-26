@@ -102,7 +102,7 @@ class PlayerRepository {
           'guardian_relationship': guardianRelationship.isEmpty ? null : guardianRelationship,
         })
         .select(
-          'id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))',
+          'id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(profiles!inner(first_name, last_name))',
         )
         .single();
 
@@ -164,15 +164,15 @@ class PlayerRepository {
         .eq('id', playerId)
         .eq('team_id', teamId)
         .select(
-          'id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))',
+          'id, jersey_number, is_active, phone, guardian_name, guardian_phone, guardian_email, guardian_relationship, players!inner(profiles!inner(first_name, last_name))',
         )
         .single();
     return Player.fromJson(row);
   }
 
   static final _demoPlayers = <Player>[
-    Player(id: 'player-1', name: 'Álvaro Sánchez', jerseyNumber: 9, isActive: true),
-    Player(id: 'player-2', name: 'Diego Romero', jerseyNumber: 4, isActive: true),
-    Player(id: 'player-3', name: 'Nico Torres', jerseyNumber: 18, isActive: true),
+    Player(id: 'player-1', name: 'Álvaro Sánchez', jerseyNumber: 9, isActive: true, phone: null, guardianName: null, guardianPhone: null, guardianEmail: null, guardianRelationship: null),
+    Player(id: 'player-2', name: 'Diego Romero', jerseyNumber: 4, isActive: true, phone: null, guardianName: null, guardianPhone: null, guardianEmail: null, guardianRelationship: null),
+    Player(id: 'player-3', name: 'Nico Torres', jerseyNumber: 18, isActive: true, phone: null, guardianName: null, guardianPhone: null, guardianEmail: null, guardianRelationship: null),
   ];
 }
