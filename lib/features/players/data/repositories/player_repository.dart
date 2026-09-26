@@ -9,12 +9,78 @@ final playerRepositoryProvider = Provider<PlayerRepository>((ref) => PlayerRepos
 class PlayerRepository {
   Future<List<Player>> listTeamPlayers(String teamId) async {
     if (!SupabaseService.isConfigured) return _demoPlayers;
-    final rows = await Supabase.instance.client.from('team_players').select('id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))').eq('team_id', teamId).order('jersey_number');
+    final rows = await Supabase.instance.client
+        .from('team_players')
+        .select('id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))')
+        .eq('team_id', teamId)
+        .order('jersey_number');
     return rows.map(Player.fromJson).toList();
   }
 
-  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Edición de dorsal/estado usando columnas existentes.
-  // No requiere cambios de esquema Supabase.
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta/asignación de jugadores y edición de dorsal/estado.
+  // El alta reutiliza una cuenta existente de profiles y las tablas players/team_players.
+  Future<Player> createAndAssignPlayer({
+    required String teamId,
+    required String firstName,
+    required String lastName,
+    required String email,
+    required int? jerseyNumber,
+  }) async {
+    if (!SupabaseService.isConfigured) {
+      final nextId = 'player-${_demoPlayers.length + 1}';
+      final player = Player(
+        id: nextId,
+        name: '$firstName $lastName'.trim(),
+        jerseyNumber: jerseyNumber,
+        isActive: true,
+      );
+      _demoPlayers.add(player);
+      return player;
+    }
+
+    final client = Supabase.instance.client;
+    final profile = await client
+        .from('profiles')
+        .select('id')
+        .eq('email', email.trim())
+        .maybeSingle();
+
+    if (profile == null) {
+      throw const PostgrestException(
+        message: 'No existe una cuenta con ese email. El jugador debe registrarse antes de añadirlo.',
+      );
+    }
+
+    final profileId = profile['id'] as String;
+    final existingPlayer = await client
+        .from('players')
+        .select('id')
+        .eq('profile_id', profileId)
+        .maybeSingle();
+
+    final playerId = existingPlayer?['id'] as String? ??
+        (await client
+                .from('players')
+                .insert({'profile_id': profileId})
+                .select('id')
+                .single())['id'] as String;
+
+    final row = await client
+        .from('team_players')
+        .insert({
+          'team_id': teamId,
+          'player_id': playerId,
+          'jersey_number': jerseyNumber,
+          'is_active': true,
+        })
+        .select(
+          'id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))',
+        )
+        .single();
+
+    return Player.fromJson(row);
+  }
+
   Future<Player> updateTeamPlayer({
     required String teamId,
     required String playerId,
@@ -34,12 +100,18 @@ class PlayerRepository {
       _demoPlayers[index] = updated;
       return updated;
     }
-    final row = await Supabase.instance.client.from('team_players').update({
-      'jersey_number': jerseyNumber,
-      'is_active': isActive,
-    }).eq('id', playerId).eq('team_id', teamId)
-      .select('id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))')
-      .single();
+    final row = await Supabase.instance.client
+        .from('team_players')
+        .update({
+          'jersey_number': jerseyNumber,
+          'is_active': isActive,
+        })
+        .eq('id', playerId)
+        .eq('team_id', teamId)
+        .select(
+          'id, jersey_number, is_active, players!inner(profiles!inner(first_name, last_name))',
+        )
+        .single();
     return Player.fromJson(row);
   }
 
