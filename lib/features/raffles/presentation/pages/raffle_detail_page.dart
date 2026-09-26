@@ -73,9 +73,10 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
 
   Future<void> _copyPublicLink(BuildContext context, Raffle raffle) async {
     final url = Uri.base.replace(path: '/r/${raffle.clubSlug!}/${raffle.slug!}').toString();
+    final messenger = ScaffoldMessenger.of(context);
     await Clipboard.setData(ClipboardData(text: url));
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público copiado. Puedes pegarlo en WhatsApp.')));
+      messenger.showSnackBar(const SnackBar(content: Text('Enlace público copiado. Puedes pegarlo en WhatsApp.')));
     }
   }
 
