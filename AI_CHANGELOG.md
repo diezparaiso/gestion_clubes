@@ -92,3 +92,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-26 — GPT-5.6 LUNA — player assignment security
 - lib/features/players/data/repositories/player_repository.dart: valida antes del alta que el equipo indicado pertenece al club activo; evita asignaciones cruzadas entre clubes desde el cliente.
 - No requiere cambio de esquema. Stripe/payment implementation remains untouched.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — raffle activation flow
+- `lib/features/raffles/data/repositories/raffle_repository.dart`: las nuevas rifas pasan a `active` al crearse, porque la interfaz actual no ofrece una acción separada para activarlas y el RPC público solo expone rifas activas.
+- Usa únicamente la columna `status` existente; no requiere cambio de esquema.
+- Stripe/payment implementation remains untouched.
