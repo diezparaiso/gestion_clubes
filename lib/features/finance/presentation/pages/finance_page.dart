@@ -58,7 +58,67 @@ class _FinancePageState extends ConsumerState<FinancePage> {
             ]),
             const SizedBox(height: 8),
             const Text('Registra ingresos y gastos y consulta el saldo del club.'),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
+            Row(children: [
+              Expanded(child: TextField(
+                controller: _searchController,
+                onChanged: (_) => setState(() {}),
+                decoration: const InputDecoration(
+                  hintText: 'Buscar descripción o categoría',
+                  prefixIcon: Icon(Icons.search),
+                ),
+              )),
+              const SizedBox(width: 12),
+              DropdownButton<TransactionType?>(
+                value: _typeFilter,
+                hint: const Text('Tipo'),
+                items: [
+                  const DropdownMenuItem<TransactionType?>(
+                    value: null,
+                    child: Text('Todos'),
+                  ),
+                  ...TransactionType.values.map(
+                    (type) => DropdownMenuItem<TransactionType?>(
+                      value: type,
+                      child: Text(
+                        type == TransactionType.income ? 'Ingresos' : 'Gastos',
+                      ),
+                    ),
+                  ),
+                ],
+                onChanged: (value) => setState(() => _typeFilter = value),
+              ),
+              const SizedBox(width: 12),
+              DropdownButton<String?>(
+                value: _categoryFilter,
+                hint: const Text('Categoría'),
+                items: [
+                  const DropdownMenuItem<String?>(
+                    value: null,
+                    child: Text('Todas'),
+                  ),
+                  ...const [
+                    'membership',
+                    'sponsorship',
+                    'raffle',
+                    'event',
+                    'equipment',
+                    'federation',
+                    'facilities',
+                    'salaries',
+                    'supplies',
+                    'other',
+                  ].map(
+                    (category) => DropdownMenuItem<String?>(
+                      value: category,
+                      child: Text(_categoryLabel(category)),
+                    ),
+                  ),
+                ],
+                onChanged: (value) => setState(() => _categoryFilter = value),
+              ),
+            ]),
+            const SizedBox(height: 16),
             Expanded(child: transactions.when(
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (error, stack) => const Center(child: Text('No se han podido cargar los movimientos.')),
