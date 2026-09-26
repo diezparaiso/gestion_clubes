@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta/asignación y edición de jugadores.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadidos teléfonos de jugador y progenitor/responsable.
 // Reutiliza cuentas existentes; no crea credenciales ni modifica Stripe.
 
 import '../../../auth/application/auth_controller.dart';
@@ -119,6 +120,11 @@ class _CreatePlayerDialogState extends ConsumerState<_CreatePlayerDialog> {
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _guardianNameController = TextEditingController();
+  final _guardianPhoneController = TextEditingController();
+  final _guardianEmailController = TextEditingController();
+  final _guardianRelationshipController = TextEditingController();
   final _jerseyController = TextEditingController();
   bool _isSaving = false;
   String? _errorMessage;
@@ -128,6 +134,16 @@ class _CreatePlayerDialogState extends ConsumerState<_CreatePlayerDialog> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
+    _guardianNameController.dispose();
+    _guardianPhoneController.dispose();
+    _guardianEmailController.dispose();
+    _guardianRelationshipController.dispose();
+    _phoneController.dispose();
+    _guardianNameController.dispose();
+    _guardianPhoneController.dispose();
+    _guardianEmailController.dispose();
+    _guardianRelationshipController.dispose();
     _jerseyController.dispose();
     super.dispose();
   }
@@ -154,6 +170,11 @@ class _CreatePlayerDialogState extends ConsumerState<_CreatePlayerDialog> {
         firstName: _firstNameController.text.trim(),
         lastName: _lastNameController.text.trim(),
         email: _emailController.text.trim(),
+        phone: _phoneController.text.trim(),
+        guardianName: _guardianNameController.text.trim(),
+        guardianPhone: _guardianPhoneController.text.trim(),
+        guardianEmail: _guardianEmailController.text.trim(),
+        guardianRelationship: _guardianRelationshipController.text.trim(),
         jerseyNumber: _jerseyController.text.trim().isEmpty
             ? null
             : int.parse(_jerseyController.text.trim()),
@@ -223,7 +244,47 @@ class _CreatePlayerDialogState extends ConsumerState<_CreatePlayerDialog> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 12),                TextFormField(
+                  controller: _phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(labelText: 'Teléfono del jugador', hintText: 'Opcional'),
+                ),
+                const SizedBox(height: 16),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('Progenitor o responsable', style: TextStyle(fontWeight: FontWeight.w700)),
+                ),
+                const SizedBox(height: 8),
+                TextFormField(
+                  controller: _guardianNameController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(labelText: 'Nombre y apellidos', hintText: 'Opcional'),
+                ),
                 const SizedBox(height: 12),
+                TextFormField(
+                  controller: _guardianPhoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(labelText: 'Teléfono del progenitor/responsable', hintText: 'Opcional'),
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _guardianEmailController,
+                  keyboardType: TextInputType.emailAddress,
+                  decoration: const InputDecoration(labelText: 'Email del progenitor/responsable', hintText: 'Opcional'),
+                  validator: (value) {
+                    final email = value?.trim() ?? '';
+                    if (email.isNotEmpty && !email.contains('@')) return 'Indica un email válido';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _guardianRelationshipController,
+                  textCapitalization: TextCapitalization.words,
+                  decoration: const InputDecoration(labelText: 'Relación', hintText: 'Madre, padre, tutor/a...'),
+                ),
+                const SizedBox(height: 12),
+
                 TextFormField(
                   controller: _jerseyController,
                   keyboardType: TextInputType.number,
@@ -286,6 +347,11 @@ class _EditPlayerDialog extends ConsumerStatefulWidget {
 
 class _EditPlayerDialogState extends ConsumerState<_EditPlayerDialog> {
   final _formKey = GlobalKey<FormState>();
+  late final TextEditingController _phoneController;
+  late final TextEditingController _guardianNameController;
+  late final TextEditingController _guardianPhoneController;
+  late final TextEditingController _guardianEmailController;
+  late final TextEditingController _guardianRelationshipController;
   late final TextEditingController _jerseyController;
   late bool _isActive;
   bool _isSaving = false;
@@ -294,6 +360,11 @@ class _EditPlayerDialogState extends ConsumerState<_EditPlayerDialog> {
   @override
   void initState() {
     super.initState();
+    _phoneController = TextEditingController(text: widget.player.phone ?? '');
+    _guardianNameController = TextEditingController(text: widget.player.guardianName ?? '');
+    _guardianPhoneController = TextEditingController(text: widget.player.guardianPhone ?? '');
+    _guardianEmailController = TextEditingController(text: widget.player.guardianEmail ?? '');
+    _guardianRelationshipController = TextEditingController(text: widget.player.guardianRelationship ?? '');
     _jerseyController = TextEditingController(
       text: widget.player.jerseyNumber?.toString() ?? '',
     );
@@ -325,6 +396,11 @@ class _EditPlayerDialogState extends ConsumerState<_EditPlayerDialog> {
         clubId: clubId,
         teamId: widget.teamId,
         playerId: widget.player.id,
+        phone: _phoneController.text.trim(),
+        guardianName: _guardianNameController.text.trim(),
+        guardianPhone: _guardianPhoneController.text.trim(),
+        guardianEmail: _guardianEmailController.text.trim(),
+        guardianRelationship: _guardianRelationshipController.text.trim(),
         jerseyNumber: _jerseyController.text.trim().isEmpty
             ? null
             : int.parse(_jerseyController.text.trim()),
@@ -363,6 +439,44 @@ class _EditPlayerDialogState extends ConsumerState<_EditPlayerDialog> {
             children: [
               Text(widget.player.name, style: const TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 16),
+              TextFormField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(labelText: 'Teléfono del jugador', hintText: 'Opcional'),
+              ),
+              const SizedBox(height: 12),
+              const Align(
+                alignment: Alignment.centerLeft,
+                child: Text('Progenitor o responsable', style: TextStyle(fontWeight: FontWeight.w700)),
+              ),
+              const SizedBox(height: 8),
+              TextFormField(
+                controller: _guardianNameController,
+                decoration: const InputDecoration(labelText: 'Nombre y apellidos', hintText: 'Opcional'),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _guardianPhoneController,
+                keyboardType: TextInputType.phone,
+                decoration: const InputDecoration(labelText: 'Teléfono', hintText: 'Opcional'),
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _guardianEmailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(labelText: 'Email', hintText: 'Opcional'),
+                validator: (value) {
+                  final email = value?.trim() ?? '';
+                  if (email.isNotEmpty && !email.contains('@')) return 'Indica un email válido';
+                  return null;
+                },
+              ),
+              const SizedBox(height: 12),
+              TextFormField(
+                controller: _guardianRelationshipController,
+                decoration: const InputDecoration(labelText: 'Relación', hintText: 'Madre, padre, tutor/a...'),
+              ),
+              const SizedBox(height: 12),
               TextFormField(
                 controller: _jerseyController,
                 keyboardType: TextInputType.number,
