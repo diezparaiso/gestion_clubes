@@ -13,6 +13,7 @@ class TeamStaffRepository {
     return rows.map(TeamStaff.fromJson).toList();
   }
 
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida que el equipo pertenece al club antes de asignar personal.
   Future<TeamStaff> createAndAssignStaff({
     required String clubId,
     required String teamId,
@@ -26,6 +27,15 @@ class TeamStaffRepository {
       return staff;
     }
     final client = Supabase.instance.client;
+    final team = await client
+        .from('teams')
+        .select('id')
+        .eq('id', teamId)
+        .eq('club_id', clubId)
+        .maybeSingle();
+    if (team == null) {
+      throw const PostgrestException(message: 'El equipo no pertenece al club activo.');
+    }
     final profile = await client.from('profiles').select('id, first_name, last_name, email').eq('email', email.trim()).maybeSingle();
     if (profile == null) throw const PostgrestException(message: 'No existe una cuenta con ese email. La persona debe registrarse antes de asignarla.');
     final row = await client.from('team_staff').insert({
