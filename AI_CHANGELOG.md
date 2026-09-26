@@ -213,3 +213,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - El alta de noticias valida también el club antes de persistir.
 - Se endurece la acción de copiar el enlace público de agenda frente a cambios de contexto asíncronos.
 - Sin cambios de esquema ni de pagos en este bloque.
+
+### 2026-09-26 — GPT-5.6 LUNA — endurecimiento de miembros del club
+- Las consultas de miembros validan club_id y el modo Supabase sin cliente disponible.
+- Los diálogos de cambio de rol e invitación no ejecutan setState si el diálogo ya fue desmontado durante una operación asíncrona.
+- Sin cambios de esquema ni de pagos en este bloque.
