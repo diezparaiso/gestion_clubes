@@ -24,6 +24,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
   String? _ticketsRaffleId;
   RaffleDraw? _draw;
   bool _drawing = false;
+  bool _manualSaving = false;
 
   @override
   void initState() {
@@ -56,9 +57,12 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
             if (snapshot.hasError) return const Center(child: Text('No se han podido cargar las participaciones.'));
             final tickets = snapshot.data!;
             return ListView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), children: [
-              Row(children: [Expanded(child: Text('Participaciones', style: Theme.of(context).textTheme.headlineMedium)), FilledButton.icon(onPressed: _drawing || _draw != null ? null : () => _confirmDraw(tickets), icon: const Icon(Icons.casino_outlined), label: const Text('Sortear'))]),
+              Row(children: [Expanded(child: Text('Participaciones', style: Theme.of(context).textTheme.headlineMedium)), FilledButton.icon(onPressed: _drawing || _draw != null || raffle.winningNumber != null ? null : () => raffle.type == RaffleType.cesta ? _setBasketWinner(raffle, tickets) : _confirmDraw(tickets), icon: Icon(raffle.type == RaffleType.cesta ? Icons.emoji_events_outlined : Icons.casino_outlined), label: Text(raffle.type == RaffleType.cesta ? 'Elegir ganador' : 'Sortear'))]),
               const SizedBox(height: 8),
               Text('${tickets.length} participaciones registradas. Solo las confirmadas participan en el sorteo.'),
+              const SizedBox(height: 8),
+              Text(raffle.type == RaffleType.cesta ? 'Tipo Cesta: el presidente elige el número ganador al finalizar la rifa.' : 'Sorteo puro: el sistema selecciona el ganador con aleatoriedad criptográfica.'),
+              if (raffle.winningNumber != null && _draw == null) ...[const SizedBox(height: 20), _DrawResult(draw: RaffleDraw(id: 'stored', raffleId: raffle.id, winningNumber: raffle.winningNumber!, drawnAt: raffle.endAt, method: raffle.type == RaffleType.cesta ? 'president_selected' : 'cryptographic_random'))],
               if (_draw != null) ...[const SizedBox(height: 20), _DrawResult(draw: _draw!)],
               const SizedBox(height: 20),
               if (tickets.isEmpty) const Card(child: Padding(padding: EdgeInsets.all(20), child: Text('Todavía no hay participaciones.')))
@@ -69,6 +73,38 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
       );
         },
       );
+
+  Future<void> _setBasketWinner(Raffle raffle, List<RaffleTicket> tickets) async {
+    if (DateTime.now().isBefore(raffle.endAt)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('La rifa todavía no ha terminado.')));
+      return;
+    }
+    final confirmed = tickets.where((ticket) => ticket.paymentStatus == 'paid').toList()..sort((a, b) => a.number.compareTo(b.number));
+    if (confirmed.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Necesitas al menos una participación confirmada.')));
+      return;
+    }
+    final numberController = TextEditingController();
+    final number = await showDialog<int>(context: context, builder: (context) => AlertDialog(
+      title: const Text('Número agraciado'),
+      content: TextField(controller: numberController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: 'Número participante', hintText: 'Entre 1 y ${raffle.totalNumbers}')),
+      actions: [
+        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+        FilledButton(onPressed: () { final n = int.tryParse(numberController.text); if (n != null) Navigator.pop(context, n); }, child: const Text('Confirmar')),
+      ],
+    ));
+    numberController.dispose();
+    if (number == null || !mounted) return;
+    setState(() => _manualSaving = true);
+    try {
+      final draw = await ref.read(raffleRepositoryProvider).setBasketWinner(raffleId: raffle.id, winningNumber: number);
+      if (mounted) setState(() { _draw = draw; _manualSaving = false; });
+    } on PostgrestException catch (e) {
+      if (mounted) { setState(() => _manualSaving = false); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message))); }
+    } catch (_) {
+      if (mounted) { setState(() => _manualSaving = false); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se ha podido registrar el ganador.'))); }
+    }
+  }
 
   Future<void> _confirmDraw(List<RaffleTicket> tickets) async {
     if (tickets.every((ticket) => ticket.paymentStatus != 'paid')) {
