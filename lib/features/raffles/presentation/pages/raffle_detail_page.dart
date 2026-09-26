@@ -1,4 +1,7 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade copia del enlace público para compartir la rifa por WhatsApp.
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -46,7 +49,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
             _tickets = ref.read(raffleRepositoryProvider).listTickets(raffle.id);
           }
           return Scaffold(
-        appBar: AppBar(title: Text(raffle.title)),
+        appBar: AppBar(title: Text(raffle.title), actions: [if (raffle.clubSlug != null && raffle.slug != null) IconButton(tooltip: 'Copiar enlace público', onPressed: () => _copyPublicLink(context, raffle), icon: const Icon(Icons.link_outlined))]),
         body: FutureBuilder<List<RaffleTicket>>(
           future: _tickets!,
           builder: (context, snapshot) {
@@ -67,6 +70,14 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
       );
         },
       );
+
+  Future<void> _copyPublicLink(BuildContext context, Raffle raffle) async {
+    final url = Uri.base.replace(path: '/r/${raffle.clubSlug!}/${raffle.slug!}').toString();
+    await Clipboard.setData(ClipboardData(text: url));
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público copiado. Puedes pegarlo en WhatsApp.')));
+    }
+  }
 
   Future<void> _confirmDraw(List<RaffleTicket> tickets) async {
     if (tickets.every((ticket) => ticket.paymentStatus != 'paid')) {
