@@ -1,3 +1,10 @@
+### 2026-09-26 — GPT-5.6 LUNA — navegación superior por rol
+- Añadida barra `ClubNavigationAppBar` reutilizable para las pantallas de gestión.
+- Todas las pantallas principales incorporan botón de inicio y menú superior de navegación.
+- El menú muestra las áreas disponibles según el rol seleccionado y mantiene visible el rol actual.
+- Añadida navegación también a jugadores, personal de equipo y detalle de rifas.
+- No se modifica la navegación pública ni Payments/Stripe.
+
 ### 2026-09-26 — GPT-5.6 LUNA — cierre inicial del módulo de accesos
 - Añadida `club_access_management_page.dart`: listado de accesos activos, alta de usuario mediante Edge Function, cambio de rol y revocación.
 - Añadida la ruta `/settings/access` y acceso directo desde Configuración.
