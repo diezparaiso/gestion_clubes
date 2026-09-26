@@ -9,5 +9,11 @@ class AdsConfig {
     defaultValue: '',
   );
 
-  static bool get enabled => publisherId.startsWith('ca-pub-');
+  static const adSlot = String.fromEnvironment(
+    'ADSENSE_AD_SLOT',
+    defaultValue: '',
+  );
+
+  static bool get enabled =>
+      publisherId.startsWith('ca-pub-') && adSlot.isNotEmpty;
 }
