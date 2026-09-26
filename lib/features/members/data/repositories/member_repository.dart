@@ -13,7 +13,7 @@ class MemberRepository {
 
     final rows = await Supabase.instance.client
         .from('memberships')
-        .select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, profiles!inner(first_name, last_name, email)')
+        .select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, address, postal_code, city, province, country, profiles!inner(first_name, last_name, email)')
         .eq('club_id', clubId)
         .order('member_number');
     return rows.map(Member.fromJson).toList();
@@ -40,7 +40,7 @@ class MemberRepository {
       'status': 'active',
       'membership_type': 'standard',
       'join_date': DateTime.now().toIso8601String().split('T').first,
-    }).select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, profiles!inner(first_name, last_name, email)').single();
+    }).select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, address, postal_code, city, province, country, profiles!inner(first_name, last_name, email)').single();
     return Member.fromJson(row);
   }
 
@@ -57,6 +57,11 @@ class MemberRepository {
     DateTime? renewalDate,
     DateTime? leaveDate,
     String? notes,
+    String? address,
+    String? postalCode,
+    String? city,
+    String? province,
+    String? country,
   }) async {
     if (clubId.trim().isEmpty) throw const FormatException('No hay un club activo.');
     if (memberNumber <= 0) throw const FormatException('El número de socio debe ser mayor que 0.');
@@ -77,6 +82,11 @@ class MemberRepository {
         renewalDate: renewalDate,
         leaveDate: leaveDate,
         notes: notes,
+        address: address?.trim().isEmpty == true ? null : address?.trim(),
+        postalCode: postalCode?.trim().isEmpty == true ? null : postalCode?.trim(),
+        city: city?.trim().isEmpty == true ? null : city?.trim(),
+        province: province?.trim().isEmpty == true ? null : province?.trim(),
+        country: country?.trim().isEmpty == true ? 'ES' : country!.trim().toUpperCase(),
       );
       _demoMembers[index] = updated;
       return updated;
@@ -89,7 +99,12 @@ class MemberRepository {
       'renewal_date': renewalDate?.toIso8601String().split('T').first,
       'leave_date': leaveDate?.toIso8601String().split('T').first,
       'notes': notes?.trim().isEmpty == true ? null : notes?.trim(),
-    }).eq('id', memberId).eq('club_id', clubId).select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, profiles!inner(first_name, last_name, email)').single();
+      'address': address?.trim().isEmpty == true ? null : address?.trim(),
+      'postal_code': postalCode?.trim().isEmpty == true ? null : postalCode?.trim(),
+      'city': city?.trim().isEmpty == true ? null : city?.trim(),
+      'province': province?.trim().isEmpty == true ? null : province?.trim(),
+      'country': country?.trim().isEmpty == true ? 'ES' : country!.trim().toUpperCase(),
+    }).eq('id', memberId).eq('club_id', clubId).select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, address, postal_code, city, province, country, profiles!inner(first_name, last_name, email)').single();
     return Member.fromJson(row);
   }
 
