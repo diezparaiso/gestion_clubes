@@ -29,6 +29,11 @@ Branch: `feature/gpt-gestion-clubes`
   - Uses logical deactivation instead of physical deletion so team history is retained.
   - Added source comments identifying GPT-5.6 LUNA as the modifier.
 
+- `lib/features/teams/presentation/pages/teams_page.dart`
+  - Added edit form reuse for existing teams.
+  - Added activate/deactivate actions in the team card.
+  - Added source marker identifying GPT-5.6 LUNA.
+
 ### Not modified
 
 - `supabase/migrations/*`: untouched.
@@ -37,7 +42,6 @@ Branch: `feature/gpt-gestion-clubes`
 
 ### Pending work
 
-- Team management UI still needs the edit/activate actions wired into `teams_page.dart`.
 - Users and roles UI.
 - Complete member management.
 - Player CRUD and team assignment.
