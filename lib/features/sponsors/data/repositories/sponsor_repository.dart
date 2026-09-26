@@ -1,4 +1,4 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Evita acceder al cliente de Supabase cuando la app funciona en modo demo.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Refuerza aislamiento por club y validación de altas de patrocinadores.\n// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Evita acceder al cliente de Supabase cuando la app funciona en modo demo.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -11,7 +11,7 @@ class SponsorRepository {
   SponsorRepository(this._supabase);
 
   Future<List<Sponsor>> getClubSponsors(String clubId) async {
-    if (!SupabaseService.isConfigured || _supabase == null) {
+    if (!SupabaseService.isConfigured || _supabase == null || clubId.trim().isEmpty) {
       return _demoSponsors();
     }
 
@@ -32,7 +32,7 @@ class SponsorRepository {
   }
 
   Future<List<Sponsor>> getActiveSponsors(String clubId) async {
-    if (!SupabaseService.isConfigured || _supabase == null) {
+    if (!SupabaseService.isConfigured || _supabase == null || clubId.trim().isEmpty) {
       return _demoSponsors().where((s) => s.isActive && !s.isExpired).toList();
     }
 
@@ -53,7 +53,7 @@ class SponsorRepository {
   }
 
   Future<List<Sponsor>> getPublicSponsors(String clubSlug) async {
-    if (!SupabaseService.isConfigured || _supabase == null) {
+    if (!SupabaseService.isConfigured || _supabase == null || clubSlug.trim().isEmpty) {
       return _demoSponsors().where((s) => s.isPublic && s.isActive).toList();
     }
 
