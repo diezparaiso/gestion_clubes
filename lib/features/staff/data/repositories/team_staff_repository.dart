@@ -52,6 +52,7 @@ class TeamStaffRepository {
   // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Edición de rol/estado con columnas existentes.
   // No requiere cambios de esquema Supabase.
   Future<TeamStaff> updateTeamStaff({
+    required String clubId,
     required String teamId,
     required String staffId,
     required String role,
@@ -64,6 +65,15 @@ class TeamStaffRepository {
       final updated = TeamStaff(id: current.id, name: current.name, role: role.trim(), isActive: isActive);
       _demoStaff[index] = updated;
       return updated;
+    }
+    final team = await Supabase.instance.client
+        .from('teams')
+        .select('id')
+        .eq('id', teamId)
+        .eq('club_id', clubId)
+        .maybeSingle();
+    if (team == null) {
+      throw const PostgrestException(message: 'El equipo no pertenece al club activo.');
     }
     final row = await Supabase.instance.client.from('team_staff').update({
       'role': role.trim(),
