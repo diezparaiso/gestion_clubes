@@ -54,9 +54,15 @@ class TeamRepository {
     return Season.fromJson(row);
   }
 
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Valida nombre, categoría y pertenencia de la temporada al club.
   Future<Team> createTeam({required String clubId, required String name, required String category, required String seasonId, required String seasonName}) async {
+    final normalizedName = name.trim();
+    final normalizedCategory = category.trim();
+    if (normalizedName.isEmpty || normalizedCategory.isEmpty) {
+      throw FormatException('El nombre y la categoría del equipo son obligatorios.');
+    }
     if (!SupabaseService.isConfigured) {
-      final team = Team(id: 'team-${_demoTeams.length + 1}', name: name, category: category, seasonName: seasonName, isActive: true);
+      final team = Team(id: 'team-${_demoTeams.length + 1}', name: normalizedName, category: normalizedCategory, seasonName: seasonName, isActive: true);
       _demoTeams.add(team);
       return team;
     }
