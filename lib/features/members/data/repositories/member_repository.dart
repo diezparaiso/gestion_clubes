@@ -33,6 +33,7 @@ class MemberRepository {
       'member_number': memberNumber,
       'status': 'active',
       'membership_type': 'standard',
+      'join_date': DateTime.now().toIso8601String().split('T').first,
     }).select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, profiles!inner(first_name, last_name, email)').single();
     return Member.fromJson(row);
   }
@@ -78,7 +79,7 @@ class MemberRepository {
       'renewal_date': renewalDate?.toIso8601String().split('T').first,
       'leave_date': leaveDate?.toIso8601String().split('T').first,
       'notes': notes?.trim().isEmpty == true ? null : notes?.trim(),
-    }).eq('id', memberId).eq('club_id', clubId).select('id, member_number, status, profiles!inner(first_name, last_name, email)').single();
+    }).eq('id', memberId).eq('club_id', clubId).select('id, member_number, membership_type, status, join_date, renewal_date, leave_date, notes, profiles!inner(first_name, last_name, email)').single();
     return Member.fromJson(row);
   }
 
