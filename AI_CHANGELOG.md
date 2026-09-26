@@ -166,3 +166,12 @@ Before changing a file, read this log and the existing AI markers. After changin
 - Supabase live database: migration prepared in repository; not executed through a live Supabase connector.
 - Stripe: untouched.
 - Marker: MODIFICADO POR GPT-5.6 LUNA.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — finance consistency cleanup
+- `lib/features/finance/presentation/pages/finance_page.dart`
+  - Removed a duplicated `@override` annotation.
+  - Aligned the demo balance with the repository's configured demo opening balance (7,180 €) instead of a second hard-coded value (8,450 €).
+- No database schema change.
+- Stripe: untouched.
+- Marker: MODIFICADO POR GPT-5.6 LUNA.
