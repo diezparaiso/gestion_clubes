@@ -273,3 +273,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Añadido filtro para mostrar u ocultar equipos inactivos.
 - La búsqueda no modifica Supabase ni el esquema de datos; filtra únicamente los equipos ya cargados.
 - Se mantiene el estado de edición/activación existente.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — filtros avanzados de socios
+- `lib/features/members/presentation/pages/members_page.dart`: añadido filtrado local por estado y tipo de socio, combinado con la búsqueda existente por nombre, email y número.
+- No se realizan consultas adicionales ni cambios de esquema; se filtran los datos ya cargados para el club autenticado.
