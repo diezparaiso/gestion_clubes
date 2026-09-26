@@ -52,13 +52,17 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
           const SizedBox(height: 8),
           Text(raffle.title, style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 6),
-          Text(raffle.type == RaffleType.cesta ? 'Rifa tipo Cesta · elige tu número' : 'Sorteo puro · elige tu número y el sistema sorteará el ganador'),
+          Text(raffle.type == RaffleType.cesta ? 'Rifa tipo Cesta · elige tu número' : raffle.type == RaffleType.mensual ? 'Rifa mensual · conserva tu número mientras la suscripción esté activa' : 'Sorteo puro · elige tu número y el sistema sorteará el ganador'),
           if (raffle.description != null) ...[const SizedBox(height: 8), Text(raffle.description!)],
           const SizedBox(height: 20),
           Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('${raffle.ticketPrice.toStringAsFixed(2).replaceAll('.', ',')} € por número', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 4),
             Text('${raffle.totalNumbers - occupiedCount} disponibles de ${raffle.totalNumbers}'),
+          if (raffle.type == RaffleType.mensual) ...[
+            const SizedBox(height: 4),
+            Text('Renovación mensual el día ${raffle.monthlyDay ?? '-'}.'),
+          ],
             const SizedBox(height: 20),
             Wrap(spacing: 8, runSpacing: 8, children: List.generate(raffle.totalNumbers, (index) => _numberTile(raffle, index + 1))),
           ]))),
