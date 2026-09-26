@@ -105,3 +105,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/raffles/presentation/pages/raffle_detail_page.dart`: añade una acción sencilla para copiar el enlace público y pegarlo después en WhatsApp u otro canal.
 - No se añade un sistema de WhatsApp ni nuevas tablas/endpoints.
 - El pago real de la participación sigue separado del flujo actual; no se modifica Stripe/payment en este bloque.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — public club link sharing
+- lib/features/clubs/presentation/pages/club_settings_page.dart: añadido botón simple para copiar el enlace público del club y corregida la anotación @override duplicada existente.
+- No se ha creado integración directa con WhatsApp.
+- El enlace queda preparado para compartir externamente.
+- Pagos/Stripe no modificados.
+- La función backend draw_raffle_random fue verificada en 009_raffle_draws.sql; no se modifica en este bloque.
