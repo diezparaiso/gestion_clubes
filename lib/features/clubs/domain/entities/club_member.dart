@@ -56,7 +56,7 @@ class ClubMember {
   bool get isPresident => role == 'club_president';
   bool get isTreasurer => role == 'club_treasurer';
   bool get isSecretary => role == 'club_secretary';
-  bool get isManager => isPresident || isTreasurer || isSecretary;
+  bool get isManager => isPresident || isSecretary;
   bool get isCoach => role == 'coach';
   bool get isStaff => role == 'staff';
   bool get isPlayer => role == 'player';
