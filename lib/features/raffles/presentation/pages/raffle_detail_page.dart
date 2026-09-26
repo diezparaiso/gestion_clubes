@@ -264,6 +264,112 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
   static String _statusLabel(String status) => switch (status) { 'paid' => 'Confirmada', 'pending' => 'Pendiente', 'cancelled' => 'Cancelada', _ => status };
 }
 
+class _MonthlyResultData {
+  const _MonthlyResultData({
+    required this.month,
+    required this.winningNumber,
+    required this.prizeAmount,
+    this.notes,
+  });
+
+  final DateTime month;
+  final int winningNumber;
+  final double prizeAmount;
+  final String? notes;
+}
+
+class _MonthlyResultDialog extends StatefulWidget {
+  const _MonthlyResultDialog();
+
+  @override
+  State<_MonthlyResultDialog> createState() => _MonthlyResultDialogState();
+}
+
+class _MonthlyResultDialogState extends State<_MonthlyResultDialog> {
+  final _formKey = GlobalKey<FormState>();
+  final _numberController = TextEditingController();
+  final _prizeController = TextEditingController(text: '0');
+  final _notesController = TextEditingController();
+  DateTime _month = DateTime(DateTime.now().year, DateTime.now().month, 1);
+
+  @override
+  void dispose() {
+    _numberController.dispose();
+    _prizeController.dispose();
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('Resultado mensual'),
+    content: SizedBox(
+      width: 420,
+      child: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(Icons.calendar_month_outlined),
+              title: const Text('Mes del resultado'),
+              subtitle: Text(_month.month.toString() + '/' + _month.year.toString()),
+              trailing: TextButton(onPressed: _pickMonth, child: const Text('Cambiar')),
+            ),
+            TextFormField(
+              controller: _numberController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: 'Número ganador'),
+              validator: (value) => int.tryParse(value ?? '') == null ? 'Introduce un número válido' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _prizeController,
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              decoration: const InputDecoration(labelText: 'Premio', suffixText: '€'),
+              validator: (value) => double.tryParse((value ?? '').replaceAll(',', '.')) == null ? 'Introduce un importe válido' : null,
+            ),
+            const SizedBox(height: 12),
+            TextFormField(
+              controller: _notesController,
+              decoration: const InputDecoration(labelText: 'Observaciones (opcional)'),
+            ),
+          ],
+        ),
+      ),
+    ),
+    actions: [
+      TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+      FilledButton(
+        onPressed: () {
+          if (!_formKey.currentState!.validate()) return;
+          Navigator.pop(
+            context,
+            _MonthlyResultData(
+              month: _month,
+              winningNumber: int.parse(_numberController.text),
+              prizeAmount: double.parse(_prizeController.text.replaceAll(',', '.')),
+              notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+            ),
+          );
+        },
+        child: const Text('Guardar'),
+      ),
+    ],
+  );
+
+  Future<void> _pickMonth() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _month,
+      firstDate: DateTime(2024),
+      lastDate: DateTime(DateTime.now().year + 10),
+    );
+    if (picked != null) setState(() => _month = DateTime(picked.year, picked.month, 1));
+  }
+}
+
 class _DrawResult extends StatelessWidget {
   const _DrawResult({required this.draw});
   final RaffleDraw draw;
