@@ -1,4 +1,4 @@
-enum RaffleType { cesta, sorteoPuro }
+enum RaffleType { cesta, sorteoPuro, mensual }
 
 enum RaffleStatus { draft, scheduled, active, soldOut, closed, drawn, cancelled }
 
