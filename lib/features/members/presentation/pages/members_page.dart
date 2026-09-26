@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Edición de número/estado del socio usando campos existentes.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Gestión completa de campos existentes en memberships.
 
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/member_repository.dart';
@@ -107,10 +107,42 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
   @override
   void dispose() {
     _numberController.dispose();
+    _notesController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
     _emailController.dispose();
     super.dispose();
+  }
+
+  String _membershipTypeLabel(MembershipType type) {
+    switch (type) {
+      case MembershipType.standard: return 'Estándar';
+      case MembershipType.youth: return 'Juvenil';
+      case MembershipType.family: return 'Familiar';
+      case MembershipType.supporter: return 'Simpatizante';
+      case MembershipType.other: return 'Otro';
+    }
+  }
+
+  String _formatDate(DateTime date) => date.day.toString().padLeft(2, '0') + '/' + date.month.toString().padLeft(2, '0') + '/' + date.year.toString();
+
+  Future<DateTime?> _pickDate(DateTime? current) async {
+    return showDatePicker(context: context, initialDate: current ?? DateTime.now(), firstDate: DateTime(1950), lastDate: DateTime(2100));
+  }
+
+  Future<void> _selectJoinDate() async {
+    final value = await _pickDate(_joinDate);
+    if (value != null && mounted) setState(() => _joinDate = value);
+  }
+
+  Future<void> _selectRenewalDate() async {
+    final value = await _pickDate(_renewalDate);
+    if (value != null && mounted) setState(() => _renewalDate = value);
+  }
+
+  Future<void> _selectLeaveDate() async {
+    final value = await _pickDate(_leaveDate);
+    if (value != null && mounted) setState(() => _leaveDate = value);
   }
 
   Future<void> _save() async {
@@ -168,7 +200,12 @@ class _EditMemberDialog extends ConsumerStatefulWidget {
 class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _numberController;
+  late final TextEditingController _notesController;
   late MemberStatus _status;
+  late MembershipType _membershipType;
+  late DateTime _joinDate;
+  DateTime? _renewalDate;
+  DateTime? _leaveDate;
   bool _isSaving = false;
   String? _errorMessage;
 
@@ -176,7 +213,12 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
   void initState() {
     super.initState();
     _numberController = TextEditingController(text: widget.member.memberNumber.toString());
+    _notesController = TextEditingController(text: widget.member.notes ?? '');
     _status = widget.member.status;
+    _membershipType = widget.member.membershipType;
+    _joinDate = widget.member.joinDate;
+    _renewalDate = widget.member.renewalDate;
+    _leaveDate = widget.member.leaveDate;
   }
 
   @override
@@ -197,6 +239,8 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
         return 'Cancelado';
       case MemberStatus.suspended:
         return 'Suspendido';
+      case MemberStatus.deceased:
+        return 'Fallecido';
     }
   }
 
@@ -216,6 +260,11 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
         memberId: widget.member.id,
         memberNumber: int.parse(_numberController.text),
         status: _status,
+        membershipType: _membershipType,
+        joinDate: _joinDate,
+        renewalDate: _renewalDate,
+        leaveDate: _leaveDate,
+        notes: _notesController.text,
       );
       if (mounted) Navigator.of(context).pop(true);
     } on PostgrestException catch (error) {
@@ -274,6 +323,13 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
                   if (value != null) setState(() => _status = value);
                 },
               ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<MembershipType>(initialValue: _membershipType, decoration: const InputDecoration(labelText: 'Tipo de socio'), items: MembershipType.values.map((type) => DropdownMenuItem(value: type, child: Text(_membershipTypeLabel(type)))).toList(), onChanged: (value) { if (value != null) setState(() => _membershipType = value); }),
+              const SizedBox(height: 12),
+              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Alta'), subtitle: Text(_formatDate(_joinDate)), trailing: IconButton(onPressed: _isSaving ? null : _selectJoinDate, icon: const Icon(Icons.calendar_today_outlined))),
+              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Renovación'), subtitle: Text(_renewalDate == null ? 'Sin fecha' : _formatDate(_renewalDate!)), trailing: Row(mainAxisSize: MainAxisSize.min, children: [if (_renewalDate != null) IconButton(onPressed: _isSaving ? null : () => setState(() => _renewalDate = null), icon: const Icon(Icons.clear)), IconButton(onPressed: _isSaving ? null : _selectRenewalDate, icon: const Icon(Icons.calendar_today_outlined))])),
+              ListTile(contentPadding: EdgeInsets.zero, title: const Text('Baja'), subtitle: Text(_leaveDate == null ? 'Sin fecha' : _formatDate(_leaveDate!)), trailing: Row(mainAxisSize: MainAxisSize.min, children: [if (_leaveDate != null) IconButton(onPressed: _isSaving ? null : () => setState(() => _leaveDate = null), icon: const Icon(Icons.clear)), IconButton(onPressed: _isSaving ? null : _selectLeaveDate, icon: const Icon(Icons.calendar_today_outlined))])),
+              TextFormField(controller: _notesController, maxLines: 3, decoration: const InputDecoration(labelText: 'Notas')),
               if (_errorMessage != null) ...[
                 const SizedBox(height: 16),
                 Align(
@@ -319,6 +375,8 @@ class _MemberTile extends StatelessWidget {
         return 'Cancelado';
       case MemberStatus.suspended:
         return 'Suspendido';
+      case MemberStatus.deceased:
+        return 'Fallecido';
     }
   }
 
