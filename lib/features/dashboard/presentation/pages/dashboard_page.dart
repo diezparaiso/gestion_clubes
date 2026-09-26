@@ -6,6 +6,7 @@ import '../../../auth/application/auth_controller.dart';
 import '../../application/dashboard_stats_provider.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Elimina actividad ficticia del dashboard.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -261,14 +262,14 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Actividad reciente', style: Theme.of(context).textTheme.titleLarge),
-                      TextButton(onPressed: () {}, child: const Text('Ver todo')),
+                      Text('Estado operativo', style: Theme.of(context).textTheme.titleLarge),
+                      TextButton(onPressed: () => context.go('/members'), child: const Text('Ver socios')),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  const _ActivityItem(icon: Icons.person_add_alt_1, title: 'Nuevo socio #248', detail: 'Hace 24 minutos', color: Color(0xFF168B68)),
-                  const _ActivityItem(icon: Icons.confirmation_number_outlined, title: 'Rifa Navidad', detail: '34 nuevas participaciones', color: Color(0xFFD27A2C)),
-                  const _ActivityItem(icon: Icons.receipt_long_outlined, title: 'Material deportivo', detail: 'Gasto registrado · 350 €', color: Color(0xFF3276B1)),
+                  _ActivityItem(icon: Icons.people_alt_outlined, title: '${stats?.memberCount ?? 0} socios registrados', detail: 'Directorio actual del club', color: const Color(0xFF168B68)),
+                  _ActivityItem(icon: Icons.groups_outlined, title: '${stats?.teamCount ?? 0} equipos registrados', detail: 'Equipos actuales del club', color: const Color(0xFF3276B1)),
+                  _ActivityItem(icon: Icons.account_balance_wallet_outlined, title: 'Saldo ${_formatCurrency(stats?.balance ?? 0)}', detail: 'Saldo calculado con los movimientos registrados', color: const Color(0xFFD27A2C)),
                 ],
               ),
             ),
