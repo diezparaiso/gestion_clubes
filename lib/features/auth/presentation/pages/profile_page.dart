@@ -55,7 +55,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authControllerProvider);
     return Scaffold(
-      appBar: ClubNavigationAppBar(title: widget.forcePasswordChange ? 'Cambia tu contraseña' : 'Mi perfil'),
+      appBar: widget.forcePasswordChange
+          ? AppBar(title: const Text('Cambia tu contraseña'))
+          : ClubNavigationAppBar(title: 'Mi perfil'),
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 560),
