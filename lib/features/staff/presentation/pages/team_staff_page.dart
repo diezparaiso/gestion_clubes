@@ -46,8 +46,7 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
     final teamName = widget.teamName;
     final staff = ref.watch(teamStaffProvider(teamId));
     return Scaffold(
-      appBar: const ClubNavigationAppBar(title: 'Personal del equipo'),
-        //title: Text('$teamName · Personal')),
+      appBar: ClubNavigationAppBar(title: '$teamName · Personal'),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
