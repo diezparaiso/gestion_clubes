@@ -49,8 +49,7 @@ class _PublicEventsPageState extends State<PublicEventsPage> {
                     leading: const Icon(Icons.event_outlined),
                     title: Text(event.title),
                     subtitle: Text(
-                      '${_formatDateTime(event.startAt)}$endText · ${event.location ?? 'Sin ubicación'}
-${event.description}',
+                      '${_formatDateTime(event.startAt)}$endText · ${event.location ?? 'Sin ubicación'}\n${event.description}',
                     ),
                     isThreeLine: true,
                   ),
