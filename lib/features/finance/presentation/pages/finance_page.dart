@@ -10,6 +10,7 @@ import '../../domain/entities/financial_transaction.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Usa el saldo inicial real del repositorio y valida movimientos.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Evita actualizar el diálogo tras desmontarse.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadidos filtros locales de tesorería.
 
 final transactionsProvider = FutureProvider<List<FinancialTransaction>>((ref) {
   final clubId = ref.watch(authControllerProvider).clubId;
@@ -23,11 +24,23 @@ final openingBalanceProvider = FutureProvider<double>((ref) {
   return ref.watch(financeRepositoryProvider).getOpeningBalance(clubId);
 });
 
-class FinancePage extends ConsumerWidget {
+class FinancePage extends ConsumerStatefulWidget {
   const FinancePage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<FinancePage> createState() => _FinancePageState();
+}
+
+class _FinancePageState extends ConsumerState<FinancePage> {
+  final _searchController = TextEditingController();
+  TransactionType? _typeFilter;
+  String? _categoryFilter;
+
+  @override
+  void dispose() { _searchController.dispose(); super.dispose(); }
+
+  @override
+  Widget build(BuildContext context) {
     final transactions = ref.watch(transactionsProvider);
     final openingBalance = ref.watch(openingBalanceProvider);
     return Scaffold(
@@ -52,7 +65,16 @@ class FinancePage extends ConsumerWidget {
               data: (items) => openingBalance.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, stack) => const Center(child: Text('No se ha podido cargar el saldo inicial.')),
-                data: (balance) => _FinanceContent(transactions: items, openingBalance: balance),
+                data: (balance) {
+                  final query = _searchController.text.trim().toLowerCase();
+                  final filtered = items.where((item) {
+                    final matchesText = query.isEmpty || item.description.toLowerCase().contains(query) || item.category.toLowerCase().contains(query);
+                    final matchesType = _typeFilter == null || item.type == _typeFilter;
+                    final matchesCategory = _categoryFilter == null || item.category == _categoryFilter;
+                    return matchesText && matchesType && matchesCategory;
+                  }).toList();
+                  return _FinanceContent(transactions: filtered, openingBalance: balance);
+                },
               ),
             )),
           ]),
