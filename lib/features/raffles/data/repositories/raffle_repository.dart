@@ -58,7 +58,7 @@ class RaffleRepository {
     return RaffleDraw.fromJson(row);
   }
 
-  Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt, required RaffleType type}) async {
+  Future<Raffle> createRaffle({required String clubId, required String title, required double ticketPrice, required int totalNumbers, required DateTime endAt, required RaffleType type, int? monthlyDay}) async {
     if (!SupabaseService.isConfigured) {
       final raffle = Raffle(id: 'raffle-new', title: title, ticketPrice: ticketPrice, totalNumbers: totalNumbers, status: RaffleStatus.draft, endAt: endAt);
       _demoRaffles.insert(0, raffle);
@@ -67,7 +67,7 @@ class RaffleRepository {
     final userId = Supabase.instance.client.auth.currentUser?.id;
     if (userId == null) throw const AuthException('La sesión ha expirado.');
     final slug = title.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '-').replaceAll(RegExp(r'^-+|-+$'), '');
-    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': title.trim(), 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'raffle_type': type.name, 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number').single();
+    final row = await Supabase.instance.client.from('raffles').insert({'club_id': clubId, 'title': title.trim(), 'slug': slug.isEmpty ? 'rifa' : slug, 'ticket_price': ticketPrice, 'total_numbers': totalNumbers, 'start_at': DateTime.now().toIso8601String(), 'end_at': endAt.toIso8601String(), 'draw_at': endAt.toIso8601String(), 'raffle_type': type.name, 'monthly_day': monthlyDay, 'subscription_enabled': type == RaffleType.mensual, 'status': 'draft', 'created_by': userId}).select('id, title, ticket_price, total_numbers, status, end_at, raffle_type, winning_number').single();
     return Raffle.fromJson(row);
   }
 
