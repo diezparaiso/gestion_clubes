@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/application/auth_controller.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
+import '../features/auth/presentation/pages/profile_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
 import '../features/clubs/presentation/pages/public_club_page.dart';
 import '../features/clubs/presentation/pages/club_settings_page.dart';
@@ -37,7 +38,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       final needsClub = authState.status == AuthStatus.needsClub;
 
       if (needsClub && location != '/onboarding') return '/onboarding';
-      if (isSignedIn && isAuthRoute) return '/dashboard';
+      if (isSignedIn && isAuthRoute) return authState.mustChangePassword ? '/profile/password' : '/dashboard';
+      if (isSignedIn && authState.mustChangePassword && location != '/profile/password') return '/profile/password';
       if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClub) return '/login';
       return null;
     },
@@ -85,6 +87,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => PublicClubPage(
           clubSlug: state.pathParameters['clubSlug']!,
         ),
+      ),
+      GoRoute(
+        path: '/profile/password',
+        name: 'profile-password',
+        builder: (context, state) => const ProfilePage(forcePasswordChange: true),
       ),
       GoRoute(
         path: '/dashboard',
