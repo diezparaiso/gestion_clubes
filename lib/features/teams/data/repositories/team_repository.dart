@@ -39,6 +39,47 @@ class TeamRepository {
     return Team.fromJson(row);
   }
 
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26):
+  // Usa exclusivamente tablas y columnas que ya existen.
+  // NO crea ni modifica migraciones, tablas, columnas ni políticas de Supabase.
+  Future<Team> updateTeam({
+    required String clubId,
+    required String teamId,
+    required String name,
+    required String category,
+    required String seasonId,
+  }) async {
+    if (!SupabaseService.isConfigured) {
+      final index = _demoTeams.indexWhere((team) => team.id == teamId);
+      if (index < 0) throw StateError('Equipo no encontrado.');
+      final current = _demoTeams[index];
+      final season = _demoSeasons.firstWhere((item) => item.id == seasonId, orElse: () => _demoSeasons.first);
+      final updated = Team(id: current.id, name: name.trim(), category: category.trim(), seasonName: season.name, isActive: current.isActive);
+      _demoTeams[index] = updated;
+      return updated;
+    }
+    final row = await Supabase.instance.client.from('teams').update({
+      'name': name.trim(),
+      'category': category.trim(),
+      'season_id': seasonId,
+    }).eq('id', teamId).eq('club_id', clubId).select('id, name, category, is_active, seasons!inner(name)').single();
+    return Team.fromJson(row);
+  }
+
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-26):
+  // Baja lógica mediante is_active; no elimina físicamente el equipo.
+  Future<Team> setTeamActive({required String clubId, required String teamId, required bool isActive}) async {
+    if (!SupabaseService.isConfigured) {
+      final index = _demoTeams.indexWhere((team) => team.id == teamId);
+      if (index < 0) throw StateError('Equipo no encontrado.');
+      final current = _demoTeams[index];
+      final updated = Team(id: current.id, name: current.name, category: current.category, seasonName: current.seasonName, isActive: isActive);
+      _demoTeams[index] = updated;
+      return updated;
+    }
+    final row = await Supabase.instance.client.from('teams').update({'is_active': isActive}).eq('id', teamId).eq('club_id', clubId).select('id, name, category, is_active, seasons!inner(name)').single();
+    return Team.fromJson(row);
+  }
   static final _demoTeams = <Team>[
     Team(id: 'team-a', name: 'Primer equipo', category: 'Senior masculina', seasonName: '2026/2027', isActive: true),
     Team(id: 'team-b', name: 'Juvenil A', category: 'Juvenil', seasonName: '2026/2027', isActive: true),
