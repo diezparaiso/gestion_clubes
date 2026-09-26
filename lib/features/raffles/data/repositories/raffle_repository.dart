@@ -88,7 +88,30 @@ class RaffleRepository {
         .select('id, raffle_id, draw_month, winning_number, winner_profile_id, prize_amount, notes')
         .eq('raffle_id', raffleId)
         .order('draw_month', ascending: false);
-    return rows.map(MonthlyRaffleResult.fromJson).toList();
+    final profileIds = rows
+        .map((row) => row['winner_profile_id'] as String?)
+        .whereType<String>()
+        .toSet()
+        .toList();
+    final names = <String, String>{};
+    if (profileIds.isNotEmpty) {
+      final profiles = await Supabase.instance.client
+          .from('profiles')
+          .select('id, first_name, last_name, email')
+          .inFilter('id', profileIds);
+      for (final profile in profiles) {
+        final first = (profile['first_name'] as String? ?? '').trim();
+        final last = (profile['last_name'] as String? ?? '').trim();
+        final email = (profile['email'] as String? ?? '').trim();
+        names[profile['id'] as String] = [first, last].where((part) => part.isNotEmpty).join(' ').trim().isNotEmpty
+            ? [first, last].where((part) => part.isNotEmpty).join(' ').trim()
+            : email;
+      }
+    }
+    return rows.map((row) => MonthlyRaffleResult.fromJson({
+      ...row,
+      'winner_name': names[row['winner_profile_id'] as String?],
+    })).toList();
   }
 
   Future<MonthlyRaffleResult> registerMonthlyResult({
