@@ -113,3 +113,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - El enlace queda preparado para compartir externamente.
 - Pagos/Stripe no modificados.
 - La función backend draw_raffle_random fue verificada en 009_raffle_draws.sql; no se modifica en este bloque.
+
+
+### 2026-09-26 — GPT-5.6 LUNA — public content link sharing
+- lib/features/events/presentation/pages/events_page.dart: botón simple para copiar el enlace público de la agenda del club.
+- lib/features/news/presentation/pages/posts_page.dart: botón simple para copiar el enlace público de noticias.
+- Se reutilizan las rutas públicas existentes; no se crea integración con WhatsApp ni backend adicional.
+- Pagos/Stripe no modificados.
