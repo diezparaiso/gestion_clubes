@@ -114,37 +114,6 @@ class _CreateMemberDialogState extends ConsumerState<_CreateMemberDialog> {
     super.dispose();
   }
 
-  String _membershipTypeLabel(MembershipType type) {
-    switch (type) {
-      case MembershipType.standard: return 'Estándar';
-      case MembershipType.youth: return 'Juvenil';
-      case MembershipType.family: return 'Familiar';
-      case MembershipType.supporter: return 'Simpatizante';
-      case MembershipType.other: return 'Otro';
-    }
-  }
-
-  String _formatDate(DateTime date) => date.day.toString().padLeft(2, '0') + '/' + date.month.toString().padLeft(2, '0') + '/' + date.year.toString();
-
-  Future<DateTime?> _pickDate(DateTime? current) async {
-    return showDatePicker(context: context, initialDate: current ?? DateTime.now(), firstDate: DateTime(1950), lastDate: DateTime(2100));
-  }
-
-  Future<void> _selectJoinDate() async {
-    final value = await _pickDate(_joinDate);
-    if (value != null && mounted) setState(() => _joinDate = value);
-  }
-
-  Future<void> _selectRenewalDate() async {
-    final value = await _pickDate(_renewalDate);
-    if (value != null && mounted) setState(() => _renewalDate = value);
-  }
-
-  Future<void> _selectLeaveDate() async {
-    final value = await _pickDate(_leaveDate);
-    if (value != null && mounted) setState(() => _leaveDate = value);
-  }
-
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final clubId = ref.read(authControllerProvider).clubId;
@@ -242,6 +211,37 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
       case MemberStatus.deceased:
         return 'Fallecido';
     }
+  }
+
+  String _membershipTypeLabel(MembershipType type) {
+    switch (type) {
+      case MembershipType.standard: return 'Estándar';
+      case MembershipType.youth: return 'Juvenil';
+      case MembershipType.family: return 'Familiar';
+      case MembershipType.supporter: return 'Simpatizante';
+      case MembershipType.other: return 'Otro';
+    }
+  }
+
+  String _formatDate(DateTime date) => date.day.toString().padLeft(2, '0') + '/' + date.month.toString().padLeft(2, '0') + '/' + date.year.toString();
+
+  Future<DateTime?> _pickDate(DateTime? current) async {
+    return showDatePicker(context: context, initialDate: current ?? DateTime.now(), firstDate: DateTime(1950), lastDate: DateTime(2100));
+  }
+
+  Future<void> _selectJoinDate() async {
+    final value = await _pickDate(_joinDate);
+    if (value != null && mounted) setState(() => _joinDate = value);
+  }
+
+  Future<void> _selectRenewalDate() async {
+    final value = await _pickDate(_renewalDate);
+    if (value != null && mounted) setState(() => _renewalDate = value);
+  }
+
+  Future<void> _selectLeaveDate() async {
+    final value = await _pickDate(_leaveDate);
+    if (value != null && mounted) setState(() => _leaveDate = value);
   }
 
   Future<void> _save() async {
