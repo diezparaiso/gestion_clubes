@@ -453,3 +453,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - La estrategia web usa AdSense Auto ads para anclas y barras laterales, que Google puede colocar de forma responsive sin invadir el contenido. Las posiciones y frecuencia se controlan desde AdSense.
 - No se crea `ads.txt` todavía porque Google exige el ID `pub-...` real del editor.
 - En EEE/Reino Unido/Suiza debe configurarse el consentimiento/CMP correspondiente antes de publicidad personalizada.
+
+### 2026-09-26 — GPT-5.6 LUNA — banda publicitaria global
+- Añadido `ClubAdBanner` multiplataforma; en Web usa un bloque responsive de AdSense y en otras plataformas no ocupa espacio hasta que se configure la integración correspondiente.
+- El banner se integra en `MaterialApp.router`, por lo que aparece de forma consistente encima de todas las pantallas de la aplicación.
+- Configuración mediante `ADSENSE_PUBLISHER_ID` y `ADSENSE_AD_SLOT`; no se han inventado identificadores de Google.
+- El bloque usa carga responsive y no se crean refrescos artificiales desde la aplicación.
+- Pendiente de activar con los identificadores reales del editor y completar la configuración de consentimiento/CMP de AdSense.
