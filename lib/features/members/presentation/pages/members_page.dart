@@ -223,7 +223,7 @@ class _EditMemberDialogState extends ConsumerState<_EditMemberDialog> {
     }
   }
 
-  String _formatDate(DateTime date) => date.day.toString().padLeft(2, '0') + '/' + date.month.toString().padLeft(2, '0') + '/' + date.year.toString();
+  String _formatDate(DateTime date) => '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 
   Future<DateTime?> _pickDate(DateTime? current) async {
     return showDatePicker(context: context, initialDate: current ?? DateTime.now(), firstDate: DateTime(1950), lastDate: DateTime(2100));
