@@ -115,7 +115,7 @@ create policy raffle_tickets_select_permission on public.raffle_tickets
 for select to authenticated
 using (
   public.has_club_permission(club_id, 'raffles_view')
-  or profile_id = auth.uid()
+  or buyer_profile_id = auth.uid()
 );
 
 drop policy if exists raffle_draws_select_manager on public.raffle_draws;
