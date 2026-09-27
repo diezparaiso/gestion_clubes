@@ -60,7 +60,7 @@
 - [x] Sin IDs ficticios.
 
 ## 3. Seguridad y permisos
-- [ ] Ejecutar migraciones 032–036 en Supabase cuando corresponda.
+- [ ] Ejecutar migraciones 032–040 en Supabase cuando corresponda (solo mediante despliegue controlado).
 - [ ] Verificar todas las políticas RLS en una base de pruebas.
 - [x] Revisar cada pantalla contra club_role_permissions.
 - [x] Separar permisos _view y _manage en la UI en los módulos ya cerrados.
