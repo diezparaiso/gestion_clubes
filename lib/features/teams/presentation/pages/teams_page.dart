@@ -115,7 +115,7 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
                         itemCount: filtered.length,
                         itemBuilder: (context, index) => _TeamCard(
                                 team: filtered[index],
-                                onEdit: () => _editTeam(context, filtered[index]),
+                                onEdit: canManage ? () => _editTeam(context, filtered[index]) : () => {},
                                 onToggleActive: canManage ? () => _toggleActive(context, filtered[index]) : null,
                                 canManage: canManage,
                               ),
