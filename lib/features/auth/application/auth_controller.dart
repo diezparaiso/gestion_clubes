@@ -4,7 +4,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/services/supabase_service.dart';
 import '../../clubs/data/repositories/club_repository.dart';
 
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): permite recuperar clubes existentes y seleccionar el acceso del usuario.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): completa recuperación de contraseña y sesión de recuperación.
 
 enum AuthStatus { signedOut, signingIn, creatingClub, signedIn, needsClub, error }
 
@@ -65,6 +65,7 @@ class AuthState {
     this.clubName,
     this.role,
     this.mustChangePassword = false,
+    this.passwordRecovery = false,
   });
 
   final AuthStatus status;
@@ -74,6 +75,7 @@ class AuthState {
   final String? clubName;
   final String? role;
   final bool mustChangePassword;
+  final bool passwordRecovery;
 
   String get roleLabel => ClubAccess(
     clubId: clubId ?? '',
@@ -89,6 +91,7 @@ class AuthState {
     String? clubName,
     String? role,
     bool? mustChangePassword,
+    bool? passwordRecovery,
     bool clearError = false,
   }) {
     return AuthState(
@@ -99,6 +102,7 @@ class AuthState {
       clubName: clubName ?? this.clubName,
       role: role ?? this.role,
       mustChangePassword: mustChangePassword ?? this.mustChangePassword,
+      passwordRecovery: passwordRecovery ?? this.passwordRecovery,
     );
   }
 }
@@ -128,8 +132,22 @@ final authControllerProvider = NotifierProvider<AuthController, AuthState>(AuthC
 class AuthController extends Notifier<AuthState> {
   @override
   AuthState build() {
-    if (SupabaseService.isConfigured && Supabase.instance.client.auth.currentSession != null) {
-      return const AuthState(status: AuthStatus.needsClub);
+    if (SupabaseService.isConfigured) {
+      final subscription = Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+        if (data.event == AuthChangeEvent.passwordRecovery) {
+          state = state.copyWith(
+            status: AuthStatus.signedIn,
+            mustChangePassword: true,
+            passwordRecovery: true,
+            clearError: true,
+          );
+        }
+      });
+      ref.onDispose(subscription.cancel);
+
+      if (Supabase.instance.client.auth.currentSession != null) {
+        return const AuthState(status: AuthStatus.needsClub);
+      }
     }
     return const AuthState();
   }
@@ -204,7 +222,7 @@ class AuthController extends Notifier<AuthState> {
   }
 
   void clearPasswordChangeRequirement() {
-    state = state.copyWith(mustChangePassword: false);
+    state = state.copyWith(mustChangePassword: false, passwordRecovery: false);
   }
 
   Future<void> signOut() async {
