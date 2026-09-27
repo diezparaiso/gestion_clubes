@@ -1,3 +1,10 @@
+### 2026-09-27 — GPT-5.6 LUNA — revisión de RLS y RPC heredadas
+- Corregida `038_permissions_rls_alignment.sql`: la propiedad del participante en `raffle_tickets` usa `buyer_profile_id`, que es la columna real.
+- Añadida `040_access_rpc_permissions.sql`: `invite_club_member` deja de depender de `is_club_manager` y exige `access_manage`, evitando que un secretario pueda saltarse la restricción de gestión de accesos.
+- Verificadas contra el esquema real las tablas de temporadas, equipos, jugadores, personal, tesorería, rifas, noticias y eventos.
+- No se ejecuta ninguna migración sobre Supabase remoto.
+- Payments/Stripe permanece sin cambios.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre de lecturas RLS por permisos view
 - Añadida `039_permissions_view_rls.sql`.
 - Las lecturas de socios, equipos, jugadores, staff, rifas, noticias, eventos y notificaciones quedan limitadas a sus permisos `*_view`.
