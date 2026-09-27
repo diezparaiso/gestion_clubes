@@ -622,3 +622,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Añadida prueba unitaria para conservar correctamente `passwordRecovery` y `mustChangePassword` en `AuthState.copyWith`.
 - Añadida prueba del estado final tras completar el cambio de contraseña.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre de matriz de permisos de rutas
+- Centralizada la correspondencia entre rutas protegidas y permisos requeridos en `permissionForLocation`.
+- Añadida cobertura unitaria para rutas principales, jugadores, personal, gestión de accesos y rutas públicas.
+- Las subrutas futuras de jugadores/personal conservan el permiso de su módulo mediante coincidencia por segmento.
+- Se marca como revisada la protección de rutas con sesión cerrada; las pruebas RLS/staging siguen abiertas por requerir infraestructura externa.
+- No se modifica Supabase remoto ni Payments/Stripe.
