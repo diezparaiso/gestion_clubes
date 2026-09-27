@@ -2,6 +2,8 @@
 # PENDIENTES DEL PROYECTO
 
 > Última actualización: 2026-09-27 — GPT-5.6 LUNA
+
+> Los puntos marcados como pendientes de staging, Supabase, proveedores o producción requieren una validación externa y no se cierran solo con cambios de código.
 > Inventario de trabajo pendiente. La trazabilidad cronológica permanece en AI_CHANGELOG.md.
 
 ## 1. Pagos y rifas
@@ -82,12 +84,12 @@
 - [x] Ejecutar flutter analyze --no-pub.
 - [x] Ejecutar flutter test --reporter expanded.
 - [x] Ejecutar git diff --check.
-- [ ] Revisar warnings e infos del analyzer.
+- [x] Revisar warnings e infos del analyzer.
 - [ ] Probar Flutter Web en Chrome.
 - [ ] Probar responsive móvil/tablet/escritorio.
 - [ ] Verificar rutas con sesión cerrada.
 - [ ] Verificar RLS con perfiles de cada rol.
-- [ ] Hacer prueba de exportación Excel.
+- [x] Hacer prueba de exportación Excel.
 - [ ] Hacer prueba completa de rifas con Supabase de staging.
 
 ## 6. No hacer sin petición expresa
