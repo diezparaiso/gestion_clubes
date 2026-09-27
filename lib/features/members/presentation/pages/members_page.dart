@@ -48,7 +48,9 @@ class _MembersPageState extends ConsumerState<MembersPage> {
   @override
   Widget build(BuildContext context) {
     final members = ref.watch(membersProvider);
-    final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'members_manage');
+    final authRole = ref.watch(authControllerProvider).role;
+    final canManage = ClubRolePermissions.has(authRole, 'members_manage');
+    final canChargeFee = canManage && ClubRolePermissions.has(authRole, 'finance_manage');
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Socios'),
       body: RefreshIndicator(
@@ -132,7 +134,7 @@ class _MembersPageState extends ConsumerState<MembersPage> {
                         itemBuilder: (context, index) => _MemberTile(
                           member: filtered[index],
                           onEdit: canManage ? () => _showEditMemberDialog(context, filtered[index]) : null,
-                          onChargeFee: canManage ? () => _showChargeFeeDialog(context, filtered[index]) : null,
+                          onChargeFee: canChargeFee ? () => _showChargeFeeDialog(context, filtered[index]) : null,
                         ),
                       ),
                     );
