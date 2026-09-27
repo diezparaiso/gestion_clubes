@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../application/auth_controller.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -10,6 +11,8 @@ class LoginPage extends ConsumerStatefulWidget {
   @override
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
+
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): añade recuperación de contraseña.
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
@@ -27,6 +30,24 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     if (!_formKey.currentState!.validate()) return;
     await ref.read(authControllerProvider.notifier).signIn(_emailController.text.trim(), _passwordController.text);
     if (mounted && ref.read(authControllerProvider).status == AuthStatus.needsClub) context.go('/onboarding');
+  }
+
+  Future<void> _recoverPassword() async {
+    final email = _emailController.text.trim();
+    if (!email.contains('@')) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Introduce primero un email válido.')));
+      return;
+    }
+    try {
+      final redirectTo = Uri.base.resolve('/profile/password').toString();
+      await Supabase.instance.client.auth.resetPasswordForEmail(email, redirectTo: redirectTo);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Si la cuenta existe, recibirás un email para restablecer la contraseña.')));
+    } on AuthException catch (error) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.message)));
+    } catch (_) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se ha podido solicitar el restablecimiento.')));
+    }
   }
 
   @override
@@ -50,7 +71,15 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ],
             const SizedBox(height: 24),
             FilledButton(onPressed: isLoading ? null : _submit, child: Padding(padding: const EdgeInsets.symmetric(vertical: 14), child: isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Iniciar sesión'))),
-            const SizedBox(height: 12),
+            const SizedBox(height: 4),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: isLoading ? null : _recoverPassword,
+                child: const Text('¿Has olvidado tu contraseña?'),
+              ),
+            ),
+            const SizedBox(height: 4),
             TextButton(onPressed: () => context.go('/register'), child: const Text('Crear una cuenta')),
           ],
         ),
