@@ -1,3 +1,8 @@
+### 2026-09-27 — GPT-5.6 LUNA — ajuste de lectura del histórico mensual
+- El histórico de resultados mensuales deja de consultar directamente `profiles`, evitando depender de `members_view` cuando el usuario solo dispone de `raffles_view`.
+- Se conserva el identificador del ganador en el resultado y el acceso al histórico queda alineado con el RLS de `raffle_monthly_results`.
+- No se modifica Supabase remoto ni Payments/Stripe.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre funcional de gestión de rifas mensuales
 - El detalle de rifas mensuales mantiene histórico de resultados y registro manual mediante la RPC existente `register_monthly_result`.
 - Las acciones de sorteo y registro de resultados quedan visibles solo con `raffles_manage`; la consulta del histórico permanece disponible para `raffles_view`.
