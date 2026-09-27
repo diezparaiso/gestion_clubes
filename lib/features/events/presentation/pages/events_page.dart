@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos view/manage en acciones de la pantalla.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -37,6 +38,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
   Widget build(BuildContext context) {
     final events = ref.watch(eventsProvider);
     return Scaffold(appBar: const ClubNavigationAppBar(title: 'Eventos'), body: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'events_manage');
       Row(children: [Expanded(child: Text('Agenda del club', style: Theme.of(context).textTheme.headlineMedium)), IconButton(tooltip: 'Copiar enlace público', onPressed: () async { final clubId = ref.read(authControllerProvider).clubId; if (clubId == null) return; final club = await ref.read(clubRepositoryProvider).getClubById(clubId); final url = Uri.base.replace(path: '/club/${club.slug}/events').toString(); await Clipboard.setData(ClipboardData(text: url)); if (!context.mounted) return; ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público de la agenda copiado.'))); }, icon: const Icon(Icons.link_outlined)), const SizedBox(width: 8), FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nuevo evento'))]),
       const SizedBox(height: 8),
       const Text('Organiza partidos, reuniones y actividades del club.'),
