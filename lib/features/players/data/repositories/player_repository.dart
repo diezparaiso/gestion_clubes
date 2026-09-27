@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): resuelve la cuenta del jugador mediante RPC sin requerir members_view.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -60,11 +61,10 @@ class PlayerRepository {
       throw const PostgrestException(message: 'El equipo no pertenece al club activo.');
     }
 
-    final profile = await client
-        .from('profiles')
-        .select('id')
-        .eq('email', email.trim())
-        .maybeSingle();
+    final profile = await client.rpc<Map<String, dynamic>?>(
+      'find_profile_for_player',
+      params: {'target_club_id': clubId, 'target_email': email.trim()},
+    );
 
     if (profile == null) {
       throw const PostgrestException(
