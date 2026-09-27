@@ -639,3 +639,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - El acceso directo a notificaciones se muestra solo con `notifications_view`.
 - El enlace `Ver socios` del estado operativo se muestra solo con `members_view`.
 - Se evita que el dashboard presente accesos a rutas que el usuario no puede abrir.
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre del nombramiento de presidente
+- La gestión de accesos ya no ofrece `club_president` en el alta ordinaria.
+- `manage-club-user` rechaza explícitamente ese rol también en backend, evitando saltarse la restricción desde una llamada directa a la Edge Function.
+- No se modifica Supabase remoto ni Payments/Stripe.
