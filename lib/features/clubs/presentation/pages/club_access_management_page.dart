@@ -7,7 +7,6 @@ import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): módulo funcional de gestión de accesos del club.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): la protección de la pantalla usa access_manage.
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): la protección de la pantalla usa access_manage.
 
 class ClubAccessManagementPage extends ConsumerStatefulWidget {
   const ClubAccessManagementPage({super.key});
