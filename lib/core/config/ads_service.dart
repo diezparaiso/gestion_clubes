@@ -1,8 +1,9 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): carga de Google AdSense en Flutter Web.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): AdSense solo se inicializa tras consentimiento explícito.
 import 'package:flutter/foundation.dart';
 import 'package:universal_html/html.dart' as html;
 
 import 'ads_config.dart';
+import 'ads_consent_service.dart';
 
 class AdsService {
   const AdsService._();
@@ -10,7 +11,9 @@ class AdsService {
   static bool _loaded = false;
 
   static void initialize() {
-    if (!kIsWeb || !AdsConfig.enabled || _loaded) return;
+    if (!kIsWeb || !AdsConfig.enabled || !AdsConsentService.canRequestAds || _loaded) {
+      return;
+    }
 
     final existing = html.document.querySelector(
       'script[data-gestion-clubes-adsense="true"]',
