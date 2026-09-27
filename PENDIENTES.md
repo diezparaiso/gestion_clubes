@@ -78,6 +78,7 @@
 - [ ] Probar flujo completo de must_change_password en Web/Chrome y staging.
 - [ ] Probar cambio de contraseña en móvil y web.
 - [x] Implementar y revisar recuperación de contraseña.
+- [x] Añadir cobertura unitaria del estado de recuperación y cambio obligatorio de contraseña.
 - [x] Revisar selección de club con múltiples clubes.
 
 ## 5. Calidad técnica
