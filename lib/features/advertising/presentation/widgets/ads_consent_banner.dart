@@ -1,5 +1,6 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aviso previo a la solicitud de publicidad.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aviso previo a la solicitud de publicidad con acceso a privacidad.
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../../core/config/ads_consent_service.dart';
 import '../../../../core/config/ads_service.dart';
@@ -28,6 +29,10 @@ class _AdsConsentBannerState extends State<AdsConsentBanner> {
                 'Usamos publicidad para ayudar a mantener el servicio. '
                 'Puedes aceptar o rechazar los anuncios.',
               ),
+            ),
+            TextButton(
+              onPressed: () => context.go('/privacy'),
+              child: const Text('Privacidad'),
             ),
             TextButton(
               onPressed: () => setState(() => AdsConsentService.setDecision(false)),
