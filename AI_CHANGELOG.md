@@ -1,3 +1,10 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre de revocación y endurecimiento del alta de accesos
+- Añadida la migración `037_revoke_member_access.sql` con RPC segura para revocar accesos activos y conservar siempre al menos un presidente activo.
+- La revocación queda auditada y protegida por el permiso `access_manage`.
+- Endurecida `manage-club-user`: el backend de alta exige explícitamente que el actor sea presidente, alineándolo con la restricción de la UI y la migración 032.
+- No se ejecuta ninguna migración ni Edge Function en Supabase remoto.
+- Payments/Stripe permanece sin cambios.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre inicial de permisos en navegación y rutas
 - Corrección inmediata de una duplicación de `selectedIndex` introducida en la navegación móvil durante este bloque.
 - Añadido el mapa de permisos por rol en la aplicación, alineado con la migración 032.
