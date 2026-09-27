@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
-import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../../../core/services/export_service.dart';
 import '../../../../core/utils/csv_exporter.dart';
 import '../../data/repositories/finance_repository.dart';
