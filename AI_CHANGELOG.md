@@ -1,3 +1,9 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre funcional de gestión de rifas mensuales
+- El detalle de rifas mensuales mantiene histórico de resultados y registro manual mediante la RPC existente `register_monthly_result`.
+- Las acciones de sorteo y registro de resultados quedan visibles solo con `raffles_manage`; la consulta del histórico permanece disponible para `raffles_view`.
+- No se ejecuta ninguna migración sobre Supabase remoto.
+- Payments/Stripe permanece sin cambios.
+
 ### 2026-09-27 — GPT-5.6 LUNA — revisión de RLS y RPC heredadas
 - Corregida `038_permissions_rls_alignment.sql`: la propiedad del participante en `raffle_tickets` usa `buyer_profile_id`, que es la columna real.
 - Añadida `040_access_rpc_permissions.sql`: `invite_club_member` deja de depender de `is_club_manager` y exige `access_manage`, evitando que un secretario pueda saltarse la restricción de gestión de accesos.
