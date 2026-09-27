@@ -25,7 +25,6 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
   String? _ticketsRaffleId;
   RaffleDraw? _draw;
   bool _drawing = false;
-  bool _manualSaving = false;
   bool _monthlySaving = false;
 
   @override
@@ -84,7 +83,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
                     child: ListTile(
                       leading: CircleAvatar(child: Text(ticket.number.toString().padLeft(2, '0'))),
                       title: Text(ticket.buyerName),
-                      subtitle: Text(ticket.buyerEmail + ' · ' + _statusLabel(ticket.paymentStatus)),
+                      subtitle: Text('${ticket.buyerEmail} · ${_statusLabel(ticket.paymentStatus)}'),
                       trailing: ticket.paymentStatus == 'paid'
                           ? const Icon(Icons.verified_outlined, color: Colors.green)
                           : const Icon(Icons.schedule_outlined),
@@ -106,9 +105,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Text(
-              'Rifa mensual: renovación prevista el día ' +
-                  (raffle.monthlyDay?.toString() ?? '-') +
-                  '. La activación y renovación real dependen del proveedor de pagos.',
+              'Rifa mensual: renovación prevista el día ${raffle.monthlyDay ?? '-'}. La activación y renovación real dependen del proveedor de pagos.',
             ),
           ),
         ),
@@ -159,11 +156,9 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
               children: results.map((result) => Card(
                 child: ListTile(
                   leading: const CircleAvatar(child: Icon(Icons.emoji_events_outlined)),
-                  title: Text(_monthLabel(result.drawMonth) + ' · número ' + result.winningNumber.toString()),
+                  title: Text('${_monthLabel(result.drawMonth)} · número ${result.winningNumber}'),
                   subtitle: Text(
-                    'Premio: ' + result.prizeAmount.toStringAsFixed(2).replaceAll('.', ',') + ' €' +
-                    (result.winnerName == null || result.winnerName!.isEmpty ? '' : ' · Ganador: ' + result.winnerName!) +
-                    (result.notes == null || result.notes!.isEmpty ? '' : ' · ' + result.notes!),
+                    'Premio: ${result.prizeAmount.toStringAsFixed(2).replaceAll('.', ',')} €${result.winnerName == null || result.winnerName!.isEmpty ? '' : ' · Ganador: ${result.winnerName!}'}${result.notes == null || result.notes!.isEmpty ? '' : ' · ${result.notes!}'}',
                   ),
                 ),
               )).toList(),
@@ -208,7 +203,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
 
   static String _monthLabel(DateTime date) {
     const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-    return months[date.month - 1] + ' ' + date.year.toString();
+    return '${months[date.month - 1]} ${date.year}';
   }
 
   Future<void> _setBasketWinner(Raffle raffle, List<RaffleTicket> tickets) async {
