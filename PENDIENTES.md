@@ -88,7 +88,7 @@
 - [x] Revisar warnings e infos del analyzer.
 - [ ] Probar Flutter Web en Chrome.
 - [ ] Probar responsive móvil/tablet/escritorio.
-- [ ] Verificar rutas con sesión cerrada.
+- [x] Verificar rutas con sesión cerrada mediante la matriz de permisos de ubicación y cobertura unitaria.
 - [ ] Verificar RLS con perfiles de cada rol.
 - [x] Hacer prueba de exportación Excel.
 - [ ] Hacer prueba completa de rifas con Supabase de staging.
