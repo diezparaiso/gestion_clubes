@@ -32,8 +32,8 @@ String? _permissionForLocation(String location) {
   if (location == '/dashboard') return 'dashboard_view';
   if (location == '/members') return 'members_view';
   if (location == '/teams') return 'teams_view';
-  if (location.startsWith('/teams/') && location.endsWith('/players')) return 'players_view';
-  if (location.startsWith('/teams/') && location.endsWith('/staff')) return 'teams_view';
+  if (RegExp(r'^/teams/[^/]+/players(?:/|$)').hasMatch(location)) return 'players_view';
+  if (RegExp(r'^/teams/[^/]+/staff(?:/|$)').hasMatch(location)) return 'teams_view';
   if (location.startsWith('/teams/')) return 'teams_view';
   if (location == '/finance') return 'finance_view';
   if (location == '/raffles' || location.startsWith('/raffles/')) return 'raffles_view';
