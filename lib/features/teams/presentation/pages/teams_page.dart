@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadida gestión de edición y activación/desactivación de equipos. Sin cambios de esquema Supabase.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos view/manage en acciones de la pantalla.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -78,10 +79,11 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'teams_manage');
             Row(children: [
               Expanded(child: Text('Equipos y temporadas', style: Theme.of(context).textTheme.headlineMedium)),
-              OutlinedButton.icon(onPressed: () => _showSeasonManager(context), icon: const Icon(Icons.calendar_month_outlined), label: const Text('Temporadas')), const SizedBox(width: 10),
-              FilledButton.icon(onPressed: () => _showCreateTeamDialog(context), icon: const Icon(Icons.add), label: const Text('Nuevo equipo')),
+              if (canManage) OutlinedButton.icon(onPressed: () => _showSeasonManager(context), icon: const Icon(Icons.calendar_month_outlined), label: const Text('Temporadas')), if (canManage) const SizedBox(width: 10),
+              if (canManage) FilledButton.icon(onPressed: () => _showCreateTeamDialog(context), icon: const Icon(Icons.add), label: const Text('Nuevo equipo')),
             ]),
             const SizedBox(height: 12),
             Row(children: [
