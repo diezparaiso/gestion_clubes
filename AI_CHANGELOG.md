@@ -478,3 +478,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Añadido PENDIENTES.md con el estado de rifas, pagos, publicidad Google, seguridad, autenticación y pruebas.
 - Se distinguen tareas ya preparadas de dependencias externas y de tareas que requieren ejecución en Supabase.
 - El siguiente foco recomendado queda en RLS/permisos y pruebas, sin ejecutar cambios en Supabase live.
+
+
+### 2026-09-27 — GPT-5.6 LUNA — reparación de imports Dart corruptos
+- Corregidos los imports de navegación que habían quedado con `.dart;` en lugar de `.dart';` en las páginas afectadas y en `lib/app/router.dart`.
+- La corrección es sintáctica y no cambia la lógica funcional de los módulos.
+- No se modifica Supabase remoto ni Payments.
