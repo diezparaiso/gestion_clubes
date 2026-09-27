@@ -116,7 +116,8 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
                         itemBuilder: (context, index) => _TeamCard(
                                 team: filtered[index],
                                 onEdit: () => _editTeam(context, filtered[index]),
-                                onToggleActive: () => _toggleActive(context, filtered[index]),
+                                onToggleActive: canManage ? () => _toggleActive(context, filtered[index]) : null,
+                                canManage: canManage,
                               ),
                       );
                 });
@@ -351,11 +352,13 @@ class _TeamCard extends StatelessWidget {
     required this.team,
     required this.onEdit,
     required this.onToggleActive,
+    required this.canManage,
   });
 
   final Team team;
   final VoidCallback onEdit;
-  final VoidCallback onToggleActive;
+  final VoidCallback? onToggleActive;
+  final bool canManage;
 
   @override
   Widget build(BuildContext context) {
@@ -375,11 +378,11 @@ class _TeamCard extends StatelessWidget {
                     child: Icon(Icons.groups_outlined, color: Color(0xFF168B68)),
                   ),
                   const Spacer(),
-                  PopupMenuButton<String>(
+                  if (canManage) PopupMenuButton<String>(
                     tooltip: 'Acciones del equipo',
                     onSelected: (value) {
                       if (value == 'edit') onEdit();
-                      if (value == 'toggle') onToggleActive();
+                      if (value == 'toggle') onToggleActive?.call();
                     },
                     itemBuilder: (context) => [
                       const PopupMenuItem(
