@@ -72,6 +72,7 @@
 - [x] Añadir cobertura inicial de seguridad para la matriz de permisos por rol; quedan pruebas de integración RLS/RPC para staging.
 - [x] Cambio de rol impide dejar el club sin presidente.
 - [x] Nombramiento de presidente reservado al administrador de plataforma.
+- [x] Alta de accesos bloquea también en backend el rol `club_president`.
 - [x] Gestión de accesos restringida al presidente.
 
 ## 4. Perfil y autenticación
