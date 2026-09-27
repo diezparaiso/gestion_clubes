@@ -25,7 +25,6 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
   String? _ticketsRaffleId;
   RaffleDraw? _draw;
   bool _drawing = false;
-  bool _manualSaving = false;
   bool _monthlySaving = false;
 
   @override
@@ -228,14 +227,14 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
     ));
     numberController.dispose();
     if (number == null || !mounted) return;
-    setState(() => _manualSaving = true);
+    setState(() => _drawing = true);
     try {
       final draw = await ref.read(raffleRepositoryProvider).setBasketWinner(raffleId: raffle.id, winningNumber: number);
-      if (mounted) setState(() { _draw = draw; _manualSaving = false; });
+      if (mounted) setState(() { _draw = draw; _drawing = false; });
     } on PostgrestException catch (e) {
-      if (mounted) { setState(() => _manualSaving = false); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message))); }
+      if (mounted) { setState(() => _drawing = false); ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message))); }
     } catch (_) {
-      if (mounted) { setState(() => _manualSaving = false); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se ha podido registrar el ganador.'))); }
+      if (mounted) { setState(() => _drawing = false); ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se ha podido registrar el ganador.'))); }
     }
   }
 
