@@ -1,3 +1,7 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre del último warning del analyzer
+- Eliminado el campo `_manualSaving` que ya no tenía lecturas; el flujo de elección manual de ganador reutiliza `_drawing`, evitando estado duplicado.
+- El cambio mantiene el comportamiento de bloqueo durante el guardado y no toca Supabase remoto ni Payments.
+
 ### 2026-09-27 — GPT-5.6 LUNA — corrección final del analyzer tras validación local
 - Restaurado `_manualSaving` en el detalle de rifas, que seguía siendo utilizado por el flujo de elección manual de ganador.
 - Corregida la última composición de texto del selector de mes y el bloque `if` del diálogo de gestión de accesos.
