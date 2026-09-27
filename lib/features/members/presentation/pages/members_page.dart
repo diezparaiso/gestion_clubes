@@ -48,6 +48,7 @@ class _MembersPageState extends ConsumerState<MembersPage> {
   @override
   Widget build(BuildContext context) {
     final members = ref.watch(membersProvider);
+    final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'members_manage');
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Socios'),
       body: RefreshIndicator(
@@ -57,7 +58,6 @@ class _MembersPageState extends ConsumerState<MembersPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'members_manage');
               Row(
                 children: [
                   Expanded(
