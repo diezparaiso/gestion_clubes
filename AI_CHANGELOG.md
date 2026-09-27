@@ -1,3 +1,10 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre de recuperación de contraseña
+- Añadido el flujo de recuperación desde Login mediante `resetPasswordForEmail`.
+- La sesión `passwordRecovery` lleva al usuario a `/profile/password` sin exigir la contraseña anterior.
+- Tras establecer la nueva contraseña, la sesión de recuperación se cierra y el usuario vuelve al inicio de sesión.
+- Se mantienen las reglas de `must_change_password` para cuentas creadas con contraseña inicial.
+- No se modifica Supabase remoto ni Payments/Stripe.
+
 ### 2026-09-27 — GPT-5.6 LUNA — ajuste de lectura del histórico mensual
 - El histórico de resultados mensuales deja de consultar directamente `profiles`, evitando depender de `members_view` cuando el usuario solo dispone de `raffles_view`.
 - Se conserva el identificador del ganador en el resultado y el acceso al histórico queda alineado con el RLS de `raffle_monthly_results`.
