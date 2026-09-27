@@ -65,7 +65,7 @@
 - [x] Revisar dashboard/sidebar para ocultar acciones no permitidas por rol.
 - [x] Verificar revoke_member_access y su política de seguridad en código/migraciones.
 - [ ] Revisar Edge Function manage-club-user desplegada con secretos solo en Supabase.
-- [ ] Añadir pruebas de seguridad para cambio de rol y revocación.
+- [x] Añadir cobertura inicial de seguridad para la matriz de permisos por rol; quedan pruebas de integración RLS/RPC para staging.
 - [x] Cambio de rol impide dejar el club sin presidente.
 - [x] Nombramiento de presidente reservado al administrador de plataforma.
 - [x] Gestión de accesos restringida al presidente.
