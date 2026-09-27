@@ -1,3 +1,9 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre de lecturas RLS por permisos view
+- Añadida `039_permissions_view_rls.sql`.
+- Las lecturas de socios, equipos, jugadores, staff, rifas, noticias, eventos y notificaciones quedan limitadas a sus permisos `*_view`.
+- Los accesos de club_memberships quedan limitados al propio acceso o a `access_manage`.
+- No se ejecuta ninguna migración en Supabase remoto.
+
 ### 2026-09-27 — GPT-5.6 LUNA — alineación inicial de RLS con permisos view/manage
 - Añadida la migración `038_permissions_rls_alignment.sql`.
 - Socios, equipos, jugadores, tesorería, rifas, noticias, eventos y configuración usan `has_club_permission` en sus operaciones protegidas.
