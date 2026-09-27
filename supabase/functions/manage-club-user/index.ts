@@ -39,10 +39,10 @@ Deno.serve(async (req) => {
       .eq("club_id", clubId)
       .eq("profile_id", caller.id)
       .eq("is_active", true)
-      .in("role", ["club_president", "club_secretary"])
+      .eq("role", "club_president")
       .maybeSingle();
 
-    if (!manager) throw new Error("No tienes permisos para gestionar accesos de este club.");
+    if (!manager) throw new Error("Solo el presidente puede gestionar los accesos de este club.");
 
     let targetUserId: string | undefined;
     const created = await admin.auth.admin.createUser({
