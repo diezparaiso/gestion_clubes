@@ -39,7 +39,7 @@ class ClubNavigationAppBar extends ConsumerWidget implements PreferredSizeWidget
       ),
       title: Text(title),
       actions: [
-        if (actions != null) ...actions!,
+        ...?actions,
         if (items.length > 1)
           PopupMenuButton<String>(
             tooltip: 'Navegación',
