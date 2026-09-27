@@ -1,3 +1,10 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre inicial de permisos en navegación y rutas
+- Añadido el mapa de permisos por rol en la aplicación, alineado con la migración 032.
+- El router bloquea el acceso directo por URL a módulos que el rol no puede consultar.
+- Dashboard, sidebar y navegación móvil ocultan secciones no permitidas.
+- Las acciones rápidas de alta/gestión se muestran solo cuando existe el permiso correspondiente.
+- No se ejecuta ninguna migración en Supabase remoto.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre del último warning del analyzer
 - Eliminado el campo `_manualSaving` que ya no tenía lecturas; el flujo de elección manual de ganador reutiliza `_drawing`, evitando estado duplicado.
 - El cambio mantiene el comportamiento de bloqueo durante el guardado y no toca Supabase remoto ni Payments.
