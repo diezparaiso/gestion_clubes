@@ -42,9 +42,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
       await client.auth.updateUser(UserAttributes(password: _newPassword.text));
       await client.from('profiles').update({'must_change_password': false}).eq('id', client.auth.currentUser!.id);
       if (!mounted) return;
+      final wasRecovery = ref.read(authControllerProvider).passwordRecovery;
       ref.read(authControllerProvider.notifier).clearPasswordChangeRequirement();
       _current.clear(); _newPassword.clear(); _confirm.clear();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Contraseña actualizada correctamente.')));
+      if (wasRecovery && mounted) {
+        await ref.read(authControllerProvider.notifier).signOut();
+        return;
+      }
     } on AuthException catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
     } catch (e) {
