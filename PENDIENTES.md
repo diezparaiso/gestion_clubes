@@ -1,6 +1,7 @@
+<!-- MODIFICADO POR GPT-5.6 LUNA (2026-09-27): sincroniza el inventario de módulos cerrados y pendientes reales. -->
 # PENDIENTES DEL PROYECTO
 
-> Última actualización: 2026-09-26 — GPT-5.6 LUNA
+> Última actualización: 2026-09-27 — GPT-5.6 LUNA
 > Inventario de trabajo pendiente. La trazabilidad cronológica permanece en AI_CHANGELOG.md.
 
 ## 1. Pagos y rifas
@@ -59,10 +60,10 @@
 ## 3. Seguridad y permisos
 - [ ] Ejecutar migraciones 032–036 en Supabase cuando corresponda.
 - [ ] Verificar todas las políticas RLS en una base de pruebas.
-- [ ] Revisar cada pantalla contra club_role_permissions.
-- [ ] Separar completamente permisos _view y _manage en la UI.
-- [ ] Revisar dashboard/sidebar para ocultar acciones no permitidas por rol.
-- [ ] Verificar revoke_member_access y su política de seguridad.
+- [x] Revisar cada pantalla contra club_role_permissions.
+- [x] Separar permisos _view y _manage en la UI en los módulos ya cerrados.
+- [x] Revisar dashboard/sidebar para ocultar acciones no permitidas por rol.
+- [x] Verificar revoke_member_access y su política de seguridad en código/migraciones.
 - [ ] Revisar Edge Function manage-club-user desplegada con secretos solo en Supabase.
 - [ ] Añadir pruebas de seguridad para cambio de rol y revocación.
 - [x] Cambio de rol impide dejar el club sin presidente.
@@ -70,15 +71,15 @@
 - [x] Gestión de accesos restringida al presidente.
 
 ## 4. Perfil y autenticación
-- [ ] Probar flujo completo de must_change_password.
+- [ ] Probar flujo completo de must_change_password en Web/Chrome y staging.
 - [ ] Probar cambio de contraseña en móvil y web.
-- [ ] Revisar recuperación de contraseña.
+- [x] Implementar y revisar recuperación de contraseña.
 - [ ] Revisar selección de club con múltiples clubes.
 
 ## 5. Calidad técnica
-- [ ] Ejecutar flutter analyze --no-pub.
-- [ ] Ejecutar flutter test --reporter expanded.
-- [ ] Ejecutar git diff --check.
+- [x] Ejecutar flutter analyze --no-pub.
+- [x] Ejecutar flutter test --reporter expanded.
+- [x] Ejecutar git diff --check.
 - [ ] Revisar warnings e infos del analyzer.
 - [ ] Probar Flutter Web en Chrome.
 - [ ] Probar responsive móvil/tablet/escritorio.
@@ -96,9 +97,10 @@
 - No modificar Payments/Stripe mientras el backend de pagos esté en standby.
 
 ## Orden recomendado para continuar
-1. Cerrar permisos/RLS y pruebas.
-2. Terminar backend real de pagos cuando se retome club_payments_backend.
-3. Activar comprobantes + emails.
-4. Activar renovación mensual real.
-5. Configurar AdSense/CMP.
-6. Pruebas completas de producción.
+1. Completar pruebas de seguridad/RLS en una base de pruebas, sin tocar Supabase live.
+2. Completar pruebas responsive/Web y del flujo de autenticación.
+3. Retomar club_payments_backend cuando se solicite.
+4. Activar comprobantes + emails con pagos reales.
+5. Activar renovación mensual real.
+6. Configurar AdSense/CMP.
+7. Pruebas completas de producción.
