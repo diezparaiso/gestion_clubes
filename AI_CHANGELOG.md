@@ -605,3 +605,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - El banner usa anuncios no personalizados como medida provisional; no se presenta como sustituto de una CMP certificada.
 - La CMP certificada por Google/IAB TCF, los IDs reales de AdSense y `ads.txt` siguen pendientes de configuración de la cuenta.
 - No se introducen IDs ficticios, secretos ni configuración remota.
+
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre de permisos por ruta en equipos
+- La ruta de jugadores de un equipo exige ahora `players_view`, en lugar de heredar `teams_view`.
+- La ruta de personal mantiene `teams_view`.
+- Se evita que un rol con acceso a equipos pero sin permiso de jugadores pueda abrir directamente una ruta de plantilla.
+- No se modifica Supabase remoto ni Payments/Stripe.
