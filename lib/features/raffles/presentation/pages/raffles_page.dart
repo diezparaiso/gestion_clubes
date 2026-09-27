@@ -37,7 +37,7 @@ class _RafflesPageState extends ConsumerState<RafflesPage> {
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Rifas'),
       body: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Expanded(child: Text('Rifas del club', style: Theme.of(context).textTheme.headlineMedium)), FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nueva rifa'))]),
+        Row(children: [Expanded(child: Text('Rifas del club', style: Theme.of(context).textTheme.headlineMedium)), if (ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'raffles_manage')) FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nueva rifa'))]),
         const SizedBox(height: 8),
         const Text('Gestiona campañas y participaciones en modo simulado.'),
         const SizedBox(height: 16),
