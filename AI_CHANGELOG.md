@@ -1,3 +1,11 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre de jugadores, staff, noticias y configuración
+- Alta y edición de jugadores condicionadas a `players_manage`, manteniendo la consulta para `players_view`.
+- Alta y edición de personal condicionadas a `teams_manage`, sin crear un permiso nuevo mientras el modelo RLS actual usa `is_club_manager`.
+- Noticias: creación, edición y borrado condicionados a `news_manage`.
+- Configuración: edición condicionada a `club_settings_manage` y gestión de accesos a `access_manage`.
+- Navegación superior actualizada para usar permisos `*_view`/gestión en lugar de una lista fija de roles.
+- No se modifica Supabase remoto ni Payments/Stripe.
+
 ### 2026-09-27 — GPT-5.6 LUNA — separación inicial de permisos view/manage en pantallas
 - Ocultadas las acciones de alta/edición/cobro en Socios cuando el rol no tiene `members_manage`.
 - Ocultada el alta de movimientos en Tesorería sin `finance_manage`.
