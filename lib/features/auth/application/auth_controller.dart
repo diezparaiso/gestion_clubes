@@ -158,7 +158,12 @@ class AuthController extends Notifier<AuthState> {
       if (SupabaseService.isConfigured) {
         await Supabase.instance.client.auth.signInWithPassword(email: email, password: password);
       }
-      state = state.copyWith(status: AuthStatus.needsClub, email: email, clearError: true);
+      state = state.copyWith(
+        status: AuthStatus.needsClub,
+        email: email,
+        passwordRecovery: false,
+        clearError: true,
+      );
     } on AuthException catch (error) {
       state = state.copyWith(status: AuthStatus.error, errorMessage: error.message);
     } catch (_) {
