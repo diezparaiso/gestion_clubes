@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Permite copiar el enlace público de noticias.
 import '../../../auth/application/auth_controller.dart';
-import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/post_repository.dart';
 import '../../domain/entities/post.dart';
 import '../../../clubs/data/repositories/club_repository.dart';
