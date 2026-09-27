@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../auth/application/auth_controller.dart';
-import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/team_repository.dart';
 import '../../domain/entities/team.dart';
 import '../../domain/entities/season.dart';
