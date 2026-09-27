@@ -43,8 +43,9 @@
 - [ ] ADSENSE_PUBLISHER_ID real (ca-pub-...).
 - [ ] ADSENSE_AD_SLOT real.
 - [ ] Crear/configurar ads.txt con el pub-... real.
-- [ ] Configurar consentimiento/CMP compatible con los requisitos de Google para EEE, Reino Unido y Suiza.
-- [ ] Revisar política de privacidad/cookies y consentimiento.
+- [ ] Configurar una CMP certificada por Google e integrada con IAB TCF para anuncios personalizados en EEE, Reino Unido y Suiza.
+- [x] Añadir bloqueo local previo a cualquier solicitud AdSense y persistir la decisión del usuario.
+- [ ] Revisar política de privacidad/cookies y consentimiento con el texto jurídico definitivo.
 - [ ] Activar Auto ads en la cuenta.
 - [ ] Ajustar anclas y barras laterales para que no sean invasivas.
 - [ ] Verificar anuncios en producción.
