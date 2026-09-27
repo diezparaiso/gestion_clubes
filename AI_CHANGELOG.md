@@ -676,3 +676,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregida la lectura de perfiles usada por jugadores: los roles con `players_view/manage` no necesitan `members_view` para mostrar nombres de jugadores.
 - El alta de jugador resuelve la cuenta por email mediante `find_profile_for_player`, protegido por `players_manage`, sin ampliar la lectura general de perfiles.
 - Preparada la migración `041_players_profile_rls.sql`; no se ejecuta Supabase remoto.
+
+### 2026-09-27 — GPT-5.6 LUNA — alineación de perfiles del personal
+- Corregida la lectura de perfiles usada por el personal: los roles con `teams_view/manage` no necesitan `members_view` para mostrar nombres.
+- El alta de personal resuelve la cuenta por email mediante `find_profile_for_team_staff`, protegido por `teams_manage`.
+- Preparada la migración `042_team_staff_profile_rls.sql`; no se ejecuta Supabase remoto.
