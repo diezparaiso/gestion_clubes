@@ -644,3 +644,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - La gestión de accesos ya no ofrece `club_president` en el alta ordinaria.
 - `manage-club-user` rechaza explícitamente ese rol también en backend, evitando saltarse la restricción desde una llamada directa a la Edge Function.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre y corrección de matriz de rutas
+- Corregida la exposición de `permissionForLocation` para que la cobertura unitaria use exactamente la misma función que el router.
+- Corregida la expectativa de subrutas de jugadores para mantener `players_view` también en `/players/edit`.
+- Añadida cobertura de detalle de rifas, perfil, cambio de contraseña, Mis rifas y páginas públicas.
+- No se modifica Supabase remoto ni Payments/Stripe.
