@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Permite copiar el enlace público de la agenda.
 import '../../../auth/application/auth_controller.dart';
-import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/event_repository.dart';
 import '../../domain/entities/event.dart';
 import '../../../clubs/data/repositories/club_repository.dart';
