@@ -55,7 +55,8 @@ class _FinancePageState extends ConsumerState<FinancePage> {
               Expanded(child: Text('Control financiero', style: Theme.of(context).textTheme.headlineMedium)),
               IconButton(onPressed: () => _exportTransactions(context, ref), tooltip: 'Exportar CSV', icon: const Icon(Icons.download_outlined)),
               const SizedBox(width: 8),
-              FilledButton.icon(onPressed: () => _showTransactionDialog(context, ref), icon: const Icon(Icons.add_chart_outlined), label: const Text('Nuevo movimiento')),
+              if (ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'finance_manage'))
+                FilledButton.icon(onPressed: () => _showTransactionDialog(context, ref), icon: const Icon(Icons.add_chart_outlined), label: const Text('Nuevo movimiento')),
             ]),
             const SizedBox(height: 8),
             const Text('Registra ingresos y gastos y consulta el saldo del club.'),
