@@ -681,3 +681,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregida la lectura de perfiles usada por el personal: los roles con `teams_view/manage` no necesitan `members_view` para mostrar nombres.
 - El alta de personal resuelve la cuenta por email mediante `find_profile_for_team_staff`, protegido por `teams_manage`.
 - Preparada la migración `042_team_staff_profile_rls.sql`; no se ejecuta Supabase remoto.
+
+### 2026-09-27 — GPT-5.6 LUNA — corrección de RLS de participaciones de rifas
+- Corregida la política de lectura de `raffle_tickets`: la propiedad del comprador usa `buyer_profile_id`, no `profile_id`.
+- Así se mantiene el acceso de un usuario a sus propias participaciones sin ampliar `raffles_view`.
+- No se ejecuta Supabase remoto ni se modifica Payments/Stripe.
