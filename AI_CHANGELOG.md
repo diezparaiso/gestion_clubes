@@ -655,3 +655,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregida `038_permissions_rls_alignment.sql`: la política de lectura propia de `raffle_tickets` usa `buyer_profile_id`, que es la columna real del participante.
 - Se evita que la migración futura falle por una columna inexistente o aplique una condición incorrecta.
 - No se ejecuta la migración sobre Supabase remoto.
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre de lectura de Mis rifas
+- Corregida la consulta de participaciones pagadas para usar `raffle_tickets.buyer_profile_id`.
+- La pantalla `Mis rifas` queda alineada con el esquema real de participaciones.
+- No se modifica Supabase remoto ni Payments/Stripe.
