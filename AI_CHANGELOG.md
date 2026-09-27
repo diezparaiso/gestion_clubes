@@ -612,3 +612,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - La ruta de personal mantiene `teams_view`.
 - Se evita que un rol con acceso a equipos pero sin permiso de jugadores pueda abrir directamente una ruta de plantilla.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre de verificaciones de calidad ya realizadas
+- Marcada como completada la revisión de warnings/infos del analyzer tras la validación de `flutter analyze --no-pub` sin incidencias.
+- Marcada como completada la prueba de exportación Excel, ya validada funcionalmente.
+- Se mantienen abiertas únicamente las pruebas que requieren Chrome, dispositivos, staging, Supabase o servicios externos.
