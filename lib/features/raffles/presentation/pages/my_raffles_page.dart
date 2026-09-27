@@ -70,14 +70,13 @@ class MyRafflesPage extends ConsumerWidget {
     final raffle = (item['raffles'] as Map<String, dynamic>?) ?? const {};
     final status = item['status'] as String? ?? 'active';
     final periodEnd = item['current_period_end'] as String?;
-    final periodText = periodEnd == null ? '' : ' · Próximo periodo: ' + _formatDate(periodEnd);
+    final periodText = periodEnd == null ? '' : ' · Próximo periodo: ${_formatDate(periodEnd)}';
     return Card(
       child: ListTile(
         leading: const CircleAvatar(child: Icon(Icons.autorenew_outlined)),
         title: Text(raffle['title'] as String? ?? 'Rifa mensual'),
         subtitle: Text(
-          'Número ' + item['number'].toString() + ' · ' +
-          item['amount'].toString() + ' ' + (item['currency'] ?? 'eur').toString() + periodText,
+          'Número ${item['number']} · ${item['amount']} ${(item['currency'] ?? 'eur')} $periodText',
         ),
         trailing: Chip(label: Text(_subscriptionStatus(status))),
       ),
@@ -88,12 +87,11 @@ class MyRafflesPage extends ConsumerWidget {
     final raffle = (ticket['raffles'] as Map<String, dynamic>?) ?? const {};
     final receipt = ticket['receipt_number'] as String?;
     final reference = ticket['payment_reference'] as String?;
-    final subtitle = (receipt == null ? 'Pago confirmado' : 'Recibo ' + receipt) +
-        (reference == null ? '' : ' · Ref. ' + reference);
+    final subtitle = '${receipt == null ? 'Pago confirmado' : 'Recibo $receipt'}${reference == null ? '' : ' · Ref. $reference'}';
     return Card(
       child: ListTile(
         leading: const CircleAvatar(child: Icon(Icons.confirmation_number_outlined)),
-        title: Text((raffle['title'] as String? ?? 'Rifa') + ' · número ' + ticket['number'].toString()),
+        title: Text('${raffle['title'] as String? ?? 'Rifa'} · número ${ticket['number']}'),
         subtitle: Text(subtitle),
         trailing: receipt == null
             ? null
@@ -115,13 +113,7 @@ class MyRafflesPage extends ConsumerWidget {
     final reference = ticket['payment_reference'] as String? ?? '—';
     final paidAt = ticket['paid_at'] as String? ?? '—';
     final price = (raffle['ticket_price'] as num?)?.toStringAsFixed(2) ?? '0.00';
-    final text = 'RECIBO DE PARTICIPACIÓN\n'
-        + 'Rifa: ' + (raffle['title'] as String? ?? 'Rifa') + '\n'
-        + 'Número: ' + ticket['number'].toString() + '\n'
-        + 'Importe: ' + price + ' €\n'
-        + 'Recibo: ' + receipt + '\n'
-        + 'Referencia de pago: ' + reference + '\n'
-        + 'Fecha de pago: ' + paidAt;
+    final text = '''RECIBO DE PARTICIPACIÓN\nRifa: ${raffle['title'] as String? ?? 'Rifa'}\nNúmero: ${ticket['number']}\nImporte: $price €\nRecibo: $receipt\nReferencia de pago: $reference\nFecha de pago: $paidAt''';
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
@@ -160,6 +152,6 @@ class MyRafflesPage extends ConsumerWidget {
   static String _formatDate(String raw) {
     final date = DateTime.tryParse(raw);
     if (date == null) return raw;
-    return date.day.toString() + '/' + date.month.toString() + '/' + date.year.toString();
+    return '${date.day}/${date.month}/${date.year}';
   }
 }
