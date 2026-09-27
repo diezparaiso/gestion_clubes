@@ -6,6 +6,7 @@ import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade acceso directo a la gestión de usuarios y permisos.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Separa consulta y edición mediante club_settings_manage.
 
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/club_repository.dart';
@@ -67,7 +68,10 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) {
+    final auth = ref.watch(authControllerProvider);
+    final canManage = ClubRolePermissions.has(auth.role, 'club_settings_manage');
+    return Scaffold(
     appBar: const ClubNavigationAppBar(title: 'Configuración'),
     body: ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
@@ -76,7 +80,7 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
           children: [
             Expanded(child: Text('Perfil público', style: Theme.of(context).textTheme.headlineMedium)),
             OutlinedButton.icon(
-              onPressed: () => context.push('/settings/access'),
+              onPressed: ClubRolePermissions.has(auth.role, 'access_manage') ? () => context.push('/settings/access') : null,
               icon: const Icon(Icons.manage_accounts_outlined),
               label: const Text('Usuarios y permisos'),
             ),
@@ -94,6 +98,7 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TextFormField(
+                    enabled: canManage,
                     controller: _nameController,
                     decoration: const InputDecoration(labelText: 'Nombre público'),
                     validator: (value) => value == null || value.trim().length < 3
@@ -102,6 +107,7 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
+                    enabled: canManage,
                     controller: _websiteController,
                     keyboardType: TextInputType.url,
                     decoration: const InputDecoration(labelText: 'Página web'),
@@ -109,6 +115,7 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
+                    enabled: canManage,
                     controller: _instagramController,
                     keyboardType: TextInputType.url,
                     decoration: const InputDecoration(labelText: 'Instagram'),
@@ -116,6 +123,7 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
+                    enabled: canManage,
                     controller: _facebookController,
                     keyboardType: TextInputType.url,
                     decoration: const InputDecoration(labelText: 'Facebook'),
@@ -123,6 +131,7 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
                   ),
                   const SizedBox(height: 12),
                   TextFormField(
+                    enabled: canManage,
                     controller: _youtubeController,
                     keyboardType: TextInputType.url,
                     decoration: const InputDecoration(labelText: 'YouTube'),
@@ -153,7 +162,7 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
                   Align(
                     alignment: Alignment.centerRight,
                     child: FilledButton.icon(
-                      onPressed: _saving ? null : _save,
+                      onPressed: canManage && !_saving ? _save : null,
                       icon: _saving
                           ? const SizedBox(
                               width: 18,
@@ -172,4 +181,5 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
       ],
     ),
   );
+  }
 }
