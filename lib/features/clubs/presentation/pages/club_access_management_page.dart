@@ -21,7 +21,7 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
   String? _error;
 
   static const _roles = <String, String>{
-    'club_president': 'Presidente', 'club_treasurer': 'Tesorero/a', 'club_secretary': 'Secretario/a',
+    'club_treasurer': 'Tesorero/a', 'club_secretary': 'Secretario/a',
     'team_manager': 'Delegado/a', 'coach': 'Entrenador/a', 'staff': 'Personal', 'member': 'Socio/a',
     'parent_guardian': 'Padre/madre/tutor', 'player': 'Jugador/a', 'follower': 'Seguidor/a',
   };
