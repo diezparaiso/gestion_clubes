@@ -7,7 +7,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Cobro de cuota con club_payments añadido en sesión posterior.
 
 import '../../../auth/application/auth_controller.dart';
-import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../../finance/data/repositories/finance_repository.dart';
 import '../../../finance/domain/entities/financial_transaction.dart';
 import '../../data/repositories/member_repository.dart';
