@@ -25,6 +25,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
   String? _ticketsRaffleId;
   RaffleDraw? _draw;
   bool _drawing = false;
+  bool _manualSaving = false;
   bool _monthlySaving = false;
 
   @override
@@ -309,7 +310,7 @@ class _MonthlyResultDialogState extends State<_MonthlyResultDialog> {
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.calendar_month_outlined),
               title: const Text('Mes del resultado'),
-              subtitle: Text(_month.month.toString() + '/' + _month.year.toString()),
+              subtitle: Text('${_month.month}/${_month.year}'),
               trailing: TextButton(onPressed: _pickMonth, child: const Text('Cambiar')),
             ),
             TextFormField(
