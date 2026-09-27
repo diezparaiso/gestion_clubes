@@ -72,10 +72,12 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
           actions: [
             TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancelar')),
             FilledButton(onPressed: () {
-              if (formKey.currentState!.validate()) Navigator.pop(dialogContext, {
-                'firstName': first.text.trim(), 'lastName': last.text.trim(), 'email': email.text.trim().toLowerCase(),
-                'password': password.text, 'role': role,
-              });
+              if (formKey.currentState!.validate()) {
+                Navigator.pop(dialogContext, {
+                  'firstName': first.text.trim(), 'lastName': last.text.trim(), 'email': email.text.trim().toLowerCase(),
+                  'password': password.text, 'role': role,
+                });
+              }
             }, child: const Text('Crear acceso')),
           ],
         ),
