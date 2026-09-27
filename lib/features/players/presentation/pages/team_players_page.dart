@@ -8,7 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Reutiliza cuentas existentes; no crea credenciales ni modifica Stripe.
 
 import '../../../auth/application/auth_controller.dart';
-import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/player_repository.dart';
 import '../../domain/entities/player.dart';
 
