@@ -585,3 +585,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Añadido `test/club_role_permissions_test.dart` para cubrir permisos de presidente, tesorero, secretario, roles de equipo y perfiles básicos.
 - Se verifica que roles desconocidos o permisos desconocidos quedan denegados por defecto.
 - Quedan como siguiente nivel las pruebas de integración RLS/RPC en una base de pruebas; no se toca Supabase remoto.
+
+
+### 2026-09-27 — GPT-5.6 LUNA — endurecimiento técnico de publicidad web
+- Añadido consentimiento publicitario persistente en navegador antes de cargar el script de AdSense.
+- Si no existe una decisión del usuario, no se solicita publicidad.
+- El banner usa anuncios no personalizados como medida provisional; no se presenta como sustituto de una CMP certificada.
+- La CMP certificada por Google/IAB TCF, los IDs reales de AdSense y `ads.txt` siguen pendientes de configuración de la cuenta.
+- No se introducen IDs ficticios, secretos ni configuración remota.
