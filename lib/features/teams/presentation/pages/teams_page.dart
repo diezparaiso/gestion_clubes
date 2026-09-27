@@ -72,6 +72,7 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
   @override
   Widget build(BuildContext context) {
     final teams = ref.watch(teamsProvider);
+    final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'teams_manage');
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Equipos'),
       body: RefreshIndicator(
@@ -79,7 +80,6 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'teams_manage');
             Row(children: [
               Expanded(child: Text('Equipos y temporadas', style: Theme.of(context).textTheme.headlineMedium)),
               if (canManage) OutlinedButton.icon(onPressed: () => _showSeasonManager(context), icon: const Icon(Icons.calendar_month_outlined), label: const Text('Temporadas')), if (canManage) const SizedBox(width: 10),
