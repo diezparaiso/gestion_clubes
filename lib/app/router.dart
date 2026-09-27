@@ -28,7 +28,8 @@ import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
 import '../features/legal/presentation/pages/privacy_page.dart';
 
-String? _permissionForLocation(String location) {
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): expone la matriz de permisos para cobertura unitaria.
+String? permissionForLocation(String location) {
   if (location == '/dashboard') return 'dashboard_view';
   if (location == '/members') return 'members_view';
   if (location == '/teams') return 'teams_view';
