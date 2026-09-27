@@ -61,7 +61,7 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
               TextFormField(controller: password, decoration: const InputDecoration(labelText: 'Contraseña inicial'), obscureText: true, validator: (v) => v == null || v.length < 8 ? 'Mínimo 8 caracteres' : null),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: role, decoration: const InputDecoration(labelText: 'Rol'),
+                initialValue: role, decoration: const InputDecoration(labelText: 'Rol'),
                 items: _roles.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
                 onChanged: (v) => setDialogState(() => role = v ?? role),
               ),
@@ -105,7 +105,7 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
       builder: (context) => AlertDialog(
         title: const Text('Cambiar rol'),
         content: DropdownButtonFormField<String>(
-          value: role, items: _roles.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
+          initialValue: role, items: _roles.entries.map((e) => DropdownMenuItem(value: e.key, child: Text(e.value))).toList(),
           onChanged: (v) => role = v ?? role,
         ),
         actions: [
@@ -127,7 +127,7 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
 
   Future<void> _revoke(Map<String, dynamic> member) async {
     final profile = member['profiles'] as Map<String, dynamic>;
-    final name = (profile['first_name'] ?? '').toString() + ' ' + (profile['last_name'] ?? '').toString();
+    final name = '${profile['first_name'] ?? ''} ${profile['last_name'] ?? ''}';
     final ok = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -169,15 +169,15 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
           const SizedBox(height: 20),
           ..._members.map((member) {
             final profile = member['profiles'] as Map<String, dynamic>;
-            final name = (profile['first_name'] ?? '').toString() + ' ' + (profile['last_name'] ?? '').toString();
+            final name = '${profile['first_name'] ?? ''} ${profile['last_name'] ?? ''}';
             final email = (profile['email'] ?? '').toString();
             final memberRole = member['role'] as String;
             return Card(child: ListTile(
               leading: const CircleAvatar(child: Icon(Icons.person_outline)),
               title: Text(name.trim().isEmpty ? email : name.trim()),
-              subtitle: Text(email + '\n' + (_roles[memberRole] ?? memberRole)), isThreeLine: true,
+              subtitle: Text('$email\n${_roles[memberRole] ?? memberRole}'), isThreeLine: true,
               trailing: PopupMenuButton<String>(
-                onSelected: (value) { if (value == 'role') _changeRole(member); if (value == 'revoke') _revoke(member); },
+                onSelected: (value) { if (value == 'role') { _changeRole(member); } if (value == 'revoke') { _revoke(member); } },
                 itemBuilder: (_) => const [PopupMenuItem(value: 'role', child: Text('Cambiar rol')), PopupMenuItem(value: 'revoke', child: Text('Revocar acceso'))],
               ),
             ));
