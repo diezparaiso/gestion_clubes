@@ -19,7 +19,7 @@ void main() {
 
     test('uses players permission for team player routes', () {
       expect(permissionForLocation('/teams/team-1/players'), 'players_view');
-      expect(permissionForLocation('/teams/team-1/players/edit'), 'teams_view');
+      expect(permissionForLocation('/teams/team-1/players/edit'), 'players_view');
     });
 
     test('keeps staff routes under teams permission', () {
@@ -28,12 +28,19 @@ void main() {
 
     test('protects access management separately', () {
       expect(permissionForLocation('/settings/access'), 'access_manage');
+      expect(permissionForLocation('/raffles/raffle-1'), 'raffles_view');
     });
 
     test('leaves public and unknown locations without a permission requirement', () {
       expect(permissionForLocation('/login'), isNull);
       expect(permissionForLocation('/register'), isNull);
       expect(permissionForLocation('/privacy'), isNull);
+      expect(permissionForLocation('/profile'), isNull);
+      expect(permissionForLocation('/profile/password'), isNull);
+      expect(permissionForLocation('/my-raffles'), isNull);
+      expect(permissionForLocation('/club/demo'), isNull);
+      expect(permissionForLocation('/club/demo/news'), isNull);
+      expect(permissionForLocation('/club/demo/events'), isNull);
       expect(permissionForLocation('/r/demo/sorteo'), isNull);
       expect(permissionForLocation('/unknown'), isNull);
     });
