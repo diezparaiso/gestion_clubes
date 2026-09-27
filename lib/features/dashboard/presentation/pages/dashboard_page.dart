@@ -12,6 +12,7 @@ import '../../application/dashboard_stats_provider.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade exportación completa de gestión a Excel.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra el rol real del acceso seleccionado.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Filtra navegación y acciones según permisos del rol.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): el Excel solo solicita módulos con permiso de lectura.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -335,6 +336,10 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       await ClubExportService().exportClub(
         clubId: clubId,
         clubName: auth.clubName ?? 'club',
+        permissions: {
+          for (final permission in const ['finance_view', 'members_view', 'teams_view', 'players_view', 'news_view', 'events_view', 'raffles_view'])
+            if (ClubRolePermissions.has(auth.role, permission)) permission,
+        },
       );
       if (!mounted) return;
       ScaffoldMessenger.of(this.context).showSnackBar(
