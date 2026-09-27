@@ -1,4 +1,4 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): añade ruta pública de privacidad y consentimiento.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): refuerza permisos por ruta en equipos y jugadores.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -31,7 +31,10 @@ import '../features/legal/presentation/pages/privacy_page.dart';
 String? _permissionForLocation(String location) {
   if (location == '/dashboard') return 'dashboard_view';
   if (location == '/members') return 'members_view';
-  if (location == '/teams' || location.startsWith('/teams/')) return 'teams_view';
+  if (location == '/teams') return 'teams_view';
+  if (location.startsWith('/teams/') && location.endsWith('/players')) return 'players_view';
+  if (location.startsWith('/teams/') && location.endsWith('/staff')) return 'teams_view';
+  if (location.startsWith('/teams/')) return 'teams_view';
   if (location == '/finance') return 'finance_view';
   if (location == '/raffles' || location.startsWith('/raffles/')) return 'raffles_view';
   if (location == '/news') return 'news_view';
