@@ -91,6 +91,7 @@
 - [ ] Probar Flutter Web en Chrome.
 - [ ] Probar responsive móvil/tablet/escritorio.
 - [x] Verificar rutas con sesión cerrada mediante la matriz de permisos de ubicación y cobertura unitaria.
+- [x] Cubrir rutas de detalle de rifas, perfil, Mis rifas y páginas públicas en la matriz.
 - [ ] Verificar RLS con perfiles de cada rol.
 - [x] Hacer prueba de exportación Excel.
 - [ ] Hacer prueba completa de rifas con Supabase de staging.
