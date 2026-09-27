@@ -103,6 +103,26 @@ class AuthState {
   }
 }
 
+
+class ClubRolePermissions {
+  const ClubRolePermissions._();
+
+  static const Map<String, Set<String>> _permissions = {
+    'club_president': {'dashboard_view','members_view','members_manage','teams_view','teams_manage','players_view','players_manage','finance_view','finance_manage','raffles_view','raffles_manage','news_view','news_manage','events_view','events_manage','notifications_view','club_settings_view','club_settings_manage','access_manage'},
+    'club_treasurer': {'dashboard_view','finance_view','finance_manage','notifications_view'},
+    'club_secretary': {'dashboard_view','members_view','members_manage','news_view','news_manage','events_view','events_manage','notifications_view'},
+    'team_manager': {'dashboard_view','teams_view','players_view','players_manage','notifications_view'},
+    'coach': {'dashboard_view','teams_view','players_view','players_manage','notifications_view'},
+    'staff': {'dashboard_view','notifications_view'},
+    'member': {'dashboard_view','members_view','notifications_view'},
+    'parent_guardian': {'dashboard_view','players_view','notifications_view'},
+    'player': {'dashboard_view','players_view','notifications_view'},
+    'follower': {'dashboard_view','notifications_view'},
+  };
+
+  static bool has(String? role, String permission) => _permissions[role]?.contains(permission) ?? false;
+}
+
 final authControllerProvider = NotifierProvider<AuthController, AuthState>(AuthController.new);
 
 class AuthController extends Notifier<AuthState> {
