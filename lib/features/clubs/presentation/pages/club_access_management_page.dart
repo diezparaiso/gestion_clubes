@@ -6,6 +6,7 @@ import '../../../auth/application/auth_controller.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): módulo funcional de gestión de accesos del club.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): la protección de la pantalla usa access_manage.
 
 class ClubAccessManagementPage extends ConsumerStatefulWidget {
   const ClubAccessManagementPage({super.key});
@@ -156,8 +157,8 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
 
   @override
   Widget build(BuildContext context) {
-    final role = ref.watch(authControllerProvider).role;
-    if (role != 'club_president') return const Scaffold(body: Center(child: Text('Solo el presidente puede gestionar los accesos del club.')));
+    final auth = ref.watch(authControllerProvider);
+    if (!ClubRolePermissions.has(auth.role, 'access_manage')) return const Scaffold(body: Center(child: Text('No tienes permiso para gestionar los accesos del club.')));
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Usuarios y permisos'),
       floatingActionButton: FloatingActionButton.extended(onPressed: _saving ? null : _createUser, icon: const Icon(Icons.person_add_alt_1), label: const Text('Dar de alta')),
