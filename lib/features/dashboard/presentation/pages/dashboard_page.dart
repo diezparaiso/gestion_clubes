@@ -356,7 +356,6 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     final selectedVisibleIndex = visibleEntries.indexWhere((entry) => entry.$1 == _selectedIndex);
     return NavigationBar(
       selectedIndex: selectedVisibleIndex < 0 ? 0 : selectedVisibleIndex,
-      selectedIndex: _selectedIndex,
       onDestinationSelected: (visibleIndex) {
         final index = visibleEntries[visibleIndex].$1;
         setState(() => _selectedIndex = index);
