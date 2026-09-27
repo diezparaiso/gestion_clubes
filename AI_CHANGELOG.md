@@ -671,3 +671,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Las estadísticas del dashboard solo consultan socios, equipos y tesorería cuando el usuario dispone de sus permisos `*_view`, evitando fallos por RLS en roles con acceso limitado.
 - La exportación Excel ahora genera solo las hojas de los módulos que el usuario puede consultar; la misma restricción se aplica al modo demo.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+### 2026-09-27 — GPT-5.6 LUNA — alineación de perfiles de jugadores
+- Corregida la lectura de perfiles usada por jugadores: los roles con `players_view/manage` no necesitan `members_view` para mostrar nombres de jugadores.
+- El alta de jugador resuelve la cuenta por email mediante `find_profile_for_player`, protegido por `players_manage`, sin ampliar la lectura general de perfiles.
+- Preparada la migración `041_players_profile_rls.sql`; no se ejecuta Supabase remoto.
