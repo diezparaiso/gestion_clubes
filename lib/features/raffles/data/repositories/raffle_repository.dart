@@ -145,7 +145,7 @@ class RaffleRepository {
     final rows = await Supabase.instance.client
         .from('raffle_tickets')
         .select('id, raffle_id, number, payment_status, paid_at, payment_reference, receipt_number, raffles!inner(title, ticket_price)')
-        .eq('profile_id', profileId)
+        .eq('buyer_profile_id', profileId)
         .eq('payment_status', 'paid')
         .order('paid_at', ascending: false);
     return rows.cast<Map<String, dynamic>>();
