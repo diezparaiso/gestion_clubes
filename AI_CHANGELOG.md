@@ -629,3 +629,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Las subrutas futuras de jugadores/personal conservan el permiso de su módulo mediante coincidencia por segmento.
 - Se marca como revisada la protección de rutas con sesión cerrada; las pruebas RLS/staging siguen abiertas por requerir infraestructura externa.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre de estado residual de recuperación
+- Un inicio de sesión normal limpia explícitamente `passwordRecovery` antes de seleccionar club.
+- Añadida cobertura unitaria para impedir que el estado de recuperación se reutilice como una reautenticación normal.
+- La prueba real del flujo completo Web/Chrome y staging permanece abierta por requerir infraestructura externa.
