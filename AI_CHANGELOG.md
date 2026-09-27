@@ -1,3 +1,8 @@
+### 2026-09-27 — GPT-5.6 LUNA — corrección final del analyzer tras validación local
+- Restaurado `_manualSaving` en el detalle de rifas, que seguía siendo utilizado por el flujo de elección manual de ganador.
+- Corregida la última composición de texto del selector de mes y el bloque `if` del diálogo de gestión de accesos.
+- La corrección mantiene el alcance funcional y no toca Supabase remoto ni Payments.
+
 ### 2026-09-27 — GPT-5.6 LUNA — limpieza final del analyzer
 - Corregidos los avisos de lint restantes en gestión de accesos, navegación y páginas de rifas.
 - Sustituidos `DropdownButtonFormField.value` por `initialValue` donde correspondía y simplificados concatenados de cadenas mediante interpolación.
