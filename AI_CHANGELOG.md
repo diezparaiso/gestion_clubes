@@ -1,3 +1,9 @@
+### 2026-09-27 — GPT-5.6 LUNA — limpieza final del analyzer
+- Corregidos los avisos de lint restantes en gestión de accesos, navegación y páginas de rifas.
+- Sustituidos `DropdownButtonFormField.value` por `initialValue` donde correspondía y simplificados concatenados de cadenas mediante interpolación.
+- Eliminado el campo `_manualSaving` sin uso y corregido el spread nullable de acciones de la barra de navegación.
+- Sin cambios de esquema, Supabase remoto ni Payments.
+
 ### 2026-09-26 — GPT-5.6 LUNA — correcciones tras validación local de Flutter
 - Corregidas las llamadas a Supabase Auth para usar los parámetros nombrados exigidos por el SDK actual.
 - Reordenadas las directivas de imports/interoperabilidad del banner AdSense Web para cumplir el analizador Dart.
