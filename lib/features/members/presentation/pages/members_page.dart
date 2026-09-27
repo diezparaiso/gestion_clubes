@@ -857,11 +857,12 @@ class _MemberTile extends StatelessWidget {
             side: BorderSide.none,
             labelStyle: TextStyle(color: color, fontWeight: FontWeight.w700),
           ),
-          IconButton(
-            tooltip: 'Cobrar cuota',
-            onPressed: onChargeFee,
-            icon: const Icon(Icons.payments_outlined),
-          ),
+          if (onChargeFee != null)
+            IconButton(
+              tooltip: 'Cobrar cuota',
+              onPressed: onChargeFee,
+              icon: const Icon(Icons.payments_outlined),
+            ),
           if (onEdit != null)
             IconButton(
               tooltip: 'Editar socio',
