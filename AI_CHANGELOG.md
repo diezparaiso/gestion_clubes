@@ -1,3 +1,12 @@
+### 2026-09-27 — GPT-5.6 LUNA — separación inicial de permisos view/manage en pantallas
+- Ocultadas las acciones de alta/edición/cobro en Socios cuando el rol no tiene `members_manage`.
+- Ocultada el alta de movimientos en Tesorería sin `finance_manage`.
+- Ocultada la creación de eventos sin `events_manage`.
+- Ocultada la creación de rifas sin `raffles_manage`.
+- Ocultadas alta, edición, activación/desactivación y gestión de temporadas de Equipos sin `teams_manage`.
+- Se mantiene el acceso de consulta para los roles que solo tienen permisos `*_view`.
+- No se modifica Supabase remoto ni Payments/Stripe.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre de revocación y endurecimiento del alta de accesos
 - Añadida la migración `037_revoke_member_access.sql` con RPC segura para revocar accesos activos y conservar siempre al menos un presidente activo.
 - La revocación queda auditada y protegida por el permiso `access_manage`.
