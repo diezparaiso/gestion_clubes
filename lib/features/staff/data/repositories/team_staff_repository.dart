@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): resuelve cuentas del personal mediante RPC sin requerir members_view.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -36,7 +37,10 @@ class TeamStaffRepository {
     if (team == null) {
       throw const PostgrestException(message: 'El equipo no pertenece al club activo.');
     }
-    final profile = await client.from('profiles').select('id, first_name, last_name, email').eq('email', email.trim()).maybeSingle();
+    final profile = await client.rpc<Map<String, dynamic>?>(
+      'find_profile_for_team_staff',
+      params: {'target_club_id': clubId, 'target_email': email.trim()},
+    );
     if (profile == null) throw const PostgrestException(message: 'No existe una cuenta con ese email. La persona debe registrarse antes de asignarla.');
     final row = await client.from('team_staff').insert({
       'club_id': clubId,
