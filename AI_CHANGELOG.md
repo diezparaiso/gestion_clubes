@@ -1,3 +1,10 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre del ciclo de consentimiento publicitario
+- Añadida página pública `/privacy` con información resumida sobre privacidad, almacenamiento local y publicidad.
+- El aviso publicitario enlaza directamente a privacidad antes de aceptar o rechazar.
+- La preferencia publicitaria puede retirarse/revisarse desde la página pública y el estado local del servicio puede reiniciarse.
+- El texto se mantiene como información técnica provisional y no se presenta como sustituto del texto jurídico definitivo ni de una CMP certificada.
+- No se modifica Supabase remoto ni Payments/Stripe.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre de recuperación de contraseña
 - Añadido el flujo de recuperación desde Login mediante `resetPasswordForEmail`.
 - La sesión `passwordRecovery` lleva al usuario a `/profile/password` sin exigir la contraseña anterior.
