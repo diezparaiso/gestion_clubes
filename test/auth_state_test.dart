@@ -39,3 +39,18 @@ void main() {
     });
   });
 }
+
+  group('normal authentication state', () {
+    test('can explicitly clear a previous recovery session', () {
+      const recoveryState = AuthState(
+        status: AuthStatus.signedIn,
+        passwordRecovery: true,
+        mustChangePassword: true,
+      );
+
+      final normalSignInState = recoveryState.copyWith(passwordRecovery: false);
+
+      expect(normalSignInState.passwordRecovery, isFalse);
+      expect(normalSignInState.mustChangePassword, isTrue);
+    });
+  });
