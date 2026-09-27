@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart;
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade acceso directo a la gestión de usuarios y permisos.
