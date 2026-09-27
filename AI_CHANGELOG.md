@@ -650,3 +650,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregida la expectativa de subrutas de jugadores para mantener `players_view` también en `/players/edit`.
 - Añadida cobertura de detalle de rifas, perfil, cambio de contraseña, Mis rifas y páginas públicas.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+### 2026-09-27 — GPT-5.6 LUNA — corrección final de RLS de participaciones
+- Corregida `038_permissions_rls_alignment.sql`: la política de lectura propia de `raffle_tickets` usa `buyer_profile_id`, que es la columna real del participante.
+- Se evita que la migración futura falle por una columna inexistente o aplique una condición incorrecta.
+- No se ejecuta la migración sobre Supabase remoto.
