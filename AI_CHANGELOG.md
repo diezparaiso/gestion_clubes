@@ -666,3 +666,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Socios: `Cobrar cuota` requiere `members_manage` y `finance_manage`, porque registra también el movimiento de tesorería.
 - Tesorería y Eventos mantienen sus acciones alineadas con `finance_manage` y `events_manage` respectivamente.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre de lecturas del dashboard
+- Las estadísticas del dashboard solo consultan socios, equipos y tesorería cuando el usuario dispone de sus permisos `*_view`, evitando fallos por RLS en roles con acceso limitado.
+- La exportación Excel ahora genera solo las hojas de los módulos que el usuario puede consultar; la misma restricción se aplica al modo demo.
+- No se modifica Supabase remoto ni Payments/Stripe.
