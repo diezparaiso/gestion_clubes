@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta/asignación y edición de jugadores.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadidos teléfonos de jugador y progenitor/responsable.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Alta y edición visibles solo con players_manage.
 // Reutiliza cuentas existentes; no crea credenciales ni modifica Stripe.
 
 import '../../../auth/application/auth_controller.dart';
@@ -50,6 +51,8 @@ class _TeamPlayersPageState extends ConsumerState<TeamPlayersPage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = ref.watch(authControllerProvider);
+    final canManage = ClubRolePermissions.has(auth.role, 'players_manage');
     final teamId = widget.teamId;
     final teamName = widget.teamName;
     final players = ref.watch(teamPlayersProvider(teamId));
@@ -81,7 +84,7 @@ class _TeamPlayersPageState extends ConsumerState<TeamPlayersPage> {
               ),
               const SizedBox(width: 16),
               FilledButton.icon(
-                onPressed: _createPlayer,
+                onPressed: canManage ? _createPlayer : null,
                 icon: const Icon(Icons.person_add_alt_1),
                 label: const Text('Nuevo jugador'),
               ),
@@ -97,7 +100,7 @@ class _TeamPlayersPageState extends ConsumerState<TeamPlayersPage> {
               separatorBuilder: (_, index) => const Divider(height: 1),
               itemBuilder: (context, index) => _PlayerTile(
                 player: items[index],
-                onEdit: () => _editPlayer(items[index]),
+                onEdit: canManage ? () => _editPlayer(items[index]) : null,
               ),
             )),
           )),
@@ -523,7 +526,7 @@ class _PlayerTile extends StatelessWidget {
   const _PlayerTile({required this.player, required this.onEdit});
 
   final Player player;
-  final VoidCallback onEdit;
+  final VoidCallback? onEdit;
 
   @override
   Widget build(BuildContext context) {
@@ -534,7 +537,7 @@ class _PlayerTile extends StatelessWidget {
       ),
       title: Text(player.name, style: const TextStyle(fontWeight: FontWeight.w700)),
       subtitle: Text(player.isActive ? 'Jugador activo' : 'Baja de equipo'),
-      trailing: IconButton(
+      trailing: onEdit == null ? null : IconButton(
         tooltip: 'Editar jugador',
         onPressed: onEdit,
         icon: const Icon(Icons.edit_outlined),
