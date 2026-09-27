@@ -1,6 +1,7 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Restaura implementación Flutter válida tras corrección del analizador.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): cierra la gestión de rifas mensuales y respeta raffles_manage en acciones.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/application/auth_controller.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -45,6 +46,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
           if (raffleSnapshot.connectionState != ConnectionState.done) return const Scaffold(body: Center(child: CircularProgressIndicator()));
           if (raffleSnapshot.hasError || raffleSnapshot.data == null) return const MissingRafflePage();
           final raffle = raffleSnapshot.data!;
+          final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'raffles_manage');
           if (_ticketsRaffleId != raffle.id) {
             _ticketsRaffleId = raffle.id;
             final repository = ref.read(raffleRepositoryProvider);
@@ -62,12 +64,12 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
             if (snapshot.hasError) return const Center(child: Text('No se han podido cargar las participaciones.'));
             final tickets = snapshot.data!;
             return ListView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), children: [
-              Row(children: [Expanded(child: Text('Participaciones', style: Theme.of(context).textTheme.headlineMedium)), FilledButton.icon(onPressed: _drawing || _draw != null || raffle.winningNumber != null ? null : () => raffle.type == RaffleType.cesta ? _setBasketWinner(raffle, tickets) : _confirmDraw(tickets), icon: Icon(raffle.type == RaffleType.cesta ? Icons.emoji_events_outlined : Icons.casino_outlined), label: Text(raffle.type == RaffleType.cesta ? 'Elegir ganador' : 'Sortear'))]),
+              Row(children: [Expanded(child: Text('Participaciones', style: Theme.of(context).textTheme.headlineMedium)), if (canManage) FilledButton.icon(onPressed: _drawing || _draw != null || raffle.winningNumber != null ? null : () => raffle.type == RaffleType.cesta ? _setBasketWinner(raffle, tickets) : _confirmDraw(tickets), icon: Icon(raffle.type == RaffleType.cesta ? Icons.emoji_events_outlined : Icons.casino_outlined), label: Text(raffle.type == RaffleType.cesta ? 'Elegir ganador' : 'Sortear'))]),
               const SizedBox(height: 8),
               Text('${tickets.length} participaciones registradas. Solo las confirmadas participan en el sorteo.'),
               const SizedBox(height: 8),
               if (raffle.type == RaffleType.mensual)
-                _monthlySection(raffle)
+                _monthlySection(raffle, canManage)
               else ...[
                 Text(raffle.type == RaffleType.cesta ? 'Tipo Cesta: el presidente elige el número ganador al finalizar la rifa.' : 'Sorteo puro: el sistema selecciona el ganador con aleatoriedad criptográfica.'),
                 if (raffle.winningNumber != null && _draw == null) ...[
@@ -97,7 +99,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
         },
       );
 
-  Widget _monthlySection(Raffle raffle) {
+  Widget _monthlySection(Raffle raffle, bool canManage) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,7 +120,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ),
-            FilledButton.icon(
+            if (canManage) FilledButton.icon(
               onPressed: _monthlySaving ? null : () => _registerMonthlyResult(raffle),
               icon: const Icon(Icons.emoji_events_outlined),
               label: const Text('Registrar resultado'),
