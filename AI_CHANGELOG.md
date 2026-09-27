@@ -617,3 +617,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Marcada como completada la revisión de warnings/infos del analyzer tras la validación de `flutter analyze --no-pub` sin incidencias.
 - Marcada como completada la prueba de exportación Excel, ya validada funcionalmente.
 - Se mantienen abiertas únicamente las pruebas que requieren Chrome, dispositivos, staging, Supabase o servicios externos.
+
+### 2026-09-27 — GPT-5.6 LUNA — cobertura del estado de autenticación
+- Añadida prueba unitaria para conservar correctamente `passwordRecovery` y `mustChangePassword` en `AuthState.copyWith`.
+- Añadida prueba del estado final tras completar el cambio de contraseña.
+- No se modifica Supabase remoto ni Payments/Stripe.
