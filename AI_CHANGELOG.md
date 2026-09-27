@@ -579,3 +579,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Los PDF, emails y confirmaciones de pago reales permanecen pendientes porque dependen de `club_payments_backend`/Stripe, actualmente en standby.
 - Actualizado `PENDIENTES.md` para distinguir pruebas externas y dependencias reales de módulos ya cerrados.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+
+### 2026-09-27 — GPT-5.6 LUNA — pruebas iniciales de permisos
+- Añadido `test/club_role_permissions_test.dart` para cubrir permisos de presidente, tesorero, secretario, roles de equipo y perfiles básicos.
+- Se verifica que roles desconocidos o permisos desconocidos quedan denegados por defecto.
+- Quedan como siguiente nivel las pruebas de integración RLS/RPC en una base de pruebas; no se toca Supabase remoto.
