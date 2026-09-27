@@ -1,4 +1,4 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): AdSense solo se inicializa tras consentimiento explícito.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): AdSense espera consentimiento y permite reiniciar su estado local.
 import 'package:flutter/foundation.dart';
 import 'package:universal_html/html.dart' as html;
 
@@ -27,10 +27,14 @@ class AdsService {
       ..async = true
       ..crossOrigin = 'anonymous'
       ..src =
-          'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${AdsConfig.publisherId}'
+          'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=\${AdsConfig.publisherId}'
       ..setAttribute('data-gestion-clubes-adsense', 'true');
 
     html.document.head?.append(script);
     _loaded = true;
+  }
+
+  static void reset() {
+    _loaded = false;
   }
 }
