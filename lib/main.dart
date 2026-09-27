@@ -1,4 +1,4 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): inicializa publicidad web.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): la publicidad espera consentimiento antes de inicializar AdSense.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
