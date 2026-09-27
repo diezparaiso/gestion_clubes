@@ -63,7 +63,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isSignedIn && authState.mustChangePassword && location != '/profile/password') return '/profile/password';
       if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClub && !isPublicPrivacy) return '/login';
       if (isSignedIn && !authState.mustChangePassword) {
-        final requiredPermission = _permissionForLocation(location);
+        final requiredPermission = permissionForLocation(location);
         if (requiredPermission != null && !ClubRolePermissions.has(authState.role, requiredPermission)) return '/dashboard';
       }
       return null;
