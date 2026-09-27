@@ -1,4 +1,5 @@
 ### 2026-09-27 — GPT-5.6 LUNA — cierre inicial de permisos en navegación y rutas
+- Corrección inmediata de una duplicación de `selectedIndex` introducida en la navegación móvil durante este bloque.
 - Añadido el mapa de permisos por rol en la aplicación, alineado con la migración 032.
 - El router bloquea el acceso directo por URL a módulos que el rol no puede consultar.
 - Dashboard, sidebar y navegación móvil ocultan secciones no permitidas.
