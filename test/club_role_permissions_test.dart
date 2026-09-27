@@ -1,4 +1,4 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): cobertura básica de la matriz de permisos por rol.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): cobertura de permisos y selección de club.
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gestion_clubes/features/auth/application/auth_controller.dart';
@@ -65,6 +65,31 @@ void main() {
       expect(ClubRolePermissions.has('unknown_role', 'dashboard_view'), isFalse);
       expect(ClubRolePermissions.has(null, 'dashboard_view'), isFalse);
       expect(ClubRolePermissions.has('member', 'unknown_permission'), isFalse);
+    });
+  });
+
+  group('ClubAccess', () {
+    test('keeps the selected club identity and exposes Spanish role labels', () {
+      const club = ClubAccess(
+        clubId: 'club-1',
+        clubName: 'Club Demo',
+        role: 'club_secretary',
+      );
+
+      expect(club.clubId, 'club-1');
+      expect(club.clubName, 'Club Demo');
+      expect(club.role, 'club_secretary');
+      expect(club.roleLabel, 'Secretario/a');
+    });
+
+    test('falls back to the raw role for an unknown role', () {
+      const club = ClubAccess(
+        clubId: 'club-2',
+        clubName: 'Otro Club',
+        role: 'future_role',
+      );
+
+      expect(club.roleLabel, 'future_role');
     });
   });
 }
