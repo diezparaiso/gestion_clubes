@@ -161,11 +161,12 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                   tooltip: 'Exportar gestión a Excel',
                   icon: const Icon(Icons.file_download_outlined),
                 ),
-                IconButton(
-                  onPressed: () => context.go('/notifications'),
-                  tooltip: 'Notificaciones',
-                  icon: const Icon(Icons.notifications_none_rounded),
-                ),
+                if (_can(authState, 'notifications_view'))
+                  IconButton(
+                    onPressed: () => context.go('/notifications'),
+                    tooltip: 'Notificaciones',
+                    icon: const Icon(Icons.notifications_none_rounded),
+                  ),
                 const SizedBox(width: 4),
                 const CircleAvatar(
                   radius: 20,
@@ -284,7 +285,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Estado operativo', style: Theme.of(context).textTheme.titleLarge),
-                      TextButton(onPressed: () => context.go('/members'), child: const Text('Ver socios')),
+                      if (_can(ref.read(authControllerProvider), 'members_view'))
+                        TextButton(onPressed: () => context.go('/members'), child: const Text('Ver socios')),
                     ],
                   ),
                   const SizedBox(height: 12),
