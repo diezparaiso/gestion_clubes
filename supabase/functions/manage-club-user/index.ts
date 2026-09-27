@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): refuerza la restricción de nombramiento de presidente.
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 type Role =
@@ -18,6 +19,7 @@ Deno.serve(async (req) => {
       body as { clubId: string; email: string; password: string; role: Role; firstName?: string; lastName?: string };
 
     if (!clubId || !email || !password || !role) throw new Error("Faltan datos obligatorios.");
+    if (role === "club_president") throw new Error("El nombramiento de presidente está reservado al administrador de plataforma.");
     if (password.length < 8) throw new Error("La contraseña inicial debe tener al menos 8 caracteres.");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
