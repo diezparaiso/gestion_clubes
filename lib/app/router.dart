@@ -9,7 +9,7 @@ import '../features/auth/presentation/pages/profile_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
 import '../features/clubs/presentation/pages/public_club_page.dart';
 import '../features/clubs/presentation/pages/club_settings_page.dart';
-import '../features/clubs/presentation/pages/club_access_management_page.dart;
+import '../features/clubs/presentation/pages/club_access_management_page.dart';
 import '../features/dashboard/presentation/pages/dashboard_page.dart';
 import '../features/events/presentation/pages/events_page.dart';
 import '../features/events/presentation/pages/public_events_page.dart';
