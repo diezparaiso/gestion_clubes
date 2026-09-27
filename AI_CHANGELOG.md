@@ -1,3 +1,8 @@
+### 2026-09-27 — GPT-5.6 LUNA — cierre de revisión de selección de club
+- Revisada la carga de múltiples clubes mediante membresías activas y la selección del club junto con su rol.
+- Añadida cobertura de `ClubAccess` para identidad del club y etiquetas de rol, incluyendo fallback para roles futuros.
+- No se modifica Supabase remoto ni Payments/Stripe.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre del ciclo de consentimiento publicitario
 - Añadida página pública `/privacy` con información resumida sobre privacidad, almacenamiento local y publicidad.
 - El aviso publicitario enlaza directamente a privacidad antes de aceptar o rechazar.
