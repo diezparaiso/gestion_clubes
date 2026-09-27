@@ -131,8 +131,8 @@ class _MembersPageState extends ConsumerState<MembersPage> {
                         separatorBuilder: (_, index) => const Divider(height: 1),
                         itemBuilder: (context, index) => _MemberTile(
                           member: filtered[index],
-                          onEdit: () => _showEditMemberDialog(context, filtered[index]),
-                          onChargeFee: () => _showChargeFeeDialog(context, filtered[index]),
+                          onEdit: canManage ? () => _showEditMemberDialog(context, filtered[index]) : null,
+                          onChargeFee: canManage ? () => _showChargeFeeDialog(context, filtered[index]) : null,
                         ),
                       ),
                     );
@@ -814,8 +814,8 @@ class _MemberTile extends StatelessWidget {
   const _MemberTile({required this.member, required this.onEdit, required this.onChargeFee});
 
   final Member member;
-  final VoidCallback onEdit;
-  final VoidCallback onChargeFee;
+  final VoidCallback? onEdit;
+  final VoidCallback? onChargeFee;
 
   String _statusLabel(MemberStatus status) {
     switch (status) {
@@ -862,9 +862,10 @@ class _MemberTile extends StatelessWidget {
             onPressed: onChargeFee,
             icon: const Icon(Icons.payments_outlined),
           ),
-          IconButton(
-            tooltip: 'Editar socio',
-            onPressed: onEdit,
+          if (onEdit != null)
+            IconButton(
+              tooltip: 'Editar socio',
+              onPressed: onEdit,
             icon: const Icon(Icons.edit_outlined),
           ),
         ],
