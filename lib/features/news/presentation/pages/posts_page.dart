@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade edición y borrado de noticias y muestra todos los estados.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): acciones de gestión condicionadas a news_manage.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,6 +23,8 @@ class PostsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final auth = ref.watch(authControllerProvider);
+    final canManage = ClubRolePermissions.has(auth.role, 'news_manage');
     final posts = ref.watch(postsProvider);
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Noticias'),
