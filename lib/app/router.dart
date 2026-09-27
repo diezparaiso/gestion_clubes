@@ -1,5 +1,4 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): cierre funcional del módulo de rifas.
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos de rol a rutas privadas.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): añade ruta pública de privacidad y consentimiento.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,6 +26,7 @@ import '../features/raffles/presentation/pages/my_raffles_page.dart';
 import '../features/raffles/domain/entities/raffle.dart';
 import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
+import '../features/legal/presentation/pages/privacy_page.dart';
 
 String? _permissionForLocation(String location) {
   if (location == '/dashboard') return 'dashboard_view';
@@ -51,13 +51,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isAuthRoute = location == '/login' || location == '/register';
       final isPublicRaffle = location.startsWith('/r/');
       final isPublicClub = location.startsWith('/club/');
+      final isPublicPrivacy = location == '/privacy';
       final isSignedIn = authState.status == AuthStatus.signedIn;
       final needsClub = authState.status == AuthStatus.needsClub;
 
       if (needsClub && location != '/onboarding') return '/onboarding';
       if (isSignedIn && isAuthRoute) return authState.mustChangePassword ? '/profile/password' : '/dashboard';
       if (isSignedIn && authState.mustChangePassword && location != '/profile/password') return '/profile/password';
-      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClub) return '/login';
+      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClub && !isPublicPrivacy) return '/login';
       if (isSignedIn && !authState.mustChangePassword) {
         final requiredPermission = _permissionForLocation(location);
         if (requiredPermission != null && !ClubRolePermissions.has(authState.role, requiredPermission)) return '/dashboard';
@@ -65,142 +66,61 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
-      GoRoute(
-        path: '/login',
-        name: 'login',
-        builder: (context, state) => const LoginPage(),
-      ),
-      GoRoute(
-        path: '/register',
-        name: 'register',
-        builder: (context, state) => const RegisterPage(),
-      ),
-      GoRoute(
-        path: '/onboarding',
-        name: 'onboarding',
-        builder: (context, state) => const ClubOnboardingPage(),
-      ),
+      GoRoute(path: '/login', name: 'login', builder: (context, state) => const LoginPage()),
+      GoRoute(path: '/register', name: 'register', builder: (context, state) => const RegisterPage()),
+      GoRoute(path: '/onboarding', name: 'onboarding', builder: (context, state) => const ClubOnboardingPage()),
+      GoRoute(path: '/privacy', name: 'privacy', builder: (context, state) => const PrivacyPage()),
       GoRoute(
         path: '/r/:clubSlug/:raffleSlug',
         name: 'public-raffle',
-        builder: (context, state) => PublicRafflePage(
-          clubSlug: state.pathParameters['clubSlug']!,
-          raffleSlug: state.pathParameters['raffleSlug']!,
-        ),
+        builder: (context, state) => PublicRafflePage(clubSlug: state.pathParameters['clubSlug']!, raffleSlug: state.pathParameters['raffleSlug']!),
       ),
       GoRoute(
         path: '/club/:clubSlug/news',
         name: 'public-news',
-        builder: (context, state) => PublicPostsPage(
-          clubSlug: state.pathParameters['clubSlug']!,
-        ),
+        builder: (context, state) => PublicPostsPage(clubSlug: state.pathParameters['clubSlug']!),
       ),
       GoRoute(
         path: '/club/:clubSlug/events',
         name: 'public-events',
-        builder: (context, state) => PublicEventsPage(
-          clubSlug: state.pathParameters['clubSlug']!,
-        ),
+        builder: (context, state) => PublicEventsPage(clubSlug: state.pathParameters['clubSlug']!),
       ),
       GoRoute(
         path: '/club/:clubSlug',
         name: 'public-club',
-        builder: (context, state) => PublicClubPage(
-          clubSlug: state.pathParameters['clubSlug']!,
-        ),
+        builder: (context, state) => PublicClubPage(clubSlug: state.pathParameters['clubSlug']!),
       ),
-      GoRoute(
-        path: '/profile',
-        name: 'profile',
-        builder: (context, state) => const ProfilePage(),
-      ),
-      GoRoute(
-        path: '/profile/password',
-        name: 'profile-password',
-        builder: (context, state) => const ProfilePage(forcePasswordChange: true),
-      ),
-      GoRoute(
-        path: '/dashboard',
-        name: 'dashboard',
-        builder: (context, state) => const DashboardPage(),
-      ),
-      GoRoute(
-        path: '/finance',
-        name: 'finance',
-        builder: (context, state) => const FinancePage(),
-      ),
-      GoRoute(
-        path: '/my-raffles',
-        name: 'my-raffles',
-        builder: (context, state) => const MyRafflesPage(),
-      ),
-      GoRoute(
-        path: '/raffles',
-        name: 'raffles',
-        builder: (context, state) => const RafflesPage(),
-      ),
+      GoRoute(path: '/profile', name: 'profile', builder: (context, state) => const ProfilePage()),
+      GoRoute(path: '/profile/password', name: 'profile-password', builder: (context, state) => const ProfilePage(forcePasswordChange: true)),
+      GoRoute(path: '/dashboard', name: 'dashboard', builder: (context, state) => const DashboardPage()),
+      GoRoute(path: '/finance', name: 'finance', builder: (context, state) => const FinancePage()),
+      GoRoute(path: '/my-raffles', name: 'my-raffles', builder: (context, state) => const MyRafflesPage()),
+      GoRoute(path: '/raffles', name: 'raffles', builder: (context, state) => const RafflesPage()),
       GoRoute(
         path: '/raffles/:raffleId',
         name: 'raffle-detail',
-        builder: (context, state) {
-          final raffle = state.extra as Raffle?;
-          return RaffleDetailPage(
-            raffle: raffle,
-            raffleId: state.pathParameters['raffleId']!,
-            clubId: ref.read(authControllerProvider).clubId,
-          );
-        },
+        builder: (context, state) => RaffleDetailPage(
+          raffle: state.extra as Raffle?,
+          raffleId: state.pathParameters['raffleId']!,
+          clubId: ref.read(authControllerProvider).clubId,
+        ),
       ),
-      GoRoute(
-        path: '/news',
-        name: 'news',
-        builder: (context, state) => const PostsPage(),
-      ),
-      GoRoute(
-        path: '/events',
-        name: 'events',
-        builder: (context, state) => const EventsPage(),
-      ),
-      GoRoute(
-        path: '/notifications',
-        name: 'notifications',
-        builder: (context, state) => const NotificationsPage(),
-      ),
-      GoRoute(
-        path: '/settings/access',
-        name: 'settings-access',
-        builder: (context, state) => const ClubAccessManagementPage(),
-      ),
-      GoRoute(
-        path: '/settings',
-        name: 'settings',
-        builder: (context, state) => const ClubSettingsPage(),
-      ),
-      GoRoute(
-        path: '/members',
-        name: 'members',
-        builder: (context, state) => const MembersPage(),
-      ),
-      GoRoute(
-        path: '/teams',
-        name: 'teams',
-        builder: (context, state) => const TeamsPage(),
-      ),
+      GoRoute(path: '/news', name: 'news', builder: (context, state) => const PostsPage()),
+      GoRoute(path: '/events', name: 'events', builder: (context, state) => const EventsPage()),
+      GoRoute(path: '/notifications', name: 'notifications', builder: (context, state) => const NotificationsPage()),
+      GoRoute(path: '/settings/access', name: 'settings-access', builder: (context, state) => const ClubAccessManagementPage()),
+      GoRoute(path: '/settings', name: 'settings', builder: (context, state) => const ClubSettingsPage()),
+      GoRoute(path: '/members', name: 'members', builder: (context, state) => const MembersPage()),
+      GoRoute(path: '/teams', name: 'teams', builder: (context, state) => const TeamsPage()),
       GoRoute(
         path: '/teams/:teamId/players',
         name: 'team-players',
-        builder: (context, state) => TeamPlayersPage(
-          teamId: state.pathParameters['teamId']!,
-          teamName: state.extra as String? ?? 'Plantilla',
-        ),
+        builder: (context, state) => TeamPlayersPage(teamId: state.pathParameters['teamId']!, teamName: state.extra as String? ?? 'Plantilla'),
       ),
       GoRoute(
         path: '/teams/:teamId/staff',
         name: 'team-staff',
-        builder: (context, state) => TeamStaffPage(
-          teamId: state.pathParameters['teamId']!,
-          teamName: state.extra as String? ?? 'Equipo',
-        ),
+        builder: (context, state) => TeamStaffPage(teamId: state.pathParameters['teamId']!, teamName: state.extra as String? ?? 'Equipo'),
       ),
     ],
   );
