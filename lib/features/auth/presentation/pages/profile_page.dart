@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../auth/application/auth_controller.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): perfil y cambio de contraseña.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): completa cambio de contraseña tras recuperación por email.
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key, this.forcePasswordChange = false});
@@ -33,9 +33,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
     setState(() => _saving = true);
     try {
       final client = Supabase.instance.client;
+      final auth = ref.read(authControllerProvider);
       final email = client.auth.currentUser?.email;
       if (email == null) throw Exception('No se ha encontrado el email de la cuenta.');
-      await client.auth.signInWithPassword(email: email, password: _current.text);
+      if (!auth.passwordRecovery) {
+        await client.auth.signInWithPassword(email: email, password: _current.text);
+      }
       await client.auth.updateUser(UserAttributes(password: _newPassword.text));
       await client.from('profiles').update({'must_change_password': false}).eq('id', client.auth.currentUser!.id);
       if (!mounted) return;
@@ -72,7 +75,8 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     Text(auth.email ?? Supabase.instance.client.auth.currentUser?.email ?? '', style: Theme.of(context).textTheme.titleMedium),
                     const SizedBox(height: 16),
                     if (widget.forcePasswordChange) const Text('Por seguridad, debes cambiar la contraseña inicial antes de continuar.'),
-                    TextFormField(controller: _current, obscureText: _obscure, decoration: const InputDecoration(labelText: 'Contraseña actual'), validator: (v) => v == null || v.isEmpty ? 'Campo obligatorio' : null),
+                    if (!auth.passwordRecovery)
+                      TextFormField(controller: _current, obscureText: _obscure, decoration: const InputDecoration(labelText: 'Contraseña actual'), validator: (v) => v == null || v.isEmpty ? 'Campo obligatorio' : null),
                     TextFormField(controller: _newPassword, obscureText: _obscure, decoration: const InputDecoration(labelText: 'Nueva contraseña'), validator: (v) => v == null || v.length < 8 ? 'Mínimo 8 caracteres' : null),
                     TextFormField(controller: _confirm, obscureText: _obscure, decoration: const InputDecoration(labelText: 'Repite la nueva contraseña'), validator: (v) => v != _newPassword.text ? 'Las contraseñas no coinciden' : null),
                     CheckboxListTile(value: !_obscure, onChanged: (v) => setState(() => _obscure = !(v ?? false)), title: const Text('Mostrar contraseña'), contentPadding: EdgeInsets.zero),
