@@ -634,3 +634,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Un inicio de sesión normal limpia explícitamente `passwordRecovery` antes de seleccionar club.
 - Añadida cobertura unitaria para impedir que el estado de recuperación se reutilice como una reautenticación normal.
 - La prueba real del flujo completo Web/Chrome y staging permanece abierta por requerir infraestructura externa.
+
+### 2026-09-27 — GPT-5.6 LUNA — cierre de accesos rápidos del dashboard
+- El acceso directo a notificaciones se muestra solo con `notifications_view`.
+- El enlace `Ver socios` del estado operativo se muestra solo con `members_view`.
+- Se evita que el dashboard presente accesos a rutas que el usuario no puede abrir.
