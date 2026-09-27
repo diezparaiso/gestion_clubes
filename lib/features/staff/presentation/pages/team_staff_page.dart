@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Alta, edición y activación del personal usando team_staff existente.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Gestión de personal visible solo con teams_manage.
 
 import '../../../auth/application/auth_controller.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
@@ -42,6 +43,8 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = ref.watch(authControllerProvider);
+    final canManage = ClubRolePermissions.has(auth.role, 'teams_manage');
     final teamId = widget.teamId;
     final teamName = widget.teamName;
     final staff = ref.watch(teamStaffProvider(teamId));
@@ -52,7 +55,7 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Expanded(child: Text('Cuerpo técnico', style: Theme.of(context).textTheme.headlineMedium)),
-            FilledButton.icon(onPressed: _newStaff, icon: const Icon(Icons.person_add_alt_1), label: const Text('Añadir personal')),
+            FilledButton.icon(onPressed: canManage ? _newStaff : null, icon: const Icon(Icons.person_add_alt_1), label: const Text('Añadir personal')),
           ]),
           const SizedBox(height: 8),
           const Text('Entrenadores y personal asignado a este equipo.'),
@@ -70,7 +73,7 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
                   leading: const CircleAvatar(backgroundColor: Color(0xFFE8EFEC), child: Icon(Icons.sports_outlined, color: Color(0xFF168B68))),
                   title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.w700)),
                   subtitle: Text(member.role),
-                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [member.isActive ? const Icon(Icons.check_circle_outline, color: Color(0xFF168B68)) : const Icon(Icons.cancel_outlined, color: Color(0xFF9BA9BC)), IconButton(tooltip: 'Editar personal', onPressed: () => _editStaff(member), icon: const Icon(Icons.edit_outlined))]),
+                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [member.isActive ? const Icon(Icons.check_circle_outline, color: Color(0xFF168B68)) : const Icon(Icons.cancel_outlined, color: Color(0xFF9BA9BC)), if (canManage) IconButton(tooltip: 'Editar personal', onPressed: () => _editStaff(member), icon: const Icon(Icons.edit_outlined))]),
                 );
               },
             )),
