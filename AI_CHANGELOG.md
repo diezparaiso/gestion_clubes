@@ -571,3 +571,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregidos los imports de navegación que habían quedado con `.dart;` en lugar de `.dart';` en las páginas afectadas y en `lib/app/router.dart`.
 - La corrección es sintáctica y no cambia la lógica funcional de los módulos.
 - No se modifica Supabase remoto ni Payments.
+
+
+### 2026-09-27 — GPT-5.6 LUNA — sincronización de cierre funcional
+- Confirmado el cierre funcional de Notificaciones: búsqueda, filtro de no leídas y marcado individual/global usan el repositorio existente.
+- Confirmado el cierre funcional de Mis rifas: suscripciones mensuales, participaciones pagadas y comprobante consultable/copiable están disponibles en la aplicación.
+- Los PDF, emails y confirmaciones de pago reales permanecen pendientes porque dependen de `club_payments_backend`/Stripe, actualmente en standby.
+- Actualizado `PENDIENTES.md` para distinguir pruebas externas y dependencias reales de módulos ya cerrados.
+- No se modifica Supabase remoto ni Payments/Stripe.
