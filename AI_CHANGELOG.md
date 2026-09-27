@@ -1,3 +1,12 @@
+### 2026-09-27 — GPT-5.6 LUNA — alineación inicial de RLS con permisos view/manage
+- Añadida la migración `038_permissions_rls_alignment.sql`.
+- Socios, equipos, jugadores, tesorería, rifas, noticias, eventos y configuración usan `has_club_permission` en sus operaciones protegidas.
+- La lectura de tesorería deja de depender de `is_club_manager` y pasa a respetar `finance_view`.
+- Jugadores pasan a respetar `players_manage`; staff mantiene `teams_manage` porque no existe un permiso `staff_manage`.
+- Gestión de accesos y auditoría quedan bajo `access_manage`.
+- No se ejecuta la migración en Supabase remoto.
+- Payments/Stripe permanece sin cambios.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre de jugadores, staff, noticias y configuración
 - Alta y edición de jugadores condicionadas a `players_manage`, manteniendo la consulta para `players_view`.
 - Alta y edición de personal condicionadas a `teams_manage`, sin crear un permiso nuevo mientras el modelo RLS actual usa `is_club_manager`.
