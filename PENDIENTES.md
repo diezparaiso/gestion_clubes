@@ -45,6 +45,7 @@
 - [ ] Crear/configurar ads.txt con el pub-... real.
 - [ ] Configurar una CMP certificada por Google e integrada con IAB TCF para anuncios personalizados en EEE, Reino Unido y Suiza.
 - [x] Añadir bloqueo local previo a cualquier solicitud AdSense y persistir la decisión del usuario.
+- [x] Añadir página pública de privacidad/cookies y permitir revisar o cambiar la preferencia publicitaria.
 - [ ] Revisar política de privacidad/cookies y consentimiento con el texto jurídico definitivo.
 - [ ] Activar Auto ads en la cuenta.
 - [ ] Ajustar anclas y barras laterales para que no sean invasivas.
