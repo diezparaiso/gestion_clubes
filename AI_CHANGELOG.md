@@ -660,3 +660,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregida la consulta de participaciones pagadas para usar `raffle_tickets.buyer_profile_id`.
 - La pantalla `Mis rifas` queda alineada con el esquema real de participaciones.
 - No se modifica Supabase remoto ni Payments/Stripe.
+
+### 2026-09-27 — GPT-5.6 LUNA — auditoría de acciones de módulos
+- Equipos: edición y activación quedan detrás de `teams_manage`.
+- Socios: `Cobrar cuota` requiere `members_manage` y `finance_manage`, porque registra también el movimiento de tesorería.
+- Tesorería y Eventos mantienen sus acciones alineadas con `finance_manage` y `events_manage` respectivamente.
+- No se modifica Supabase remoto ni Payments/Stripe.
