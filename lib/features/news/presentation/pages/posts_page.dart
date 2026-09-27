@@ -112,13 +112,17 @@ class _PostCard extends StatelessWidget {
       subtitle: Text(post.body, maxLines: 2, overflow: TextOverflow.ellipsis),
       trailing: Row(mainAxisSize: MainAxisSize.min, children: [
         Chip(label: Text(_statusLabel()), side: BorderSide.none),
-        PopupMenuButton<String>(
-          onSelected: (value) { if (value == 'edit') onEdit(); if (value == 'delete') onDelete(); },
-          itemBuilder: (_) => const [
-            PopupMenuItem(value: 'edit', child: Text('Editar')),
-            PopupMenuItem(value: 'delete', child: Text('Eliminar')),
-          ],
-        ),
+        if (onEdit != null || onDelete != null)
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'edit' && onEdit != null) onEdit!();
+              if (value == 'delete' && onDelete != null) onDelete!();
+            },
+            itemBuilder: (_) => [
+              if (onEdit != null) const PopupMenuItem(value: 'edit', child: Text('Editar')),
+              if (onDelete != null) const PopupMenuItem(value: 'delete', child: Text('Eliminar')),
+            ],
+          ),
       ]),
     ),
   );
