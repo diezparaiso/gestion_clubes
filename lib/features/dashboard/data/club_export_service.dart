@@ -40,22 +40,30 @@ class ClubExportService {
         ['Fecha de exportación', DateTime.now().toIso8601String()],
         ['Modo', 'Datos de demostración'],
       ]);
-      _writeSheet(workbook, 'Tesorería', [
-        ['ID', 'Tipo', 'Categoría', 'Importe', 'Descripción', 'Fecha'],
-        ...finance.map((t) => [t.id, t.type.name, t.category, t.amount, t.description, t.date.toIso8601String()]),
-      ]);
-      _writeSheet(workbook, 'Socios', [
-        ['Número', 'Nombre', 'Email', 'Estado', 'Tipo', 'Alta', 'Renovación', 'Baja', 'Dirección', 'CP', 'Ciudad', 'Provincia', 'País', 'Notas'],
-        ...members.map((m) => [m.memberNumber, m.name, m.email, m.status.name, m.membershipType.name, m.joinDate.toIso8601String(), m.renewalDate?.toIso8601String() ?? '', m.leaveDate?.toIso8601String() ?? '', m.address ?? '', m.postalCode ?? '', m.city ?? '', m.province ?? '', m.country, m.notes ?? '']),
-      ]);
-      _writeSheet(workbook, 'Equipos', [
-        ['ID', 'Equipo', 'Categoría', 'Temporada', 'Activo'],
-        ...teams.map((t) => [t.id, t.name, t.category, t.seasonName, t.isActive]),
-      ]);
-      _writeSheet(workbook, 'Jugadores', [
-        ['Equipo', 'ID', 'Nombre', 'Dorsal', 'Activo', 'Teléfono', 'Responsable', 'Teléfono responsable', 'Email responsable', 'Relación'],
-        ...players.map((p) => [p.team, p.player.id, p.player.name, p.player.jerseyNumber ?? '', p.player.isActive, p.player.phone ?? '', p.player.guardianName ?? '', p.player.guardianPhone ?? '', p.player.guardianEmail ?? '', p.player.guardianRelationship ?? '']),
-      ]);
+      if (allowed.contains('finance_view')) {
+        _writeSheet(workbook, 'Tesorería', [
+          ['ID', 'Tipo', 'Categoría', 'Importe', 'Descripción', 'Fecha'],
+          ...finance.map((t) => [t.id, t.type.name, t.category, t.amount, t.description, t.date.toIso8601String()]),
+        ]);
+      }
+      if (allowed.contains('members_view')) {
+        _writeSheet(workbook, 'Socios', [
+          ['Número', 'Nombre', 'Email', 'Estado', 'Tipo', 'Alta', 'Renovación', 'Baja', 'Dirección', 'CP', 'Ciudad', 'Provincia', 'País', 'Notas'],
+          ...members.map((m) => [m.memberNumber, m.name, m.email, m.status.name, m.membershipType.name, m.joinDate.toIso8601String(), m.renewalDate?.toIso8601String() ?? '', m.leaveDate?.toIso8601String() ?? '', m.address ?? '', m.postalCode ?? '', m.city ?? '', m.province ?? '', m.country, m.notes ?? '']),
+        ]);
+      }
+      if (allowed.contains('teams_view')) {
+        _writeSheet(workbook, 'Equipos', [
+          ['ID', 'Equipo', 'Categoría', 'Temporada', 'Activo'],
+          ...teams.map((t) => [t.id, t.name, t.category, t.seasonName, t.isActive]),
+        ]);
+      }
+      if (allowed.contains('teams_view') && allowed.contains('players_view')) {
+        _writeSheet(workbook, 'Jugadores', [
+          ['Equipo', 'ID', 'Nombre', 'Dorsal', 'Activo', 'Teléfono', 'Responsable', 'Teléfono responsable', 'Email responsable', 'Relación'],
+          ...players.map((p) => [p.team, p.player.id, p.player.name, p.player.jerseyNumber ?? '', p.player.isActive, p.player.phone ?? '', p.player.guardianName ?? '', p.player.guardianPhone ?? '', p.player.guardianEmail ?? '', p.player.guardianRelationship ?? '']),
+        ]);
+      }
       _writeSheet(workbook, 'Noticias', [['Sin datos en modo demostración']]);
       _writeSheet(workbook, 'Eventos', [['Sin datos en modo demostración']]);
       _writeSheet(workbook, 'Rifas', [['Sin datos en modo demostración']]);
