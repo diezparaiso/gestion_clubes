@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): cierre funcional del módulo de rifas.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos de rol a rutas privadas.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -27,6 +28,20 @@ import '../features/raffles/domain/entities/raffle.dart';
 import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
 
+String? _permissionForLocation(String location) {
+  if (location == '/dashboard') return 'dashboard_view';
+  if (location == '/members') return 'members_view';
+  if (location == '/teams' || location.startsWith('/teams/')) return 'teams_view';
+  if (location == '/finance') return 'finance_view';
+  if (location == '/raffles' || location.startsWith('/raffles/')) return 'raffles_view';
+  if (location == '/news') return 'news_view';
+  if (location == '/events') return 'events_view';
+  if (location == '/notifications') return 'notifications_view';
+  if (location == '/settings/access') return 'access_manage';
+  if (location == '/settings') return 'club_settings_view';
+  return null;
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
   return GoRouter(
@@ -43,6 +58,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (isSignedIn && isAuthRoute) return authState.mustChangePassword ? '/profile/password' : '/dashboard';
       if (isSignedIn && authState.mustChangePassword && location != '/profile/password') return '/profile/password';
       if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClub) return '/login';
+      if (isSignedIn && !authState.mustChangePassword) {
+        final requiredPermission = _permissionForLocation(location);
+        if (requiredPermission != null && !ClubRolePermissions.has(authState.role, requiredPermission)) return '/dashboard';
+      }
       return null;
     },
     routes: [
