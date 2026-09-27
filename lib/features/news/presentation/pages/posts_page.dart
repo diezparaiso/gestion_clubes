@@ -34,7 +34,7 @@ class PostsPage extends ConsumerWidget {
           Row(children: [
             Expanded(child: Text('Noticias del club', style: Theme.of(context).textTheme.headlineMedium)),
             IconButton(tooltip: 'Copiar enlace público', onPressed: () async { final clubId = ref.read(authControllerProvider).clubId; if (clubId == null) return; final club = await ref.read(clubRepositoryProvider).getClubById(clubId); final url = Uri.base.replace(path: '/club/${club.slug}/news').toString(); await Clipboard.setData(ClipboardData(text: url)); if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público de noticias copiado.'))); }, icon: const Icon(Icons.link_outlined)), const SizedBox(width: 8),
-            FilledButton.icon(onPressed: () => _showPostDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nueva noticia')),
+            FilledButton.icon(onPressed: canManage ? () => _showPostDialog(context, ref) : null, icon: const Icon(Icons.add), label: const Text('Nueva noticia')),
           ]),
           const SizedBox(height: 8),
           const Text('Publica avisos y novedades para la comunidad.'),
@@ -51,8 +51,8 @@ class PostsPage extends ConsumerWidget {
                       final post = items[index];
                       return _PostCard(
                         post: post,
-                        onEdit: () => _showPostDialog(context, ref, post: post),
-                        onDelete: () => _deletePost(context, ref, post),
+                        onEdit: canManage ? () => _showPostDialog(context, ref, post: post) : null,
+                        onDelete: canManage ? () => _deletePost(context, ref, post) : null,
                       );
                     },
                   ),
@@ -92,8 +92,8 @@ class PostsPage extends ConsumerWidget {
 class _PostCard extends StatelessWidget {
   const _PostCard({required this.post, required this.onEdit, required this.onDelete});
   final Post post;
-  final VoidCallback onEdit;
-  final VoidCallback onDelete;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   String _statusLabel() {
     switch (post.status) {
