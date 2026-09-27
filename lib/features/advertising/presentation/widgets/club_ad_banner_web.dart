@@ -1,4 +1,4 @@
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): banner AdSense real para Flutter Web.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): evita solicitudes AdSense sin consentimiento y usa anuncios no personalizados de forma provisional.
 import 'dart:async';
 import 'dart:js_interop';
 import 'dart:ui_web' as ui_web;
@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:universal_html/html.dart' as html;
 
 import '../../../../core/config/ads_config.dart';
+import '../../../../core/config/ads_consent_service.dart';
+import '../../../../core/config/ads_service.dart';
+import 'ads_consent_banner.dart';
 
 @JS('adsbygoogle.push')
 external void _pushAd(JSObject options);
@@ -35,7 +38,8 @@ class ClubAdBanner extends StatelessWidget {
         ..setAttribute('data-ad-client', AdsConfig.publisherId)
         ..setAttribute('data-ad-slot', AdsConfig.adSlot)
         ..setAttribute('data-ad-format', 'auto')
-        ..setAttribute('data-full-width-responsive', 'true');
+        ..setAttribute('data-full-width-responsive', 'true')
+        ..setAttribute('data-ad-personalized-ads', 'false');
 
       wrapper.append(ad);
 
@@ -58,6 +62,12 @@ class ClubAdBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!AdsConfig.enabled) return const SizedBox.shrink();
+
+    if (!AdsConsentService.canRequestAds) {
+      return const AdsConsentBanner();
+    }
+
+    AdsService.initialize();
     _register();
 
     return SizedBox(
