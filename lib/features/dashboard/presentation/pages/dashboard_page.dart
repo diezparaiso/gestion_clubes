@@ -11,6 +11,7 @@ import '../../application/dashboard_stats_provider.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Elimina actividad ficticia del dashboard.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade exportación completa de gestión a Excel.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra el rol real del acceso seleccionado.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Filtra navegación y acciones según permisos del rol.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -54,6 +55,14 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
+  bool _can(AuthState authState, String permission) => ClubRolePermissions.has(authState.role, permission);
+
+  String _navigationPermission(int index) => switch (index) {
+    0 => 'dashboard_view', 1 => 'members_view', 2 => 'teams_view', 3 => 'finance_view',
+    4 => 'raffles_view', 5 => 'news_view', 6 => 'events_view', 7 => 'club_settings_view',
+    _ => 'dashboard_view',
+  };
+
   Widget _buildSidebar(BuildContext context, AuthState authState) {
     return Container(
       width: 248,
@@ -90,6 +99,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           const SizedBox(height: 12),
           ...List.generate(_navigationItems.length, (index) {
             final item = _navigationItems[index];
+            if (!_can(authState, _navigationPermission(index))) return const SizedBox.shrink();
             return _NavigationTile(
               icon: item.$1,
               label: item.$2,
@@ -227,16 +237,18 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   }
 
   Widget _buildQuickActions(bool isDesktop) {
+    final authState = ref.read(authControllerProvider);
     final actions = [
-      (Icons.person_add_alt_1_outlined, 'Nuevo socio', const Color(0xFF168B68), '/members'),
-      (Icons.add_chart_outlined, 'Registrar ingreso', const Color(0xFF3276B1), '/finance'),
-      (Icons.receipt_long_outlined, 'Registrar gasto', const Color(0xFFD27A2C), '/finance'),
-      (Icons.local_activity_outlined, 'Crear rifa', const Color(0xFF8B5E9E), '/raffles'),
+      (Icons.person_add_alt_1_outlined, 'Nuevo socio', const Color(0xFF168B68), '/members', 'members_manage'),
+      (Icons.add_chart_outlined, 'Registrar ingreso', const Color(0xFF3276B1), '/finance', 'finance_manage'),
+      (Icons.receipt_long_outlined, 'Registrar gasto', const Color(0xFFD27A2C), '/finance', 'finance_manage'),
+      (Icons.local_activity_outlined, 'Crear rifa', const Color(0xFF8B5E9E), '/raffles', 'raffles_manage'),
     ];
+    final visibleActions = actions.where((action) => _can(authState, action.$5)).toList();
     return Wrap(
       spacing: 12,
       runSpacing: 12,
-      children: actions.map((action) {
+      children: visibleActions.map((action) {
         return SizedBox(
           width: isDesktop ? 190 : double.infinity,
           child: OutlinedButton.icon(
@@ -337,9 +349,16 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   String _formatCurrency(double value) => '${value.toStringAsFixed(2).replaceAll('.', ',')} €';
 
   Widget _buildBottomNavigation() {
+    final authState = ref.read(authControllerProvider);
+    final visibleEntries = List.generate(_navigationItems.length, (index) => (index, _navigationItems[index]))
+        .where((entry) => _can(authState, _navigationPermission(entry.$1)))
+        .toList();
+    final selectedVisibleIndex = visibleEntries.indexWhere((entry) => entry.$1 == _selectedIndex);
     return NavigationBar(
+      selectedIndex: selectedVisibleIndex < 0 ? 0 : selectedVisibleIndex,
       selectedIndex: _selectedIndex,
-      onDestinationSelected: (index) {
+      onDestinationSelected: (visibleIndex) {
+        final index = visibleEntries[visibleIndex].$1;
         setState(() => _selectedIndex = index);
         if (index == 1) context.go('/members');
         if (index == 2) context.go('/teams');
@@ -349,8 +368,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         if (index == 6) context.go('/events');
         if (index == 7) context.go('/settings');
       },
-      destinations: _navigationItems
-          .map((item) => NavigationDestination(icon: Icon(item.$1), label: item.$2))
+      destinations: visibleEntries
+          .map((entry) => NavigationDestination(icon: Icon(entry.$2.$1), label: entry.$2.$2))
           .toList(),
     );
   }
