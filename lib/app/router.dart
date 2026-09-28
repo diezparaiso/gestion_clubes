@@ -32,8 +32,10 @@ import '../features/sponsors/presentation/pages/public_sponsors_page.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): expone la matriz de permisos para cobertura unitaria.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): integra rutas internas y públicas de patrocinadores.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierra protección de perfil y Mis rifas para usuarios autenticados.
 String? permissionForLocation(String location) {
   if (location == '/dashboard') return 'dashboard_view';
+  if (location == '/my-raffles') return 'dashboard_view';
   if (location == '/members') return 'members_view';
   if (location == '/teams') return 'teams_view';
   if (RegExp(r'^/teams/[^/]+/players(?:/|$)').hasMatch(location)) return 'players_view';
@@ -57,6 +59,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final location = state.uri.path;
       final isAuthRoute = location == '/login' || location == '/register';
+      final isPublicRoute = isAuthRoute || location == '/privacy' || location.startsWith('/r/') || location.startsWith('/club/');
       final isPublicRaffle = location.startsWith('/r/');
       final isPublicClub = location.startsWith('/club/');
       final isPublicPrivacy = location == '/privacy';
@@ -67,7 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       if (needsClub && location != '/onboarding') return '/onboarding';
       if (isSignedIn && isAuthRoute) return authState.mustChangePassword ? '/profile/password' : '/dashboard';
       if (isSignedIn && authState.mustChangePassword && location != '/profile/password') return '/profile/password';
-      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClub && !isPublicPrivacy && !isPublicSponsors) return '/login';
+      if (!isSignedIn && !needsClub && !isPublicRoute) return '/login';
       if (isSignedIn && !authState.mustChangePassword) {
         final requiredPermission = permissionForLocation(location);
         if (requiredPermission != null && !ClubRolePermissions.has(authState.role, requiredPermission)) return '/dashboard';
