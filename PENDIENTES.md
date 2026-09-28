@@ -112,3 +112,38 @@
 5. Activar renovación mensual real.
 6. Configurar AdSense/CMP.
 7. Pruebas completas de producción.
+
+## 7. Trabajo de desarrollo en curso — 2026-09-28
+
+### Implementado en rama `ai/non-payments-development`
+- [x] Mejorado responsive de Socios: cabecera, buscador y filtros.
+- [x] Mejorado responsive de Tesorería: cabecera, buscador y filtros.
+- [x] Mejorado responsive de Eventos: cabecera, buscador y filtro público.
+- [x] Mejorado responsive de Equipos: cabecera, buscador y filtro de inactivos.
+- [x] Todos estos cambios quedan aislados de Supabase remoto y Payments/Stripe.
+- [x] Registrados los cambios en `AI_CHANGELOG.md`.
+- [x] Marcados los cuatro archivos fuente modificados con `MODIFICADO POR GPT-5.6 LUNA`.
+
+### Próximo bloque sin pagos
+- [ ] Auditoría responsive del resto de pantallas.
+- [ ] Revisar UX de dashboard y navegación móvil.
+- [ ] Completar/repasar CRUD y estados de Noticias.
+- [ ] Revisar módulo de patrocinadores/publicidad del club.
+- [ ] Revisar centro de Notificaciones y estados vacíos/error.
+- [ ] Revisar Perfil y gestión de cuenta.
+- [ ] Auditoría integral Equipos → Jugadores → Personal.
+- [ ] Auditoría de Rifas excluyendo checkout/pago real.
+- [ ] Mejorar mensajes de error y estados de carga de la aplicación.
+- [ ] Ampliar tests unitarios que no dependan de Supabase/Stripe.
+- [ ] Revisar permisos de UI frente a `*_view` / `*_manage`.
+- [ ] Revisar PWA y comportamiento móvil/tablet/escritorio.
+
+### Bloqueado deliberadamente
+- [ ] Integración real de `club_payments`.
+- [ ] Integración de `club_payments_backend`.
+- [ ] Stripe Connect, Checkout, PaymentIntent, webhooks e idempotencia.
+- [ ] Suscripciones y renovaciones reales.
+- [ ] Cualquier cambio remoto en Supabase.
+- [ ] Cualquier despliegue de migraciones/RPC/Edge Functions que requiera validación externa.
+
+> Regla de trabajo: cualquier archivo modificado por ChatGPT debe llevar un marcador `MODIFICADO POR GPT-5.6 LUNA` y cada intervención debe registrarse también en `AI_CHANGELOG.md`. No se consideran terminadas las tareas que dependan de infraestructura externa hasta validarlas allí.
