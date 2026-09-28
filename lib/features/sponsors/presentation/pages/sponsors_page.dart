@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/sponsor_repository.dart';
 import '../../domain/entities/sponsor.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): integra navegación y control de gestión del módulo.
 class SponsorsPage extends ConsumerWidget {
   const SponsorsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clubId = ref.watch(authControllerProvider).clubId;
+    final auth = ref.watch(authControllerProvider);
+    final clubId = auth.clubId;
+    final canManage = auth.role == 'club_president';
 
     if (clubId == null) {
       return const Scaffold(
@@ -21,16 +25,18 @@ class SponsorsPage extends ConsumerWidget {
     final sponsorsAsync = ref.watch(clubSponsorsProvider(clubId));
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: const ClubNavigationAppBar(title: 'Patrocinadores'),
+      /*
         title: const Text('Patrocinadores'),
         actions: [
           IconButton(
             icon: const Icon(Icons.business_outlined),
             tooltip: 'Nuevo patrocinador',
-            onPressed: () => _showCreateDialog(context, ref, clubId),
+            onPressed: canManage ? () => _showCreateDialog(context, ref, clubId) : null,
           ),
         ],
       ),
+      */
       body: sponsorsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
@@ -45,6 +51,7 @@ class SponsorsPage extends ConsumerWidget {
                 itemBuilder: (context, index) => _SponsorCard(
                   sponsor: sponsors[index],
                   clubId: clubId,
+                  canManage: canManage,
                   onChanged: () {
                     ref.invalidate(clubSponsorsProvider(clubId));
                     ref.invalidate(activeSponsorsProvider(clubId));
@@ -71,11 +78,13 @@ class SponsorsPage extends ConsumerWidget {
 class _SponsorCard extends ConsumerWidget {
   final Sponsor sponsor;
   final String clubId;
+  final bool canManage;
   final VoidCallback onChanged;
 
   const _SponsorCard({
     required this.sponsor,
     required this.clubId,
+    required this.canManage,
     required this.onChanged,
   });
 
@@ -209,13 +218,13 @@ class _SponsorCard extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton.icon(
-                      onPressed: () => _showEditDialog(context, ref),
+                      onPressed: canManage ? () => _showEditDialog(context, ref) : null,
                       icon: const Icon(Icons.edit_outlined),
                       label: const Text('Editar'),
                     ),
                     const SizedBox(width: 8),
                     FilledButton.icon(
-                      onPressed: () => _togglePublic(ref),
+                      onPressed: canManage ? () => _togglePublic(ref) : null,
                       icon: Icon(
                         sponsor.isPublic
                             ? Icons.visibility_outlined
