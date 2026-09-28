@@ -1098,3 +1098,12 @@ This file is the permanent handoff log between AI assistants working on this rep
 - No se modifican migraciones, RPC, políticas ni Supabase remoto.
 - No se modifican Stripe, `club_payments` ni `club_payments_backend`.
 - Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — estados de error de Plantilla, Personal y Equipos
+- `team_players_page.dart`: el error de carga permite reintentar mediante el proveedor de plantilla.
+- `team_staff_page.dart`: el error de carga permite reintentar mediante el proveedor de personal.
+- `teams_page.dart`: el error de carga del listado de equipos permite reintentar mediante su proveedor.
+- Se mantienen las consultas y permisos existentes.
+- No se modifica Supabase remoto ni Payments/Stripe.
+- Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
