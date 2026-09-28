@@ -1,7 +1,7 @@
 <!-- MODIFICADO POR GPT-5.6 LUNA (2026-09-27): sincroniza el inventario de módulos cerrados y pendientes reales. -->
 # PENDIENTES DEL PROYECTO
 
-> Última actualización: 2026-09-27 — GPT-5.6 LUNA
+> Última actualización: 2026-09-28 — GPT-5.6 LUNA
 
 > Los puntos marcados como pendientes de staging, Supabase, proveedores o producción requieren una validación externa y no se cierran solo con cambios de código.
 > Inventario de trabajo pendiente. La trazabilidad cronológica permanece en AI_CHANGELOG.md.
@@ -128,8 +128,7 @@
 - [x] Cerrar módulo de Patrocinadores: gestión interna, rutas, navegación y escaparate público.
 - [ ] Auditoría responsive del resto de pantallas.
 - [ ] Revisar UX de dashboard y navegación móvil.
-- [ ] Completar/repasar CRUD y estados de Noticias.
-- [ ] Revisar módulo de patrocinadores/publicidad del club.
+- [x] Completar/repasar CRUD y estados de Noticias.
 - [ ] Revisar centro de Notificaciones y estados vacíos/error.
 - [ ] Revisar Perfil y gestión de cuenta.
 - [ ] Auditoría integral Equipos → Jugadores → Personal.
