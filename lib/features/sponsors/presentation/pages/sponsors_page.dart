@@ -243,7 +243,7 @@ class _SponsorCard extends ConsumerWidget {
     ).then((_) => onChanged());
   }
 
-  Future<void> _togglePublic(WidgetRef ref) async {
+  Future<void> _togglePublic(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(sponsorRepositoryProvider).updateSponsor(
             sponsorId: sponsor.id,
@@ -258,7 +258,6 @@ class _SponsorCard extends ConsumerWidget {
           );
       onChanged();
     } catch (e) {
-      final context = ref.context;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se ha podido cambiar la visibilidad: $e')));
     }
   }
