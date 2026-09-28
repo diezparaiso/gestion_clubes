@@ -1,3 +1,26 @@
+## 2026-09-28 — GPT-5.6 LUNA — consistencia de navegación pública
+
+### Cambios realizados
+- `lib/features/events/presentation/pages/public_events_page.dart`
+  - Añadido botón **Acceder** en la cabecera pública.
+- `lib/features/news/presentation/pages/public_posts_page.dart`
+  - Añadido botón **Acceder** en la cabecera pública.
+- `lib/features/sponsors/presentation/pages/public_sponsors_page.dart`
+  - Añadido botón **Acceder** en la cabecera pública.
+- Las tres páginas reutilizan la ruta existente `/login`.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+
+### Revisión adicional
+- Se ha comprobado que el modelo actual de equipos no dispone de una consulta pública equivalente a las de noticias/eventos.
+- Las tablas `teams` y `seasons` tienen políticas de lectura para usuarios autenticados, por lo que no se ha creado una falsa página pública de equipos que dependa de datos que un visitante anónimo no puede consultar.
+- La publicación pública de equipos queda pendiente de diseñar/validar dentro del modelo de acceso de Supabase, sin tocarlo en esta ronda.
+
+### Estado
+- Navegación pública: coherente con acceso al login desde home, noticias, eventos y patrocinadores.
+- Equipos públicos: pendiente por dependencia del modelo de acceso de datos.
+- Pendiente validación visual/compilación en Flutter Web/Chrome.
+
 ## 2026-09-28 — GPT-5.6 LUNA — actualidad real en la home pública
 
 ### Cambios realizados
