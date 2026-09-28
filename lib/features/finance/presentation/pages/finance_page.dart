@@ -51,75 +51,93 @@ class _FinancePageState extends ConsumerState<FinancePage> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(child: Text('Control financiero', style: Theme.of(context).textTheme.headlineMedium)),
-              IconButton(onPressed: () => _exportTransactions(context, ref), tooltip: 'Exportar CSV', icon: const Icon(Icons.download_outlined)),
-              const SizedBox(width: 8),
-              if (ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'finance_manage'))
-                FilledButton.icon(onPressed: () => _showTransactionDialog(context, ref), icon: const Icon(Icons.add_chart_outlined), label: const Text('Nuevo movimiento')),
-            ]),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text('Control financiero', style: Theme.of(context).textTheme.headlineMedium),
+                IconButton(
+                  onPressed: () => _exportTransactions(context, ref),
+                  tooltip: 'Exportar CSV',
+                  icon: const Icon(Icons.download_outlined),
+                ),
+                if (ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'finance_manage'))
+                  FilledButton.icon(
+                    onPressed: () => _showTransactionDialog(context, ref),
+                    icon: const Icon(Icons.add_chart_outlined),
+                    label: const Text('Nuevo movimiento'),
+                  ),
+              ],
+            ),
             const SizedBox(height: 8),
             const Text('Registra ingresos y gastos y consulta el saldo del club.'),
             const SizedBox(height: 16),
-            Row(children: [
-              Expanded(child: TextField(
-                controller: _searchController,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  hintText: 'Buscar descripción o categoría',
-                  prefixIcon: Icon(Icons.search),
-                ),
-              )),
-              const SizedBox(width: 12),
-              DropdownButton<TransactionType?>(
-                value: _typeFilter,
-                hint: const Text('Tipo'),
-                items: [
-                  const DropdownMenuItem<TransactionType?>(
-                    value: null,
-                    child: Text('Todos'),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 240, maxWidth: 520),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (_) => setState(() {}),
+                    decoration: const InputDecoration(
+                      hintText: 'Buscar descripción o categoría',
+                      prefixIcon: Icon(Icons.search),
+                    ),
                   ),
-                  ...TransactionType.values.map(
-                    (type) => DropdownMenuItem<TransactionType?>(
-                      value: type,
-                      child: Text(
-                        type == TransactionType.income ? 'Ingresos' : 'Gastos',
+                ),
+                DropdownButton<TransactionType?>(
+                  value: _typeFilter,
+                  hint: const Text('Tipo'),
+                  items: [
+                    const DropdownMenuItem<TransactionType?>(
+                      value: null,
+                      child: Text('Todos'),
+                    ),
+                    ...TransactionType.values.map(
+                      (type) => DropdownMenuItem<TransactionType?>(
+                        value: type,
+                        child: Text(
+                          type == TransactionType.income ? 'Ingresos' : 'Gastos',
+                        ),
                       ),
                     ),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _typeFilter = value),
-              ),
-              const SizedBox(width: 12),
-              DropdownButton<String?>(
-                value: _categoryFilter,
-                hint: const Text('Categoría'),
-                items: [
-                  const DropdownMenuItem<String?>(
-                    value: null,
-                    child: Text('Todas'),
-                  ),
-                  ...const [
-                    'membership',
-                    'sponsorship',
-                    'raffle',
-                    'event',
-                    'equipment',
-                    'federation',
-                    'facilities',
-                    'salaries',
-                    'supplies',
-                    'other',
-                  ].map(
-                    (category) => DropdownMenuItem<String?>(
-                      value: category,
-                      child: Text(_categoryLabel(category)),
+                  ],
+                  onChanged: (value) => setState(() => _typeFilter = value),
+                ),
+                DropdownButton<String?>(
+                  value: _categoryFilter,
+                  hint: const Text('Categoría'),
+                  items: [
+                    const DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text('Todas'),
                     ),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _categoryFilter = value),
-              ),
-            ]),
+                    ...const [
+                      'membership',
+                      'sponsorship',
+                      'raffle',
+                      'event',
+                      'equipment',
+                      'federation',
+                      'facilities',
+                      'salaries',
+                      'supplies',
+                      'other',
+                    ].map(
+                      (category) => DropdownMenuItem<String?>(
+                        value: category,
+                        child: Text(_categoryLabel(category)),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) => setState(() => _categoryFilter = value),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
             Expanded(child: transactions.when(
               loading: () => const Center(child: CircularProgressIndicator()),
