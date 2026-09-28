@@ -39,15 +39,61 @@ class _EventsPageState extends ConsumerState<EventsPage> {
     final events = ref.watch(eventsProvider);
     final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'events_manage');
     return Scaffold(appBar: const ClubNavigationAppBar(title: 'Eventos'), body: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [Expanded(child: Text('Agenda del club', style: Theme.of(context).textTheme.headlineMedium)), IconButton(tooltip: 'Copiar enlace público', onPressed: () async { final clubId = ref.read(authControllerProvider).clubId; if (clubId == null) return; final club = await ref.read(clubRepositoryProvider).getClubById(clubId); final url = Uri.base.replace(path: '/club/${club.slug}/events').toString(); await Clipboard.setData(ClipboardData(text: url)); if (!context.mounted) return; ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público de la agenda copiado.'))); }, icon: const Icon(Icons.link_outlined)), const SizedBox(width: 8), if (canManage) FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nuevo evento'))]),
+      Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text('Agenda del club', style: Theme.of(context).textTheme.headlineMedium),
+          IconButton(
+            tooltip: 'Copiar enlace público',
+            onPressed: () async {
+              final clubId = ref.read(authControllerProvider).clubId;
+              if (clubId == null) return;
+              final club = await ref.read(clubRepositoryProvider).getClubById(clubId);
+              final url = Uri.base.replace(path: '/club/' + club.slug + '/events').toString();
+              await Clipboard.setData(ClipboardData(text: url));
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Enlace público de la agenda copiado.')),
+              );
+            },
+            icon: const Icon(Icons.link_outlined),
+          ),
+          if (canManage)
+            FilledButton.icon(
+              onPressed: () => _showCreateDialog(context, ref),
+              icon: const Icon(Icons.add),
+              label: const Text('Nuevo evento'),
+            ),
+        ],
+      ),
       const SizedBox(height: 8),
       const Text('Organiza partidos, reuniones y actividades del club.'),
       const SizedBox(height: 16),
-      Row(children: [
-        Expanded(child: TextField(controller: _searchController, onChanged: (_) => setState(() {}), decoration: const InputDecoration(hintText: 'Buscar evento, ubicación o descripción', prefixIcon: Icon(Icons.search)))),
-        const SizedBox(width: 12),
-        FilterChip(label: const Text('Solo públicos'), selected: _publicOnly, onSelected: (value) => setState(() => _publicOnly = value)),
-      ]),
+      Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 240, maxWidth: 520),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (_) => setState(() {}),
+              decoration: const InputDecoration(
+                hintText: 'Buscar evento, ubicación o descripción',
+                prefixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
+          FilterChip(
+            label: const Text('Solo públicos'),
+            selected: _publicOnly,
+            onSelected: (value) => setState(() => _publicOnly = value),
+          ),
+        ],
+      ),
       const SizedBox(height: 24),
       Expanded(child: events.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar los eventos.')), data: (items) {
         final query = _searchController.text.trim().toLowerCase();
