@@ -1087,3 +1087,14 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Añadido un mensaje no bloqueante que explica que se puede continuar trabajando en el módulo.
 - No se modifica Supabase remoto ni Payments/Stripe.
 - Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — estados de Noticias y Eventos
+- `lib/features/news/presentation/pages/posts_page.dart`
+  - Cabecera adaptada a anchuras reducidas mediante `Wrap`.
+  - El error de carga ahora permite reintentar mediante `postsProvider` sin salir de Noticias.
+- `lib/features/events/presentation/pages/events_page.dart`
+  - El error de carga ahora permite reintentar mediante `eventsProvider` sin salir de Eventos.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+- Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
