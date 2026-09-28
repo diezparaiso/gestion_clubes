@@ -2,7 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/services/supabase_service.dart';
 import '../../data/repositories/sponsor_repository.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/sponsor.dart';
 
 class PublicSponsorsPage extends StatefulWidget {
@@ -20,7 +22,8 @@ class _PublicSponsorsPageState extends State<PublicSponsorsPage> {
   @override
   void initState() {
     super.initState();
-    _sponsors = SponsorRepository(null).getPublicSponsors(widget.clubSlug);
+    final client = SupabaseService.isConfigured ? Supabase.instance.client : null;
+    _sponsors = SponsorRepository(client).getPublicSponsors(widget.clubSlug);
   }
 
   @override
