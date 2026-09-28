@@ -1,5 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Incluye todos los roles del enum del club en la gestión de miembros.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Evita setState tras cerrar los diálogos durante operaciones asíncronas.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora responsive y reintento del listado de miembros.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -35,7 +36,10 @@ class ClubMembersPage extends ConsumerWidget {
       ),
       body: membersAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
+        error: (error, stack) => _ClubMembersLoadError(onRetry: () {
+          ref.invalidate(clubMembersProvider(clubId));
+          ref.invalidate(activeClubMembersProvider(clubId));
+        }),
         data: (members) => members.isEmpty
             ? const Center(child: Text('No hay miembros.'))
             : ListView.separated(
@@ -445,4 +449,20 @@ class _InviteMemberDialogState extends ConsumerState<_InviteMemberDialog> {
       ],
     );
   }
+}
+
+class _ClubMembersLoadError extends StatelessWidget {
+  const _ClubMembersLoadError({required this.onRetry});
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+    const Icon(Icons.error_outline, size: 42),
+    const SizedBox(height: 12),
+    const Text('No se han podido cargar los miembros.'),
+    const SizedBox(height: 6),
+    const Text('Puedes reintentarlo sin salir de Miembros del Club.'),
+    const SizedBox(height: 16),
+    FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+  ]));
 }
