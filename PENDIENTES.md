@@ -128,6 +128,11 @@
 - [x] Centro de Notificaciones.
 - [x] Flujo Equipos → Jugadores → Personal.
 
+### Navegación pública
+- [x] Mantener acceso **Acceder** desde la home pública.
+- [x] Añadir acceso **Acceder** también en Noticias, Eventos y Patrocinadores públicos.
+- [ ] Diseñar/validar consulta pública de Equipos sin exponer datos privados; no crear una página pública contra las tablas actuales mientras su lectura siga restringida a usuarios autenticados.
+
 ### Próximo bloque sin pagos
 - [x] Cerrar módulo de Patrocinadores: gestión interna, rutas, navegación y escaparate público.
 - [ ] Auditoría responsive del resto de pantallas.
