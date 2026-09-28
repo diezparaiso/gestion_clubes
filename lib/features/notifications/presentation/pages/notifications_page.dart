@@ -6,6 +6,7 @@ import '../../data/repositories/notification_delivery_repository.dart';
 import '../../domain/entities/notification_delivery.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadido filtrado local de notificaciones.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX del módulo, responsive y manejo visible de errores.
 
 /// Provider para obtener las entregas de notificaciones del usuario actual
 final notificationDeliveriesProvider =
@@ -50,11 +51,15 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                     child: Center(
                       child: TextButton(
                         onPressed: () async {
-                          await ref
+                          try {
+                            await ref
                               .read(notificationDeliveryRepositoryProvider)
                               .markAllAsRead();
                           ref.invalidate(notificationDeliveriesProvider);
-                          ref.invalidate(unreadNotificationsProvider);
+                            ref.invalidate(unreadNotificationsProvider);
+                          } catch (error) {
+                            if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se han podido marcar todas: $error')));
+                          }
                         },
                         child: Text('Marcar todas (${unread.length}) como leídas'),
                       ),
@@ -68,11 +73,18 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(children: [
-          Row(children: [
-            Expanded(child: TextField(onChanged: (value) => setState(() => _query = value.trim().toLowerCase()), decoration: const InputDecoration(hintText: 'Buscar notificación', prefixIcon: Icon(Icons.search)))),
-            const SizedBox(width: 12),
-            FilterChip(label: const Text('Solo no leídas'), selected: _onlyUnread, onSelected: (value) => setState(() => _onlyUnread = value)),
-          ]),
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 240, maxWidth: 600),
+                child: TextField(onChanged: (value) => setState(() => _query = value.trim().toLowerCase()), decoration: const InputDecoration(hintText: 'Buscar notificación', prefixIcon: Icon(Icons.search))),
+              ),
+              FilterChip(label: const Text('Solo no leídas'), selected: _onlyUnread, onSelected: (value) => setState(() => _onlyUnread = value)),
+            ],
+          ),
           const SizedBox(height: 16),
           Expanded(child: deliveries.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -93,11 +105,15 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                   itemBuilder: (context, index) => _NotificationDeliveryCard(
                     delivery: filtered[index],
                     onMarkAsRead: () async {
-                      await ref
+                      try {
+                        await ref
                           .read(notificationDeliveryRepositoryProvider)
                           .markAsRead(filtered[index].id);
                       ref.invalidate(notificationDeliveriesProvider);
-                      ref.invalidate(unreadNotificationsProvider);
+                        ref.invalidate(unreadNotificationsProvider);
+                      } catch (error) {
+                        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se ha podido marcar la notificación: $error')));
+                      }
                     },
                   ),
                 );
