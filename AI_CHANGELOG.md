@@ -1,3 +1,18 @@
+## 2026-09-28 — GPT-5.6 LUNA — actualidad real en la home pública
+
+### Cambios realizados
+- lib/features/clubs/presentation/pages/public_club_page.dart
+  - La home pública ahora consulta las noticias y eventos públicos existentes.
+  - Muestra una sección «Actualidad» con la última noticia y el próximo evento cuando existen.
+  - Los bloques enlazan a las páginas públicas completas de noticias y eventos.
+  - No se duplica lógica de acceso a datos: reutiliza los repositorios existentes.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se han modificado Stripe, club_payments ni club_payments_backend.
+
+### Estado
+- Home pública: portada + navegación + actualidad real del club.
+- Pendiente validación visual/compilación en Flutter Web/Chrome.
+
 ## 2026-09-28 — GPT-5.6 LUNA — nueva home pública del club
 
 ### Cambios realizados
