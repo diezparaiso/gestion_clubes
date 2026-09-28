@@ -5,6 +5,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../data/repositories/club_repository.dart';
 import '../../domain/entities/club.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso público a patrocinadores.
+
 class PublicClubPage extends StatefulWidget {
   const PublicClubPage({super.key, required this.clubSlug});
   final String clubSlug;
@@ -55,6 +57,8 @@ class _PublicClubPageState extends State<PublicClubPage> {
               _PublicSection(icon: Icons.article_outlined, title: 'Noticias', description: 'Últimas novedades del club.', onTap: () => context.go('/club/${widget.clubSlug}/news')),
               const SizedBox(height: 12),
               _PublicSection(icon: Icons.event_outlined, title: 'Eventos', description: 'Partidos y actividades próximas.', onTap: () => context.go('/club/${widget.clubSlug}/events')),
+              const SizedBox(height: 12),
+              _PublicSection(icon: Icons.business_outlined, title: 'Patrocinadores', description: 'Empresas que apoyan al club.', onTap: () => context.go('/club/${widget.clubSlug}/sponsors')),
               const SizedBox(height: 12),
               _PublicSection(icon: Icons.confirmation_number_outlined, title: 'Rifas', description: 'Consulta las campañas públicas del club.', onTap: () => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Comparte el enlace de una rifa para abrirla.')))),
             ]),
