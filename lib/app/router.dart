@@ -58,7 +58,7 @@ String? permissionForLocation(String location) {
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/',
     redirect: (context, state) {
       final location = state.uri.path;
       final isAuthRoute = location == '/login' || location == '/register';
