@@ -1,5 +1,7 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade escaparate público de patrocinadores.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade navegación pública consistente y acceso al login.
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -29,7 +31,19 @@ class _PublicSponsorsPageState extends State<PublicSponsorsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Patrocinadores del club')),
+      appBar: AppBar(
+          title: const Text('Patrocinadores del club'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: FilledButton.icon(
+                onPressed: () => context.go('/login'),
+                icon: const Icon(Icons.login, size: 18),
+                label: const Text('Acceder'),
+              ),
+            ),
+          ],
+        ),
       body: FutureBuilder<List<Sponsor>>(
         future: _sponsors,
         builder: (context, snapshot) {
