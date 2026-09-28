@@ -1,5 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): área del socio para consultar rifas, suscripciones y recibos.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX del área Mis rifas; responsive y estados vacíos.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora error y reintento del área Mis rifas.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,7 +37,13 @@ class MyRafflesPage extends ConsumerWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return const Center(child: Text('No se ha podido cargar tu información de rifas.'));
+            return Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.error_outline, size: 42), const SizedBox(height: 12),
+              const Text('No se ha podido cargar tu información de rifas.'),
+              const SizedBox(height: 6), const Text('Puedes reintentarlo sin salir de Mis rifas.'),
+              const SizedBox(height: 16),
+              FilledButton.icon(onPressed: () => (context as Element).markNeedsBuild(), icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+            ]));
           }
 
           final subscriptions = (snapshot.data?[0] as List<Map<String, dynamic>>?) ?? const [];
