@@ -10,6 +10,7 @@ import '../../data/repositories/raffle_repository.dart';
 import '../../domain/entities/raffle.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadida búsqueda y filtro local por estado de rifa.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX del módulo de rifas sin checkout real; responsive y estados de listado.
 
 final rafflesProvider = FutureProvider<List<Raffle>>((ref) {
   final clubId = ref.watch(authControllerProvider).clubId;
@@ -37,15 +38,14 @@ class _RafflesPageState extends ConsumerState<RafflesPage> {
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Rifas'),
       body: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [Expanded(child: Text('Rifas del club', style: Theme.of(context).textTheme.headlineMedium)), if (ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'raffles_manage')) FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nueva rifa'))]),
+        Wrap(spacing: 12, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [Text('Rifas del club', style: Theme.of(context).textTheme.headlineMedium), if (ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'raffles_manage')) FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nueva rifa'))]),
         const SizedBox(height: 8),
         const Text('Gestiona campañas y participaciones en modo simulado.'),
         const SizedBox(height: 16),
-        Row(children: [
-          Expanded(child: TextField(controller: _searchController, onChanged: (_) => setState(() {}), decoration: const InputDecoration(hintText: 'Buscar rifa', prefixIcon: Icon(Icons.search)))),
-          const SizedBox(width: 12),
+        Wrap(spacing: 12, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [
+          ConstrainedBox(constraints: const BoxConstraints(minWidth: 220, maxWidth: 520), child: TextField(controller: _searchController, onChanged: (_) => setState(() {}), decoration: const InputDecoration(hintText: 'Buscar rifa', prefixIcon: Icon(Icons.search), border: OutlineInputBorder()))),
           DropdownButton<RaffleStatus?>(value: _statusFilter, hint: const Text('Estado'), items: [const DropdownMenuItem<RaffleStatus?>(value: null, child: Text('Todos')), ...RaffleStatus.values.map((status) => DropdownMenuItem<RaffleStatus?>(value: status, child: Text(_RaffleCard._statusLabel(status))))], onChanged: (value) => setState(() => _statusFilter = value)),
-        ]),
+         ]),
         const SizedBox(height: 24),
         Expanded(child: raffles.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar las rifas.')), data: (items) {
           final query = _searchController.text.trim().toLowerCase();
