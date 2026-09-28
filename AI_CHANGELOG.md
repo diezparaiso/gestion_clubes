@@ -1,3 +1,19 @@
+## 2026-09-28 — GPT-5.6 LUNA — cierre UX de Perfil y Configuración
+
+### Cambios
+- `lib/features/auth/presentation/pages/profile_page.dart`
+  - Reorganizada la pantalla de perfil.
+  - Mejorados estados de error/guardado y adaptación móvil.
+  - Añadidos autofill hints y navegación de teclado para contraseñas.
+  - Mantiene el flujo existente de recuperación/cambio obligatorio.
+- `lib/features/clubs/presentation/pages/club_settings_page.dart`
+  - Cabecera responsive para pantallas estrechas.
+  - La acción «Usuarios y permisos» pasa a disposición vertical en móvil.
+- No se modifica Supabase remoto ni Payments/Stripe.
+
+### Validación
+Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome.
+
 ## 2026-09-28 — GPT-5.6 LUNA — definición funcional del flujo de incorporación
 
 ### Cambios
