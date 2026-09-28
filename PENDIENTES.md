@@ -173,6 +173,7 @@
 - [x] Cerrar flujo Equipos → Jugadores → Personal: CRUD/estado, navegación, filtros, responsive y estados vacíos.
 - [x] Auditoría de Rifas excluyendo checkout/pago real: listado, detalle, Cesta, Sorteo puro, Mensual, área del socio y página pública.
 - [x] Mejorar mensajes de error y estados de carga del dashboard.\n- [ ] Mejorar mensajes de error y estados de carga del resto de la aplicación.
+- [x] Mejorar estado de error y reintento del listado de Socios.
 - [ ] Ampliar tests unitarios que no dependan de Supabase/Stripe.
 - [ ] Revisar permisos de UI frente a `*_view` / `*_manage`.
 - [ ] Revisar PWA y comportamiento móvil/tablet/escritorio.
