@@ -1072,3 +1072,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Si la consulta falla, muestra un mensaje no bloqueante y permite reintentar sin abandonar el dashboard.
 - Se mantienen los permisos por módulo ya existentes y no se modifica Supabase remoto ni Payments/Stripe.
 - Validación de compilación/análisis y prueba visual en Chrome: pendientes de ejecución local.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — estados de Tesorería
+- Tesorería muestra estados de carga explícitos para movimientos y saldo inicial.
+- Los errores de carga ofrecen un botón de reintento sobre el proveedor afectado.
+- No se modifica Supabase remoto ni Payments/Stripe.
+- Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
