@@ -26,24 +26,11 @@ class SponsorsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Patrocinadores'),
-      /*
-        title: const Text('Patrocinadores'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.business_outlined),
-            tooltip: 'Nuevo patrocinador',
-            onPressed: canManage ? () => _showCreateDialog(context, ref, clubId) : null,
-          ),
-        ],
-      ),
-      */
       body: sponsorsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
         data: (sponsors) => sponsors.isEmpty
-            ? const Center(
-                child: Text('No hay patrocinadores. ¡Agrega uno para generar ingresos!'),
-              )
+            ? const Center(child: Text('No hay patrocinadores.'))
             : ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: sponsors.length,
@@ -58,13 +45,9 @@ class SponsorsPage extends ConsumerWidget {
                   },
                 ),
               ),
-          ),
-        ],
       ),
     );
-  }
-
-  void _showCreateDialog(BuildContext context, WidgetRef ref, String clubId) {
+  }g(BuildContext context, WidgetRef ref, String clubId) {
     showDialog(
       context: context,
       builder: (_) => _SponsorFormDialog(clubId: clubId),
