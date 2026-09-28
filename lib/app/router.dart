@@ -60,7 +60,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isPublicRaffle = location.startsWith('/r/');
       final isPublicClub = location.startsWith('/club/');
       final isPublicPrivacy = location == '/privacy';
-      final isPublicSponsors = RegExp(r'^\/club\/[^/]+\/sponsors
+      final isPublicSponsors = RegExp(r'^/club/[^/]+/sponsors$').hasMatch(location);
       final isSignedIn = authState.status == AuthStatus.signedIn;
       final needsClub = authState.status == AuthStatus.needsClub;
 
