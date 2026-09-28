@@ -1,3 +1,29 @@
+## 2026-09-28 — GPT-5.6 LUNA — landing pública de la plataforma
+
+### Cambios
+- Creado `lib/features/clubs/presentation/pages/platform_home_page.dart`.
+  - Nueva portada pública de la plataforma.
+  - Presenta de forma resumida Socios, Tesorería, Rifas y porras, Noticias/avisos, Patrocinadores y Web pública.
+  - CTA **Incorporar mi club** hacia `/solicitar-incorporacion`.
+  - CTA **Ya tengo acceso** hacia `/login`.
+  - Enlace público a privacidad.
+  - Diseño responsive para móvil, tablet y escritorio.
+- Modificado `lib/app/router.dart`.
+  - Añadida la ruta pública `/`.
+  - La landing no requiere autenticación.
+  - Se mantiene `/login` como acceso al área privada.
+- No se modifica Supabase remoto.
+- No se modifica Stripe, `club_payments` ni `club_payments_backend`.
+- No se almacenan ni transmiten datos desde la landing.
+
+### Arquitectura
+La entrada pública queda separada de la web pública de cada club:
+`/` → plataforma; `/club/:clubSlug` → club; rutas privadas → gestión autenticada.
+La incorporación continúa inicialmente mediante `/solicitar-incorporacion`; el alta autónoma y Stripe Connect quedan para fases posteriores.
+
+### Validación
+Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome después de estos cambios.
+
 ## 2026-09-28 — GPT-5.6 LUNA — endurecimiento de la solicitud de incorporación
 
 ### Cambios
