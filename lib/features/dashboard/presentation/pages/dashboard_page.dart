@@ -220,15 +220,14 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   Widget _buildDashboardStats(BuildContext context, bool isDesktop, AsyncValue<DashboardStats> statsAsync) {
     return statsAsync.when(
       loading: () => _buildStatsLoading(isDesktop),
-      error: (error, stack) => _buildStatsError(context, error, isDesktop),
+      error: (error, stack) => _buildStatsError(context),
       data: (stats) => _buildMetricGrid(isDesktop, stats),
     );
   }
 
   Widget _buildStatsLoading(bool isDesktop) {
-    final width = isDesktop ? double.infinity : double.infinity;
     return SizedBox(
-      width: width,
+      width: double.infinity,
       height: isDesktop ? 154 : 310,
       child: Card(
         child: Center(
@@ -245,7 +244,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  Widget _buildStatsError(BuildContext context, Object error, bool isDesktop) {
+  Widget _buildStatsError(BuildContext context) {
     return SizedBox(
       width: double.infinity,
       child: Card(
