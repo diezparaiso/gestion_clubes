@@ -1,3 +1,15 @@
+## 2026-09-29 — GPT-5.6 LUNA — revisión de páginas públicas y autenticación
+
+### Cambios
+- Corregida la estructura inválida de la marca de acceso en `login_page.dart`.
+- Noticias, Eventos y Patrocinadores públicos incorporan reintento ante errores de carga.
+- Se mantiene el acceso público y el botón «Acceder» existente.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+
+### Validación
+Analyzer/tests y validación visual en Flutter Web/Chrome: pendientes de ejecución.
+
 ## 2026-09-29 — GPT-5.6 LUNA — estados de Rifas
 
 ### Cambios
