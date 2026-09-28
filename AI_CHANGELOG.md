@@ -1,3 +1,43 @@
+## 2026-09-28 — GPT-5.6 LUNA — cierre del módulo de patrocinadores
+
+### Objetivo
+Cerrar el módulo de patrocinadores de extremo a extremo sin tocar Supabase remoto, migraciones, RPC, Stripe ni los módulos de pagos.
+
+### Cambios
+1. `lib/features/sponsors/presentation/pages/sponsors_page.dart`
+   - Integrada la navegación común del club.
+   - Gestión de alta/edición/visibilidad limitada en UI al presidente.
+   - Mejorado el comportamiento responsive de tarjetas y acciones.
+   - Validación de importe anual y fechas del contrato.
+   - Los errores al cambiar visibilidad dejan de ocultarse silenciosamente.
+2. `lib/features/sponsors/presentation/pages/public_sponsors_page.dart`
+   - Nueva página pública para mostrar patrocinadores activos/publicables.
+   - Enlace opcional a la web del patrocinador.
+   - Usa el repositorio existente y su RPC pública cuando Supabase está configurado.
+3. `lib/features/auth/application/auth_controller.dart`
+   - Añadido `sponsors_manage` únicamente al rol `club_president`.
+   - No se cambia ninguna tabla ni política remota.
+4. `lib/app/router.dart`
+   - Ruta interna `/sponsors` protegida por `sponsors_manage`.
+   - Ruta pública `/club/:clubSlug/sponsors`.
+5. `lib/features/dashboard/presentation/widgets/club_navigation_app_bar.dart`
+   - Añadido Patrocinadores a la navegación común.
+6. `lib/features/dashboard/presentation/pages/dashboard_page.dart`
+   - Añadido Patrocinadores a navegación desktop/mobile.
+7. `lib/features/clubs/presentation/pages/public_club_page.dart`
+   - Añadido acceso público a Patrocinadores.
+
+### Alcance y seguridad
+- No se modifican migraciones Supabase.
+- No se ejecuta ninguna operación sobre Supabase remoto.
+- No se modifica `club_payments`.
+- No se modifica `club_payments_backend`.
+- No se modifica Stripe.
+- No se introducen secretos.
+- La integración reutiliza las consultas/RPC existentes del repositorio de patrocinadores.
+
+### Estado
+El módulo queda integrado en rutas, navegación y escaparate público. La validación contra RLS/RPC real de Supabase queda, como el resto de infraestructura externa, pendiente de staging.
 ## 2026-09-28 — GPT-5.6 LUNA — bloque responsive sin pagos
 
 ### Objetivo
