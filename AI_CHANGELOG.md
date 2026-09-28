@@ -1,3 +1,17 @@
+## 2026-09-28 — GPT-5.6 LUNA — cierre del flujo Equipos → Jugadores → Personal
+
+### Cambios realizados
+- lib/features/players/presentation/pages/team_players_page.dart: búsqueda por nombre/dorsal, filtro de inactivos, cabecera responsive, estados vacíos y refresco manual.
+- lib/features/players/presentation/pages/team_players_page.dart: corregida la liberación de todos los TextEditingController del diálogo de edición.
+- lib/features/staff/presentation/pages/team_staff_page.dart: búsqueda por persona/cargo, filtro de inactivos, cabecera responsive, estados vacíos y refresco manual.
+- Se mantiene el flujo existente Equipos → Plantilla → Personal y los permisos players_manage / teams_manage.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se ha modificado club_payments, club_payments_backend ni Stripe.
+
+### Estado
+- Flujo frontend Equipos → Jugadores → Personal: cerrado a nivel de UI/código.
+- Sigue pendiente la validación real de RLS/RPC en staging y la ejecución de flutter analyze/tests en un entorno local/CI.
+
 ## 2026-09-28 — GPT-5.6 LUNA — cierre del módulo de notificaciones
 
 ### Objetivo
