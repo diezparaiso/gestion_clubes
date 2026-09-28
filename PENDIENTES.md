@@ -179,6 +179,7 @@
 - [x] Mejorar estado de error y reintento de Plantilla.
 - [x] Mejorar estado de error y reintento de Personal.
 - [x] Mejorar estado de error y reintento de Equipos.
+- [x] Mejorar estados de error y reintento del módulo de Rifas sin pagos reales.
 - [x] Mejorar estado de error y reintento de Usuarios y permisos.
 - [x] Mejorar estado de error y reintento de Miembros del Club.
 - [ ] Ampliar tests unitarios que no dependan de Supabase/Stripe.
