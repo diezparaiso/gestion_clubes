@@ -172,7 +172,7 @@
 - [x] Mejorar responsive de Configuración del club y acceso a Usuarios y permisos.
 - [x] Cerrar flujo Equipos → Jugadores → Personal: CRUD/estado, navegación, filtros, responsive y estados vacíos.
 - [x] Auditoría de Rifas excluyendo checkout/pago real: listado, detalle, Cesta, Sorteo puro, Mensual, área del socio y página pública.
-- [x] Mejorar mensajes de error y estados de carga del dashboard.\n- [ ] Mejorar mensajes de error y estados de carga del resto de la aplicación.
+- [x] Mejorar mensajes de error y estados de carga del dashboard.\n- [ ] Mejorar mensajes de error y estados de carga del resto de la aplicación.\n- [x] Mejorar estados de error y reintento de las páginas públicas de Noticias, Eventos y Patrocinadores.
 - [x] Mejorar estado de error y reintento del listado de Socios.
 - [x] Mejorar estado de error y reintento de Noticias.
 - [x] Mejorar estado de error y reintento de Eventos.
