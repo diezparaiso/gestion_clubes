@@ -136,7 +136,8 @@
 ### Próximo bloque sin pagos
 - [x] Cerrar módulo de Patrocinadores: gestión interna, rutas, navegación y escaparate público.
 - [ ] Auditoría responsive del resto de pantallas.
-- [ ] Revisar UX de dashboard y navegación móvil.
+- [x] Revisar UX de dashboard y navegación móvil: acceso a la web pública, identidad del usuario y cabecera responsive.
+- [ ] Completar revisión visual del dashboard en Flutter Web/Chrome.
 - [x] Completar/repasar CRUD y estados de Noticias.
 - [x] Cerrar centro de Notificaciones y estados vacíos/error.
 - [ ] Revisar Perfil y gestión de cuenta.
