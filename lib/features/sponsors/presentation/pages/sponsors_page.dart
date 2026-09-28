@@ -47,7 +47,9 @@ class SponsorsPage extends ConsumerWidget {
               ),
       ),
     );
-  }g(BuildContext context, WidgetRef ref, String clubId) {
+  }
+
+  void _showCreateDialog(BuildContext context, WidgetRef ref, String clubId) {
     showDialog(
       context: context,
       builder: (_) => _SponsorFormDialog(clubId: clubId),
