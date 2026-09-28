@@ -4,9 +4,14 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../data/repositories/club_repository.dart';
 import '../../domain/entities/club.dart';
+import '../../../events/data/repositories/event_repository.dart';
+import '../../../events/domain/entities/event.dart';
+import '../../../news/data/repositories/post_repository.dart';
+import '../../../news/domain/entities/post.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso público a patrocinadores.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): convierte la página pública del club en home principal con acceso al login.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): incorpora actualidad real de noticias y eventos públicos.
 
 class PublicClubPage extends StatefulWidget {
   const PublicClubPage({super.key, required this.clubSlug});
@@ -18,11 +23,15 @@ class PublicClubPage extends StatefulWidget {
 
 class _PublicClubPageState extends State<PublicClubPage> {
   late final Future<Club> _club;
+  late final Future<List<ClubEvent>> _events;
+  late final Future<List<Post>> _posts;
 
   @override
   void initState() {
     super.initState();
     _club = ClubRepository().getPublicClub(widget.clubSlug);
+    _events = EventRepository().listPublicEvents(widget.clubSlug);
+    _posts = PostRepository().listPublicPosts(widget.clubSlug);
   }
 
   @override
@@ -43,6 +52,27 @@ class _PublicClubPageState extends State<PublicClubPage> {
       );
 
   Widget _content(BuildContext context, Club club) {
+    final theme = Theme.of(context);
+    return FutureBuilder<(List<ClubEvent>, List<Post>)>(
+      future: Future.wait([_events, _posts]).then((values) => (values[0] as List<ClubEvent>, values[1] as List<Post>)),
+      builder: (context, snapshot) {
+        final events = snapshot.data?.$1 ?? const <ClubEvent>[];
+        final posts = snapshot.data?.$2 ?? const <Post>[];
+        return _contentBody(context, club, events, posts, snapshot.hasError);
+      },
+    );
+  }
+
+  String _formatDate(DateTime value) =>
+      '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year} · ${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}';
+
+  Widget _contentBody(
+    BuildContext context,
+    Club club,
+    List<ClubEvent> events,
+    List<Post> posts,
+    bool contentError,
+  ) {
     final theme = Theme.of(context);
     return SingleChildScrollView(
       child: Column(
@@ -118,6 +148,55 @@ class _PublicClubPageState extends State<PublicClubPage> {
               ),
             ),
           ),
+          if (!contentError && (events.isNotEmpty || posts.isNotEmpty))
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1100),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Actualidad',
+                        style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(height: 16),
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final columns = constraints.maxWidth >= 760 ? 2 : 1;
+                          final width = (constraints.maxWidth - (columns - 1) * 12) / columns;
+                          return Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: [
+                              if (events.isNotEmpty)
+                                _LatestCard(
+                                  width: width,
+                                  icon: Icons.event_outlined,
+                                  title: 'Próximo evento',
+                                  headline: events.first.title,
+                                  detail: _formatDate(events.first.startAt),
+                                  onTap: () => context.go('/club/${widget.clubSlug}/events'),
+                                ),
+                              if (posts.isNotEmpty)
+                                _LatestCard(
+                                  width: width,
+                                  icon: Icons.article_outlined,
+                                  title: 'Última noticia',
+                                  headline: posts.first.title,
+                                  detail: posts.first.publishedAt == null ? '' : _formatDate(posts.first.publishedAt!),
+                                  onTap: () => context.go('/club/${widget.clubSlug}/news'),
+                                ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 1100),
@@ -284,6 +363,46 @@ class _PublicAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
     );
   }
+}
+
+class _LatestCard extends StatelessWidget {
+  const _LatestCard({
+    required this.width,
+    required this.icon,
+    required this.title,
+    required this.headline,
+    required this.detail,
+    required this.onTap,
+  });
+
+  final double width;
+  final IconData icon;
+  final String title;
+  final String headline;
+  final String detail;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        width: width,
+        child: Card(
+          child: ListTile(
+            onTap: onTap,
+            contentPadding: const EdgeInsets.all(18),
+            leading: CircleAvatar(child: Icon(icon)),
+            title: Text(title),
+            subtitle: Padding(
+              padding: const EdgeInsets.only(top: 4),
+              child: Text(
+                detail.isEmpty ? headline : '$headline\n$detail',
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+          ),
+        ),
+      );
 }
 
 class _PublicCard extends StatelessWidget {
