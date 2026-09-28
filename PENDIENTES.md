@@ -136,7 +136,7 @@
 - [x] Cerrar centro de Notificaciones y estados vacíos/error.
 - [ ] Revisar Perfil y gestión de cuenta.
 - [x] Cerrar flujo Equipos → Jugadores → Personal: CRUD/estado, navegación, filtros, responsive y estados vacíos.
-- [ ] Auditoría de Rifas excluyendo checkout/pago real.
+- [x] Auditoría de Rifas excluyendo checkout/pago real: listado, detalle, Cesta, Sorteo puro, Mensual, área del socio y página pública.
 - [ ] Mejorar mensajes de error y estados de carga de la aplicación.
 - [ ] Ampliar tests unitarios que no dependan de Supabase/Stripe.
 - [ ] Revisar permisos de UI frente a `*_view` / `*_manage`.
