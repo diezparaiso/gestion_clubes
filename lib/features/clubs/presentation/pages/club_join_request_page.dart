@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): nueva solicitud pública de incorporación de clubes.
+/// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): nueva solicitud pública de incorporación de clubes.\n/// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade tipo de entidad, web y aceptación de privacidad.
 /// Esta primera fase es frontend-only: no persiste datos ni toca Supabase remoto.
 class ClubJoinRequestPage extends StatefulWidget {
   const ClubJoinRequestPage({super.key});
@@ -16,6 +16,9 @@ class _ClubJoinRequestPageState extends State<ClubJoinRequestPage> {
   final _taxId = TextEditingController();
   final _city = TextEditingController();
   final _province = TextEditingController();
+  final _website = TextEditingController();
+  String _clubType = 'Club deportivo';
+  bool _privacyAccepted = false;
   final _contactName = TextEditingController();
   final _contactEmail = TextEditingController();
   final _contactPhone = TextEditingController();
@@ -30,6 +33,7 @@ class _ClubJoinRequestPageState extends State<ClubJoinRequestPage> {
       _taxId,
       _city,
       _province,
+      _website,
       _contactName,
       _contactEmail,
       _contactPhone,
@@ -42,6 +46,10 @@ class _ClubJoinRequestPageState extends State<ClubJoinRequestPage> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
+    if (!_privacyAccepted) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Debes aceptar la información de privacidad para continuar.')));
+      return;
+    }
     setState(() => _submitted = true);
   }
 
@@ -94,6 +102,19 @@ class _ClubJoinRequestPageState extends State<ClubJoinRequestPage> {
                 _field(_city, 'Localidad', required: true),
                 _field(_province, 'Provincia', required: true),
               ]),
+              DropdownButtonFormField<String>(
+                value: _clubType,
+                decoration: const InputDecoration(labelText: 'Tipo de entidad'),
+                items: const [
+                  DropdownMenuItem(value: 'Club deportivo', child: Text('Club deportivo')),
+                  DropdownMenuItem(value: 'Escuela deportiva', child: Text('Escuela deportiva')),
+                  DropdownMenuItem(value: 'Asociación deportiva', child: Text('Asociación deportiva')),
+                  DropdownMenuItem(value: 'Otro', child: Text('Otro')),
+                ],
+                onChanged: (value) => setState(() => _clubType = value ?? _clubType),
+              ),
+              const SizedBox(height: 16),
+              _field(_website, 'Web del club (opcional)'),
             ],
           ),
           const SizedBox(height: 16),
@@ -156,6 +177,18 @@ class _ClubJoinRequestPageState extends State<ClubJoinRequestPage> {
             ],
           ),
           const SizedBox(height: 20),
+          CheckboxListTile(
+            contentPadding: EdgeInsets.zero,
+            value: _privacyAccepted,
+            onChanged: (value) => setState(() => _privacyAccepted = value ?? false),
+            title: const Text('He leído la información de privacidad y acepto el tratamiento de los datos de contacto para gestionar esta solicitud.'),
+            subtitle: TextButton(
+              onPressed: () => context.go('/privacy'),
+              child: const Align(alignment: Alignment.centerLeft, child: Text('Consultar política de privacidad')),
+            ),
+            controlAffinity: ListTileControlAffinity.leading,
+          ),
+          const SizedBox(height: 8),
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(16),
