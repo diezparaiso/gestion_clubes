@@ -176,6 +176,9 @@
 - [x] Mejorar estado de error y reintento del listado de Socios.
 - [x] Mejorar estado de error y reintento de Noticias.
 - [x] Mejorar estado de error y reintento de Eventos.
+- [x] Mejorar estado de error y reintento de Plantilla.
+- [x] Mejorar estado de error y reintento de Personal.
+- [x] Mejorar estado de error y reintento de Equipos.
 - [ ] Ampliar tests unitarios que no dependan de Supabase/Stripe.
 - [ ] Revisar permisos de UI frente a `*_view` / `*_manage`.
 - [ ] Revisar PWA y comportamiento móvil/tablet/escritorio.
