@@ -154,6 +154,8 @@
 
 ### Navegación pública
 - [x] Crear landing pública de la plataforma en `/`.
+- [x] Hacer que `/` sea la entrada inicial de la aplicación.
+- [x] Conectar login y solicitud de incorporación con retorno a la landing pública.
 - [x] Mantener acceso **Acceder** desde la home pública.
 - [x] Añadir acceso **Acceder** también en Noticias, Eventos y Patrocinadores públicos.
 - [ ] Diseñar/validar consulta pública de Equipos sin exponer datos privados; no crear una página pública contra las tablas actuales mientras su lectura siga restringida a usuarios autenticados.
