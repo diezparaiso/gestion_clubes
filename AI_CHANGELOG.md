@@ -1,3 +1,19 @@
+## 2026-09-29 — GPT-5.6 LUNA — estados de accesos y miembros del club
+
+### Cambios
+- lib/features/clubs/presentation/pages/club_access_management_page.dart
+  - El error de carga de accesos ahora ofrece reintento sin abandonar la pantalla.
+  - La cabecera del contenido se adapta mejor a anchuras reducidas.
+  - Se mantiene intacta la gestión existente de roles, revocaciones y alta mediante las operaciones ya existentes.
+- lib/features/clubs/presentation/pages/club_members_page.dart
+  - El error del listado de miembros ahora ofrece reintento sobre sus proveedores.
+  - Se evita mostrar directamente el detalle técnico de la excepción en la interfaz.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, club_payments ni club_payments_backend.
+
+### Validación
+Pendiente ejecutar analyzer/tests y validación visual en Flutter Web/Chrome.
+
 ## 2026-09-28 — GPT-5.6 LUNA — cierre UX de Perfil y Configuración
 
 ### Cambios
