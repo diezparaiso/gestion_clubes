@@ -104,6 +104,28 @@
 - No implementar auto-refresh artificial de publicidad.
 - No modificar Payments/Stripe mientras el backend de pagos esté en standby.
 
+## 8. Incorporación de nuevos clubes — 2026-09-28
+
+### Fase 1 implementada
+- [x] Crear ruta pública `/solicitar-incorporacion`.
+- [x] Crear formulario responsive de solicitud.
+- [x] Añadir acceso desde login.
+- [x] Documentar arquitectura futura de onboarding.
+- [x] Dejar explícito que los datos bancarios no se introducen en la plataforma.
+
+### Pendiente para hacerla operativa
+- [ ] Crear persistencia `club_onboarding_requests` en Supabase.
+- [ ] Crear RLS y/o endpoint server-side para recepción segura.
+- [ ] Añadir protección anti-spam/rate limiting/CAPTCHA si la solicitud queda abierta a anónimos.
+- [ ] Crear bandeja de solicitudes para soporte.
+- [ ] Definir datos de contacto reales de soporte.
+- [ ] Implementar alta autónoma del club.
+- [ ] Integrar Stripe Connect para onboarding financiero.
+- [ ] Guardar únicamente `stripe_connected_account_id` y estados de Stripe.
+- [ ] Probar flujo completo de alta, aprobación, activación y cobros.
+
+> La Fase 1 es deliberadamente frontend-only. El botón de envío muestra una confirmación de interfaz, pero todavía no transmite ni almacena datos.
+
 ## Orden recomendado para continuar
 1. Completar pruebas de seguridad/RLS en una base de pruebas, sin tocar Supabase live.
 2. Completar pruebas responsive/Web y del flujo de autenticación.
