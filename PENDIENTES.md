@@ -112,6 +112,8 @@
 - [x] Añadir acceso desde login.
 - [x] Documentar arquitectura futura de onboarding.
 - [x] Dejar explícito que los datos bancarios no se introducen en la plataforma.
+- [x] Añadir información/aceptación de privacidad al formulario de solicitud.
+- [x] Añadir tipo de entidad y web opcional al formulario.
 
 ### Pendiente para hacerla operativa
 - [ ] Crear persistencia `club_onboarding_requests` en Supabase.
