@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Hace seguro el repositorio de notificaciones en modo demo y restringe lecturas al usuario actual.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): completa estado de lectura en modo demo.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -34,24 +35,39 @@ class NotificationDeliveryRepository {
   }
 
   Future<void> markAsRead(String deliveryId) async {
-    if (!SupabaseService.isConfigured || _supabase == null) return;
+    if (!SupabaseService.isConfigured || _supabase == null) {
+      final index = _demoState.indexWhere((item) => item.id == deliveryId);
+      if (index >= 0) {
+        final item = _demoState[index];
+        _demoState[index] = NotificationDelivery(id: item.id, notificationId: item.notificationId, profileId: item.profileId, readAt: DateTime.now(), createdAt: item.createdAt, title: item.title, body: item.body);
+      }
+      return;
+    }
     try {
       await _supabase.rpc('mark_notification_delivery_read', params: {'p_delivery_id': deliveryId});
     } on PostgrestException catch (e) { throw Exception('Error al marcar como leído: ${e.message}'); }
   }
 
   Future<void> markAllAsRead() async {
-    if (!SupabaseService.isConfigured || _supabase == null) return;
+    if (!SupabaseService.isConfigured || _supabase == null) {
+      for (var i = 0; i < _demoState.length; i++) {
+        final item = _demoState[i];
+        if (!item.isRead) _demoState[i] = NotificationDelivery(id: item.id, notificationId: item.notificationId, profileId: item.profileId, readAt: DateTime.now(), createdAt: item.createdAt, title: item.title, body: item.body);
+      }
+      return;
+    }
     try {
       await _supabase.rpc('mark_all_notification_deliveries_read');
     } on PostgrestException catch (e) { throw Exception('Error al marcar todas como leídas: ${e.message}'); }
   }
 
-  List<NotificationDelivery> _demoDeliveries() => [
+  static final _demoState = <NotificationDelivery>[
     NotificationDelivery(id: '1', notificationId: 'notif-1', profileId: 'demo-user', readAt: null, createdAt: DateTime.now().subtract(const Duration(hours: 2))),
     NotificationDelivery(id: '2', notificationId: 'notif-2', profileId: 'demo-user', readAt: DateTime.now().subtract(const Duration(hours: 1)), createdAt: DateTime.now().subtract(const Duration(hours: 3))),
     NotificationDelivery(id: '3', notificationId: 'notif-3', profileId: 'demo-user', readAt: null, createdAt: DateTime.now().subtract(const Duration(days: 1))),
   ];
+
+  List<NotificationDelivery> _demoDeliveries() => List.unmodifiable(_demoState);
 }
 
 final notificationDeliveryRepositoryProvider = Provider<NotificationDeliveryRepository>((ref) {
