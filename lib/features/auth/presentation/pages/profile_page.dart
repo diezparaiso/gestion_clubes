@@ -6,6 +6,7 @@ import '../../../auth/application/auth_controller.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): completa cambio de contraseña tras recuperación por email.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX del perfil; responsive, validación y visibilidad del estado de guardado.
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({super.key, this.forcePasswordChange = false});
@@ -22,6 +23,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
   final _confirm = TextEditingController();
   bool _saving = false;
   bool _obscure = true;
+  String? _error;
 
   @override
   void dispose() {
@@ -30,7 +32,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
 
   Future<void> _changePassword() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _saving = true);
+    setState(() { _saving = true; _error = null; });
     try {
       final client = Supabase.instance.client;
       final auth = ref.read(authControllerProvider);
@@ -51,9 +53,9 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         return;
       }
     } on AuthException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      if (mounted) setState(() => _error = e.message);
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se ha podido cambiar la contraseña: $e')));
+      if (mounted) setState(() => _error = 'No se ha podido cambiar la contraseña. Inténtalo de nuevo.');
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -78,6 +80,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                   key: _formKey,
                   child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                     Text(auth.email ?? Supabase.instance.client.auth.currentUser?.email ?? '', style: Theme.of(context).textTheme.titleMedium),
+                    if (_error != null) ...[
+                      const SizedBox(height: 12),
+                      Text(_error!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                    ],
                     const SizedBox(height: 16),
                     if (widget.forcePasswordChange) const Text('Por seguridad, debes cambiar la contraseña inicial antes de continuar.'),
                     if (!auth.passwordRecovery)
@@ -86,7 +92,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     TextFormField(controller: _confirm, obscureText: _obscure, decoration: const InputDecoration(labelText: 'Repite la nueva contraseña'), validator: (v) => v != _newPassword.text ? 'Las contraseñas no coinciden' : null),
                     CheckboxListTile(value: !_obscure, onChanged: (v) => setState(() => _obscure = !(v ?? false)), title: const Text('Mostrar contraseña'), contentPadding: EdgeInsets.zero),
                     const SizedBox(height: 12),
-                    FilledButton.icon(onPressed: _saving ? null : _changePassword, icon: const Icon(Icons.lock_reset), label: const Text('Cambiar contraseña')),
+                    FilledButton.icon(onPressed: _saving ? null : _changePassword, icon: const Icon(Icons.lock_reset), label: _saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Cambiar contraseña')),
                   ]),
                 ),
               ),
