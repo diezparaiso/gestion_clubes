@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../data/club_export_service.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../clubs/data/repositories/club_repository.dart';
+import '../../../clubs/domain/entities/club.dart';
 import '../../application/dashboard_stats_provider.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA
@@ -14,6 +16,7 @@ import '../../application/dashboard_stats_provider.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Filtra navegación y acciones según permisos del rol.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): el Excel solo solicita módulos con permiso de lectura.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): incorpora Patrocinadores en navegación desktop/mobile.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso directo a la web pública y mejora la identificación del usuario.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -23,6 +26,16 @@ class DashboardPage extends ConsumerStatefulWidget {
 
 class _DashboardPageState extends ConsumerState<DashboardPage> {
   int _selectedIndex = 0;
+  late final Future<Club?> _publicClubFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final clubId = ref.read(authControllerProvider).clubId;
+    _publicClubFuture = clubId == null || clubId.isEmpty
+        ? Future.value(null)
+        : ref.read(clubRepositoryProvider).getClubById(clubId);
+  }
 
   static const _navigationItems = [
     (Icons.grid_view_rounded, 'Resumen'),
@@ -125,10 +138,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           const SizedBox(height: 12),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const CircleAvatar(
-              backgroundColor: Color(0xFFE4B363),
-              child: Text('PM', style: TextStyle(color: Color(0xFF14213D), fontWeight: FontWeight.w800)),
-            ),
+            leading: _UserAvatar(initials: _userInitials(authState.email)),
             title: Text(authState.email ?? 'Usuario', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis),
             subtitle: Text(authState.roleLabel, style: const TextStyle(color: Color(0xFF9BA9BC))),
             trailing: IconButton(onPressed: () => ref.read(authControllerProvider.notifier).signOut(), tooltip: 'Cerrar sesión', icon: const Icon(Icons.logout_rounded, color: Color(0xFF9BA9BC))),
@@ -154,12 +164,18 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     children: [
                       Text(authState.clubName ?? 'Tu club', style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 8),
-                      Text('Hola, ${authState.email?.split('@').first ?? 'de nuevo'}', style: Theme.of(context).textTheme.headlineMedium),
+                      Text('Hola, ${_displayName(authState.email)}', style: Theme.of(context).textTheme.headlineMedium),
                       const SizedBox(height: 6),
                       const Text('Aquí tienes el estado de tu club hoy.'),
                     ],
                   ),
                 ),
+                OutlinedButton.icon(
+                  onPressed: () => _openPublicClub(context),
+                  icon: const Icon(Icons.public_rounded, size: 18),
+                  label: const Text('Ver web pública'),
+                ),
+                const SizedBox(width: 8),
                 IconButton(
                   onPressed: () => _exportClub(context),
                   tooltip: 'Exportar gestión a Excel',
@@ -172,11 +188,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     icon: const Icon(Icons.notifications_none_rounded),
                   ),
                 const SizedBox(width: 4),
-                const CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Color(0xFFE4B363),
-                  child: Text('PM', style: TextStyle(color: Color(0xFF14213D), fontWeight: FontWeight.w800, fontSize: 12)),
-                ),
+                _UserAvatar(initials: _userInitials(authState.email), radius: 20),
               ],
             ),
             const SizedBox(height: 32),
@@ -356,6 +368,43 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     }
   }
 
+  Future<void> _openPublicClub(BuildContext context) async {
+    try {
+      final club = await _publicClubFuture;
+      if (!mounted) return;
+      if (club == null || club.slug.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se ha podido localizar la página pública del club.')),
+        );
+        return;
+      }
+      context.go('/club/${Uri.encodeComponent(club.slug)}');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se ha podido abrir la página pública del club.')),
+      );
+    }
+  }
+
+  String _displayName(String? email) {
+    final localPart = email?.split('@').first.trim();
+    if (localPart == null || localPart.isEmpty) return 'de nuevo';
+    final words = localPart.replaceAll(RegExp(r'[._-]+'), ' ').trim().split(RegExp(r'\s+'));
+    return words.map((word) {
+      if (word.isEmpty) return word;
+      return '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
+    }).join(' ');
+  }
+
+  String _userInitials(String? email) {
+    final name = _displayName(email);
+    if (name == 'de nuevo') return 'U';
+    final words = name.split(' ').where((word) => word.isNotEmpty).toList();
+    if (words.length == 1) return words.first.substring(0, 1).toUpperCase();
+    return '${words.first.substring(0, 1)}${words.last.substring(0, 1)}'.toUpperCase();
+  }
+
   String _formatCurrency(double value) => '${value.toStringAsFixed(2).replaceAll('.', ',')} €';
 
   Widget _buildBottomNavigation() {
@@ -381,6 +430,29 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       destinations: visibleEntries
           .map((entry) => NavigationDestination(icon: Icon(entry.$2.$1), label: entry.$2.$2))
           .toList(),
+    );
+  }
+}
+
+class _UserAvatar extends StatelessWidget {
+  const _UserAvatar({required this.initials, this.radius = 20});
+
+  final String initials;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: const Color(0xFFE4B363),
+      child: Text(
+        initials,
+        style: TextStyle(
+          color: const Color(0xFF14213D),
+          fontWeight: FontWeight.w800,
+          fontSize: radius <= 20 ? 12 : 14,
+        ),
+      ),
     );
   }
 }
