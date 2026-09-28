@@ -1,3 +1,42 @@
+## 2026-09-28 — GPT-5.6 LUNA — bloque responsive sin pagos
+
+### Objetivo
+Avanzar el desarrollo de `gestion_clubes` sin tocar Supabase remoto ni integrar todavía los módulos externos de pagos.
+
+### Rama de trabajo
+- `ai/non-payments-development`
+- PR: `#1` — Responsive UI improvements without payments/Supabase changes.
+- Base: `main`.
+
+### Archivos modificados
+1. `lib/features/members/presentation/pages/members_page.dart`
+   - Cabecera convertida de `Row` a `Wrap`.
+   - Buscador y filtros convertidos a distribución responsive.
+   - Se evita el desbordamiento horizontal en anchuras reducidas.
+2. `lib/features/finance/presentation/pages/finance_page.dart`
+   - Cabecera convertida a `Wrap`.
+   - Buscador y filtros adaptados a anchuras reducidas.
+   - No se altera el cálculo financiero ni las consultas existentes.
+3. `lib/features/events/presentation/pages/events_page.dart`
+   - Cabecera y acciones convertidas a `Wrap`.
+   - Buscador/filtro público adaptados a móvil y tablet.
+   - Se conserva la generación del enlace público existente.
+4. `lib/features/teams/presentation/pages/teams_page.dart`
+   - Cabecera y acciones convertidas a `Wrap`.
+   - Buscador/filtro de inactivos adaptados a anchuras reducidas.
+
+### Seguridad de alcance
+- No se modifican migraciones Supabase.
+- No se ejecuta ninguna operación sobre Supabase remoto.
+- No se modifica `club_payments`.
+- No se modifica `club_payments_backend`.
+- No se modifica Stripe.
+- No se introducen secretos.
+- Los cambios son exclusivamente de presentación/responsive.
+
+### Siguiente trabajo previsto
+Continuar cerrando funcionalidades y calidad del frontend que no dependan de pagos, Supabase remoto o servicios externos. Cada nueva intervención deberá documentar los archivos afectados y mantener el marcador de autoría IA.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre de revisión de selección de club
 - Revisada la carga de múltiples clubes mediante membresías activas y la selección del club junto con su rol.
 - Añadida cobertura de `ClubAccess` para identidad del club y etiquetas de rol, incluyendo fallback para roles futuros.
