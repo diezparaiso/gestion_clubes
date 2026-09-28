@@ -1079,3 +1079,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Los errores de carga ofrecen un botón de reintento sobre el proveedor afectado.
 - No se modifica Supabase remoto ni Payments/Stripe.
 - Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
+
+
+### 2026-09-28 — GPT-5.6 LUNA — estados de Socios
+- El listado de Socios mantiene el estado de carga existente y mejora el estado de error.
+- El error de carga ahora permite reintentar directamente mediante `membersProvider`, sin salir de la pantalla.
+- Añadido un mensaje no bloqueante que explica que se puede continuar trabajando en el módulo.
+- No se modifica Supabase remoto ni Payments/Stripe.
+- Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
