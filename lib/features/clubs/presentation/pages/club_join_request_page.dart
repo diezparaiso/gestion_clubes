@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-/// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): nueva solicitud pública de incorporación de clubes.\n/// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade tipo de entidad, web y aceptación de privacidad.
+/// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): nueva solicitud pública de incorporación de clubes.\n/// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade tipo de entidad, web y aceptación de privacidad.\n/// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade navegación de retorno a la landing pública.
 /// Esta primera fase es frontend-only: no persiste datos ni toca Supabase remoto.
 class ClubJoinRequestPage extends StatefulWidget {
   const ClubJoinRequestPage({super.key});
@@ -60,6 +60,10 @@ class _ClubJoinRequestPageState extends State<ClubJoinRequestPage> {
         title: const Text('Incorporar mi club'),
         actions: [
           TextButton(
+            onPressed: () => context.go('/'),
+            child: const Text('Plataforma'),
+          ),
+          TextButton(
             onPressed: () => context.go('/login'),
             child: const Text('Acceder'),
           ),
@@ -71,7 +75,7 @@ class _ClubJoinRequestPageState extends State<ClubJoinRequestPage> {
           padding: const EdgeInsets.all(24),
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 820),
-            child: _submitted ? _SuccessView(onBack: () => context.go('/login')) : _buildForm(context),
+            child: _submitted ? _SuccessView(onBack: () => context.go('/')) : _buildForm(context),
           ),
         ),
       ),
