@@ -1,3 +1,16 @@
+## 2026-09-29 — GPT-5.6 LUNA — estados de Rifas
+
+### Cambios
+- Listado de Rifas: error de carga con botón Reintentar.
+- Detalle de Rifa: reintento de carga de la rifa, participaciones e histórico mensual.
+- Mis rifas: error de carga con opción de reintento.
+- Rifa pública: corregida la propagación del estado de cierre al selector de números.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, club_payments ni club_payments_backend.
+
+### Validación
+Pendiente ejecutar analyzer/tests y validación visual en Flutter Web/Chrome.
+
 ## 2026-09-29 — GPT-5.6 LUNA — estados de accesos y miembros del club
 
 ### Cambios
