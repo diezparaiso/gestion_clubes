@@ -1,3 +1,24 @@
+## 2026-09-28 — GPT-5.6 LUNA — cierre del flujo de entrada pública
+
+### Cambios
+- `lib/app/router.dart`
+  - La landing `/` pasa a ser la entrada inicial de la aplicación.
+  - Se mantiene como ruta pública y no requiere autenticación.
+- `lib/features/auth/presentation/pages/login_page.dart`
+  - El identificador de la plataforma permite volver a `/`.
+  - Añadido **Volver a la plataforma**.
+- `lib/features/clubs/presentation/pages/club_join_request_page.dart`
+  - Añadido acceso **Plataforma** en la cabecera.
+  - Tras la confirmación de la solicitud se vuelve a la landing pública.
+- No se modifica Supabase remoto ni la infraestructura de pagos.
+
+### Flujo resultante
+`/` → landing → `/login` o `/solicitar-incorporacion`.
+Desde login y solicitud se puede regresar a la landing.
+
+### Validación
+Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome.
+
 ## 2026-09-28 — GPT-5.6 LUNA — landing pública de la plataforma
 
 ### Cambios
