@@ -13,6 +13,7 @@ import '../../application/dashboard_stats_provider.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra el rol real del acceso seleccionado.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Filtra navegación y acciones según permisos del rol.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): el Excel solo solicita módulos con permiso de lectura.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): incorpora Patrocinadores en navegación desktop/mobile.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -31,6 +32,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     (Icons.confirmation_number_outlined, 'Rifas'),
     (Icons.article_outlined, 'Noticias'),
     (Icons.event_outlined, 'Eventos'),
+    (Icons.business_outlined, 'Patrocinadores'),
     (Icons.settings_outlined, 'Configuración'),
   ];
 
@@ -60,7 +62,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
   String _navigationPermission(int index) => switch (index) {
     0 => 'dashboard_view', 1 => 'members_view', 2 => 'teams_view', 3 => 'finance_view',
-    4 => 'raffles_view', 5 => 'news_view', 6 => 'events_view', 7 => 'club_settings_view',
+    4 => 'raffles_view', 5 => 'news_view', 6 => 'events_view', 7 => 'sponsors_manage', 8 => 'club_settings_view',
     _ => 'dashboard_view',
   };
 
@@ -113,7 +115,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 if (index == 4) context.go('/raffles');
                 if (index == 5) context.go('/news');
                 if (index == 6) context.go('/events');
-                if (index == 7) context.go('/settings');
+                if (index == 7) context.go('/sponsors');
+                if (index == 8) context.go('/settings');
               },
             );
           }),
@@ -372,7 +375,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         if (index == 4) context.go('/raffles');
         if (index == 5) context.go('/news');
         if (index == 6) context.go('/events');
-        if (index == 7) context.go('/settings');
+        if (index == 7) context.go('/sponsors');
+        if (index == 8) context.go('/settings');
       },
       destinations: visibleEntries
           .map((entry) => NavigationDestination(icon: Icon(entry.$2.$1), label: entry.$2.$2))
