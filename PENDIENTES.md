@@ -172,7 +172,7 @@
 - [x] Mejorar responsive de Configuración del club y acceso a Usuarios y permisos.
 - [x] Cerrar flujo Equipos → Jugadores → Personal: CRUD/estado, navegación, filtros, responsive y estados vacíos.
 - [x] Auditoría de Rifas excluyendo checkout/pago real: listado, detalle, Cesta, Sorteo puro, Mensual, área del socio y página pública.
-- [ ] Mejorar mensajes de error y estados de carga de la aplicación.
+- [x] Mejorar mensajes de error y estados de carga del dashboard.\n- [ ] Mejorar mensajes de error y estados de carga del resto de la aplicación.
 - [ ] Ampliar tests unitarios que no dependan de Supabase/Stripe.
 - [ ] Revisar permisos de UI frente a `*_view` / `*_manage`.
 - [ ] Revisar PWA y comportamiento móvil/tablet/escritorio.
