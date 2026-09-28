@@ -1,3 +1,27 @@
+## 2026-09-28 — GPT-5.6 LUNA — cierre del módulo de notificaciones
+
+### Objetivo
+Cerrar el centro de notificaciones del usuario sin tocar Supabase remoto, migraciones, RPC, Stripe ni los módulos de pagos.
+
+### Cambios
+1. `lib/features/notifications/presentation/pages/notifications_page.dart`
+   - Búsqueda y filtro de no leídas adaptados a pantallas estrechas.
+   - Marcar una notificación como leída y marcar todas como leídas con manejo visible de errores.
+   - Mantiene el acceso protegido por `notifications_view`.
+2. `lib/features/notifications/data/repositories/notification_delivery_repository.dart`
+   - El modo demo ahora conserva el estado de lectura durante la sesión.
+   - Se pueden probar realmente las acciones de marcar una/todas como leídas sin Supabase.
+   - El comportamiento conectado a Supabase/RPC existente no se modifica.
+
+### Alcance y seguridad
+- No se modifican migraciones Supabase.
+- No se ejecuta ninguna operación sobre Supabase remoto.
+- No se modifican RPC.
+- No se modifica Stripe ni ningún módulo de pagos.
+
+### Estado
+Centro de notificaciones del usuario cerrado a nivel de frontend. La validación de RLS/RPC y notificaciones reales queda para staging/infraestructura externa.
+
 ## 2026-09-28 — GPT-5.6 LUNA — cierre del módulo de patrocinadores
 
 ### Objetivo
