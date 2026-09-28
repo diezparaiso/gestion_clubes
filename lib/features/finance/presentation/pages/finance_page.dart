@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estados de carga y error de tesorería.; sin cambios de Supabase ni Payments/Stripe.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estados de carga y error de tesorería; sin cambios de Supabase ni Payments/Stripe.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -206,7 +206,7 @@ class _FinanceLoading extends StatelessWidget {
       children: const [
         SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5)),
         SizedBox(width: 12),
-        Text('Cargando…'),
+        Text(message),
       ],
     ),
   );
