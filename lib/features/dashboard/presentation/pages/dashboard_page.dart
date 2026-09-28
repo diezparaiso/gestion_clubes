@@ -156,9 +156,14 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 16,
+              runSpacing: 12,
               children: [
-                Expanded(
+                SizedBox(
+                  width: isDesktop ? 620 : double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -170,25 +175,30 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     ],
                   ),
                 ),
-                OutlinedButton.icon(
-                  onPressed: () => _openPublicClub(context),
-                  icon: const Icon(Icons.public_rounded, size: 18),
-                  label: const Text('Ver web pública'),
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 4,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () => _openPublicClub(context),
+                      icon: const Icon(Icons.public_rounded, size: 18),
+                      label: const Text('Ver web pública'),
+                    ),
+                    IconButton(
+                      onPressed: () => _exportClub(context),
+                      tooltip: 'Exportar gestión a Excel',
+                      icon: const Icon(Icons.file_download_outlined),
+                    ),
+                    if (_can(authState, 'notifications_view'))
+                      IconButton(
+                        onPressed: () => context.go('/notifications'),
+                        tooltip: 'Notificaciones',
+                        icon: const Icon(Icons.notifications_none_rounded),
+                      ),
+                    _UserAvatar(initials: _userInitials(authState.email), radius: 20),
+                  ],
                 ),
-                const SizedBox(width: 8),
-                IconButton(
-                  onPressed: () => _exportClub(context),
-                  tooltip: 'Exportar gestión a Excel',
-                  icon: const Icon(Icons.file_download_outlined),
-                ),
-                if (_can(authState, 'notifications_view'))
-                  IconButton(
-                    onPressed: () => context.go('/notifications'),
-                    tooltip: 'Notificaciones',
-                    icon: const Icon(Icons.notifications_none_rounded),
-                  ),
-                const SizedBox(width: 4),
-                _UserAvatar(initials: _userInitials(authState.email), radius: 20),
               ],
             ),
             const SizedBox(height: 32),
