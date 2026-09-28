@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive; sin cambios de Supabase ni Payments/Stripe.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
