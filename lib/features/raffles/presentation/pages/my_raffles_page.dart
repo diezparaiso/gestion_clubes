@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): área del socio para consultar rifas, suscripciones y recibos.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX del área Mis rifas; responsive y estados vacíos.
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -44,7 +45,7 @@ class MyRafflesPage extends ConsumerWidget {
           return ListView(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
             children: [
-              Text('Mis rifas', style: Theme.of(context).textTheme.headlineMedium),
+              Wrap(spacing: 12, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [Text('Mis rifas', style: Theme.of(context).textTheme.headlineMedium)]),
               const SizedBox(height: 16),
               Text('Suscripciones mensuales', style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 8),
