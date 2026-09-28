@@ -1,7 +1,9 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Corrige el rango visual de números y la reserva pública.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX público de rifas; estado de cierre y selección responsive.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso al login desde la página pública de la rifa.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -31,7 +33,19 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Rifa del club')),
+        appBar: AppBar(
+          title: const Text('Rifa del club'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: FilledButton.icon(
+                onPressed: () => context.go('/login'),
+                icon: const Icon(Icons.login, size: 18),
+                label: const Text('Acceder'),
+              ),
+            ),
+          ],
+        ),
         body: FutureBuilder<Raffle>(
           future: _raffle,
           builder: (context, snapshot) {
