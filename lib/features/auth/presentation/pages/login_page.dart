@@ -12,7 +12,7 @@ class LoginPage extends ConsumerStatefulWidget {
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): añade recuperación de contraseña.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): añade recuperación de contraseña.\n// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso público a la solicitud de incorporación de clubes.
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
@@ -81,6 +81,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
             const SizedBox(height: 4),
             TextButton(onPressed: () => context.go('/register'), child: const Text('Crear una cuenta')),
+            TextButton(onPressed: () => context.go('/solicitar-incorporacion'), child: const Text('¿Quieres incorporar tu club? Solicitar incorporación')),
           ],
         ),
       ),
