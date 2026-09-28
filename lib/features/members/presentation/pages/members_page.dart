@@ -1,4 +1,5 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos view/manage en acciones de la pantalla.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive; sin cambios de Supabase ni Payments/Stripe.
 import 'package:club_payments/club_payments.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
