@@ -107,7 +107,7 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
           const SizedBox(height: 16),
           Expanded(child: staff.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => const Center(child: Text('No se ha podido cargar el personal.')),
+            error: (error, stack) => Center(child: _StaffLoadError(onRetry: () => ref.invalidate(staffProvider))),
             data: (items) {
               final query = _searchController.text.trim().toLowerCase();
               final filtered = items.where((member) {
