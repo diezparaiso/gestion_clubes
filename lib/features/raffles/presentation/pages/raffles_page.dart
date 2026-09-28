@@ -11,6 +11,7 @@ import '../../domain/entities/raffle.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadida búsqueda y filtro local por estado de rifa.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX del módulo de rifas sin checkout real; responsive y estados de listado.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora error y reintento del listado de rifas.
 
 final rafflesProvider = FutureProvider<List<Raffle>>((ref) {
   final clubId = ref.watch(authControllerProvider).clubId;
@@ -47,7 +48,7 @@ class _RafflesPageState extends ConsumerState<RafflesPage> {
           DropdownButton<RaffleStatus?>(value: _statusFilter, hint: const Text('Estado'), items: [const DropdownMenuItem<RaffleStatus?>(value: null, child: Text('Todos')), ...RaffleStatus.values.map((status) => DropdownMenuItem<RaffleStatus?>(value: status, child: Text(_RaffleCard._statusLabel(status))))], onChanged: (value) => setState(() => _statusFilter = value)),
          ]),
         const SizedBox(height: 24),
-        Expanded(child: raffles.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar las rifas.')), data: (items) {
+        Expanded(child: raffles.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => Center(child: _RafflesLoadError(onRetry: () => ref.invalidate(rafflesProvider))), data: (items) {
           final query = _searchController.text.trim().toLowerCase();
           final filtered = items.where((raffle) => (query.isEmpty || raffle.title.toLowerCase().contains(query)) && (_statusFilter == null || raffle.status == _statusFilter)).toList();
           return filtered.isEmpty ? Center(child: Text(items.isEmpty ? 'Todavía no hay rifas creadas.' : 'No hay rifas que coincidan.')) : ListView.separated(itemCount: filtered.length, separatorBuilder: (_, index) => const SizedBox(height: 12), itemBuilder: (context, index) => _RaffleCard(raffle: filtered[index]));
@@ -116,4 +117,17 @@ class _CreateRaffleDialogState extends ConsumerState<_CreateRaffleDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(title: const Text('Nueva rifa'), content: SizedBox(width: 420, child: Form(key: _formKey, child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [TextFormField(controller: _titleController, decoration: const InputDecoration(labelText: 'Título'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null), const SizedBox(height: 12), TextFormField(controller: _priceController, keyboardType: const TextInputType.numberWithOptions(decimal: true), decoration: const InputDecoration(labelText: 'Precio por número', suffixText: '€'), validator: (value) => double.tryParse((value ?? '').replaceAll(',', '.')) == null ? 'Introduce un precio válido' : null), const SizedBox(height: 12), DropdownButtonFormField<RaffleType>(initialValue: _type, decoration: const InputDecoration(labelText: 'Tipo de rifa'), items: const [DropdownMenuItem(value: RaffleType.cesta, child: Text('Cesta — número elegido por el socio')), DropdownMenuItem(value: RaffleType.sorteoPuro, child: Text('Sorteo puro — ganador aleatorio')), DropdownMenuItem(value: RaffleType.mensual, child: Text('Mensual — renovación automática'))], onChanged: _saving ? null : (value) { if (value != null) setState(() => _type = value); }), if (_type == RaffleType.mensual) ...[const SizedBox(height: 12), DropdownButtonFormField<int>(initialValue: _monthlyDay, decoration: const InputDecoration(labelText: 'Día mensual de renovación y resultado'), items: [for (var day = 1; day <= 28; day++) DropdownMenuItem(value: day, child: Text('Día $day'))], onChanged: _saving ? null : (value) { if (value != null) setState(() => _monthlyDay = value); })], const SizedBox(height: 12), ListTile(contentPadding: EdgeInsets.zero, leading: const Icon(Icons.event_outlined), title: const Text('Fecha final'), subtitle: Text('${_endAt.day}/${_endAt.month}/${_endAt.year}'), trailing: TextButton(onPressed: _saving ? null : _pickEndDate, child: const Text('Cambiar'))), const SizedBox(height: 12), TextFormField(controller: _numbersController, keyboardType: TextInputType.number, decoration: const InputDecoration(labelText: 'Total de números'), validator: (value) => int.tryParse(value ?? '') == null ? 'Introduce una cantidad válida' : null), if (_error != null) ...[const SizedBox(height: 16), Align(alignment: Alignment.centerLeft, child: Text(_error!, style: const TextStyle(color: Colors.red)))]])))), actions: [TextButton(onPressed: _saving ? null : () => Navigator.of(context).pop(), child: const Text('Cancelar')), FilledButton(onPressed: _saving ? null : _save, child: _saving ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2)) : const Text('Guardar'))]);
+}
+
+
+class _RafflesLoadError extends StatelessWidget {
+  const _RafflesLoadError({required this.onRetry});
+  final VoidCallback onRetry;
+  @override
+  Widget build(BuildContext context) => Column(mainAxisSize: MainAxisSize.min, children: [
+    const Icon(Icons.error_outline, size: 42), const SizedBox(height: 12),
+    const Text('No se han podido cargar las rifas.'), const SizedBox(height: 6),
+    const Text('Puedes reintentarlo sin salir del módulo.'), const SizedBox(height: 16),
+    FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+  ]);
 }
