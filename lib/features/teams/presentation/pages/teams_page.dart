@@ -80,21 +80,51 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(child: Text('Equipos y temporadas', style: Theme.of(context).textTheme.headlineMedium)),
-              if (canManage) OutlinedButton.icon(onPressed: () => _showSeasonManager(context), icon: const Icon(Icons.calendar_month_outlined), label: const Text('Temporadas')), if (canManage) const SizedBox(width: 10),
-              if (canManage) FilledButton.icon(onPressed: () => _showCreateTeamDialog(context), icon: const Icon(Icons.add), label: const Text('Nuevo equipo')),
-            ]),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text('Equipos y temporadas', style: Theme.of(context).textTheme.headlineMedium),
+                if (canManage)
+                  OutlinedButton.icon(
+                    onPressed: () => _showSeasonManager(context),
+                    icon: const Icon(Icons.calendar_month_outlined),
+                    label: const Text('Temporadas'),
+                  ),
+                if (canManage)
+                  FilledButton.icon(
+                    onPressed: () => _showCreateTeamDialog(context),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Nuevo equipo'),
+                  ),
+              ],
+            ),
             const SizedBox(height: 12),
-            Row(children: [
-              Expanded(child: TextField(
-                controller: _searchController,
-                decoration: const InputDecoration(prefixIcon: Icon(Icons.search), labelText: 'Buscar equipo o categoría', border: OutlineInputBorder()),
-                onChanged: (_) => setState(() {}),
-              )),
-              const SizedBox(width: 12),
-              FilterChip(label: const Text('Mostrar inactivos'), selected: _showInactive, onSelected: (value) => setState(() => _showInactive = value)),
-            ]),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 240, maxWidth: 520),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      labelText: 'Buscar equipo o categoría',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+                FilterChip(
+                  label: const Text('Mostrar inactivos'),
+                  selected: _showInactive,
+                  onSelected: (value) => setState(() => _showInactive = value),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
             const Text('Organiza las plantillas del club por categoría y temporada.'),
             const SizedBox(height: 24),
