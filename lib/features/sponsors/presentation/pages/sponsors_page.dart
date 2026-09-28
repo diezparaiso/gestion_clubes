@@ -258,7 +258,8 @@ class _SponsorCard extends ConsumerWidget {
           );
       onChanged();
     } catch (e) {
-      // Error manejado silenciosamente
+      final context = ref.context;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se ha podido cambiar la visibilidad: $e')));
     }
   }
 
@@ -495,10 +496,20 @@ class _SponsorFormDialogState extends ConsumerState<_SponsorFormDialog> {
   }
 
   Future<void> _handleSave() async {
-    if (nameController.text.isEmpty) {
+    if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('El nombre es requerido')),
       );
+      return;
+    }
+
+    final amount = double.tryParse(amountController.text.trim().replaceAll(',', '.'));
+    if (amount == null || amount < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Introduce un importe anual válido.')));
+      return;
+    }
+    if (endDate.isBefore(startDate)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('La fecha de fin no puede ser anterior a la de inicio.')));
       return;
     }
 
@@ -518,7 +529,7 @@ class _SponsorFormDialogState extends ConsumerState<_SponsorFormDialog> {
               contactPhone: phoneController.text.isEmpty ? null : phoneController.text,
               contractStartDate: startDate,
               contractEndDate: endDate,
-              annualAmount: double.parse(amountController.text),
+              annualAmount: amount,
               benefits:
                   benefitsController.text.isEmpty ? null : benefitsController.text,
               isPublic: isPublic,
