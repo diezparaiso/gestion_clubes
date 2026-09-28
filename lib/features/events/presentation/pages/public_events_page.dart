@@ -6,6 +6,7 @@ import '../../domain/entities/event.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra fecha y hora reales en la agenda pública.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade navegación pública consistente y acceso al login.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): añade reintento ante errores de carga pública.
 class PublicEventsPage extends StatefulWidget {
   const PublicEventsPage({super.key, required this.clubSlug});
   final String clubSlug;
@@ -15,7 +16,7 @@ class PublicEventsPage extends StatefulWidget {
 }
 
 class _PublicEventsPageState extends State<PublicEventsPage> {
-  late final Future<List<ClubEvent>> _events;
+  late Future<List<ClubEvent>> _events;
 
   @override
   void initState() {
@@ -27,6 +28,12 @@ class _PublicEventsPageState extends State<PublicEventsPage> {
     final date = '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}';
     final time = '${value.hour.toString().padLeft(2, '0')}:${value.minute.toString().padLeft(2, '0')}';
     return '$date · $time';
+  }
+
+  void _retry() {
+    setState(() {
+      _events = EventRepository().listPublicEvents(widget.clubSlug);
+    });
   }
 
   @override
@@ -48,7 +55,7 @@ class _PublicEventsPageState extends State<PublicEventsPage> {
           future: _events,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-            if (snapshot.hasError) return const Center(child: Text('No se han podido cargar los eventos.'));
+            if (snapshot.hasError) return _PublicLoadError(message: 'No se han podido cargar los eventos.', onRetry: _retry);
             final events = snapshot.data!;
             if (events.isEmpty) return const Center(child: Text('Todavía no hay eventos públicos.'));
             return ListView.separated(
@@ -73,4 +80,34 @@ class _PublicEventsPageState extends State<PublicEventsPage> {
           },
         ),
       );
+}
+
+class _PublicLoadError extends StatelessWidget {
+  const _PublicLoadError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 42, color: Theme.of(context).colorScheme.error),
+            const SizedBox(height: 12),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
