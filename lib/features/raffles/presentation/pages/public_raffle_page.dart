@@ -1,6 +1,7 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Corrige el rango visual de números y la reserva pública.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX público de rifas; estado de cierre y selección responsive.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso al login desde la página pública de la rifa.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): corrige el estado de cierre en la selección de números.
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -80,7 +81,7 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
             Text('Renovación mensual el día ${raffle.monthlyDay ?? '-'}.'),
           ],
             const SizedBox(height: 20),
-            Wrap(spacing: 8, runSpacing: 8, children: List.generate(raffle.totalNumbers, (index) => _numberTile(raffle, index + 1))),
+            Wrap(spacing: 8, runSpacing: 8, children: List.generate(raffle.totalNumbers, (index) => _numberTile(raffle, index + 1, isClosed))),
           ]))),
           const SizedBox(height: 16),
           FilledButton.icon(onPressed: isClosed || _selectedNumbers.isEmpty ? null : _showReservationDialog, icon: const Icon(Icons.confirmation_number_outlined), label: Text(isClosed ? 'Rifa cerrada' : (_selectedNumbers.isEmpty ? 'Selecciona números' : 'Reservar ${_selectedNumbers.length} número(s)')),
@@ -92,7 +93,7 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
     );
   }
 
-  Widget _numberTile(Raffle raffle, int number) {
+  Widget _numberTile(Raffle raffle, int number, bool isClosed) {
     final isOccupied = raffle.occupiedNumbers.contains(number) || _reservedNumbers.contains(number);
     final isSelected = _selectedNumbers.contains(number);
     return SizedBox(width: 48, height: 42, child: OutlinedButton(onPressed: isClosed || isOccupied ? null : () => setState(() => isSelected ? _selectedNumbers.remove(number) : _selectedNumbers.add(number)), style: OutlinedButton.styleFrom(padding: EdgeInsets.zero, backgroundColor: isOccupied ? Colors.grey.shade300 : (isSelected ? Theme.of(context).colorScheme.primaryContainer : null), foregroundColor: isOccupied ? Colors.grey.shade600 : null, disabledForegroundColor: Colors.grey.shade600), child: Text(number.toString().padLeft(2, '0'))));
