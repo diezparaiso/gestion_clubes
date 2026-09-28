@@ -5,6 +5,7 @@ import '../../../core/services/supabase_service.dart';
 import '../../clubs/data/repositories/club_repository.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): completa recuperación de contraseña y sesión de recuperación.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade permiso de gestión de patrocinadores para el presidente.
 
 enum AuthStatus { signedOut, signingIn, creatingClub, signedIn, needsClub, error }
 
@@ -112,7 +113,7 @@ class ClubRolePermissions {
   const ClubRolePermissions._();
 
   static const Map<String, Set<String>> _permissions = {
-    'club_president': {'dashboard_view','members_view','members_manage','teams_view','teams_manage','players_view','players_manage','finance_view','finance_manage','raffles_view','raffles_manage','news_view','news_manage','events_view','events_manage','notifications_view','club_settings_view','club_settings_manage','access_manage'},
+    'club_president': {'dashboard_view','members_view','members_manage','teams_view','teams_manage','players_view','players_manage','finance_view','finance_manage','raffles_view','raffles_manage','news_view','news_manage','events_view','events_manage','notifications_view','club_settings_view','club_settings_manage','access_manage','sponsors_manage'},
     'club_treasurer': {'dashboard_view','finance_view','finance_manage','notifications_view'},
     'club_secretary': {'dashboard_view','members_view','members_manage','news_view','news_manage','events_view','events_manage','notifications_view'},
     'team_manager': {'dashboard_view','teams_view','players_view','players_manage','notifications_view'},
