@@ -1,3 +1,4 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora estados de carga y error de Socios; añade reintento sin cambios de Supabase ni Payments/Stripe.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos view/manage en acciones de la pantalla.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive; sin cambios de Supabase ni Payments/Stripe.
 import 'package:club_payments/club_payments.dart';
@@ -137,8 +138,11 @@ class _MembersPageState extends ConsumerState<MembersPage> {
               Expanded(
                 child: members.when(
                   loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) =>
-                      const Center(child: Text('No se ha podido cargar el listado.')),
+                  error: (error, stack) => Center(
+                    child: _MembersLoadError(
+                      onRetry: () => ref.invalidate(membersProvider),
+                    ),
+                  ),
                   data: (items) {
                     final query = _searchController.text.toLowerCase();
                     final filtered = items.where((member) {
