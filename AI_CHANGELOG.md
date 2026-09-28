@@ -1,3 +1,16 @@
+## 2026-09-28 — GPT-5.6 LUNA — acceso consistente al login en rifas públicas
+
+### Cambios realizados
+- `lib/features/raffles/presentation/pages/public_raffle_page.dart`
+  - Añadido botón **Acceder** en la cabecera de la rifa pública.
+  - Reutiliza la ruta existente `/login`.
+  - No modifica la reserva simulada ni integra pagos reales.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+
+### Estado
+La navegación pública dispone ahora de acceso al login desde home, noticias, eventos, patrocinadores y rifas públicas. Pendiente validación visual/compilación en Flutter Web/Chrome.
+
 ## 2026-09-28 — GPT-5.6 LUNA — consistencia de navegación pública
 
 ### Cambios realizados
