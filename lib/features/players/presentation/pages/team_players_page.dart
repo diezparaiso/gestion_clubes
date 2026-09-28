@@ -124,7 +124,7 @@ class _TeamPlayersPageState extends ConsumerState<TeamPlayersPage> {
           const SizedBox(height: 16),
           Expanded(child: players.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => const Center(child: Text('No se ha podido cargar la plantilla.')),
+            error: (error, stack) => Center(child: _PlayersLoadError(onRetry: () => ref.invalidate(playersProvider))),
             data: (items) {
               final query = _searchController.text.trim().toLowerCase();
               final filtered = items.where((player) {
