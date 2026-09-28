@@ -207,6 +207,32 @@ class _MembersPageState extends ConsumerState<MembersPage> {
   }
 }
 
+class _MembersLoadError extends StatelessWidget {
+  const _MembersLoadError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.error_outline, size: 40),
+        const SizedBox(height: 12),
+        const Text('No se ha podido cargar el listado.'),
+        const SizedBox(height: 8),
+        const Text('Puedes reintentarlo sin salir de Socios.'),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: onRetry,
+          icon: const Icon(Icons.refresh),
+          label: const Text('Reintentar'),
+        ),
+      ],
+    );
+  }
+}
+
 /// Charges a membership fee to [member] using club_payments, and on
 /// success records the corresponding movement in Tesorería (Finance).
 ///
