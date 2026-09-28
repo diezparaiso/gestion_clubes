@@ -124,14 +124,18 @@
 - [x] Registrados los cambios en `AI_CHANGELOG.md`.
 - [x] Marcados los cuatro archivos fuente modificados con `MODIFICADO POR GPT-5.6 LUNA`.
 
+### Trabajo cerrado en esta ronda
+- [x] Centro de Notificaciones.
+- [x] Flujo Equipos → Jugadores → Personal.
+
 ### Próximo bloque sin pagos
 - [x] Cerrar módulo de Patrocinadores: gestión interna, rutas, navegación y escaparate público.
 - [ ] Auditoría responsive del resto de pantallas.
 - [ ] Revisar UX de dashboard y navegación móvil.
 - [x] Completar/repasar CRUD y estados de Noticias.
-- [ ] Revisar centro de Notificaciones y estados vacíos/error.
+- [x] Cerrar centro de Notificaciones y estados vacíos/error.
 - [ ] Revisar Perfil y gestión de cuenta.
-- [ ] Auditoría integral Equipos → Jugadores → Personal.
+- [x] Cerrar flujo Equipos → Jugadores → Personal: CRUD/estado, navegación, filtros, responsive y estados vacíos.
 - [ ] Auditoría de Rifas excluyendo checkout/pago real.
 - [ ] Mejorar mensajes de error y estados de carga de la aplicación.
 - [ ] Ampliar tests unitarios que no dependan de Supabase/Stripe.
