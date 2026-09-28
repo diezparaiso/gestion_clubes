@@ -51,6 +51,8 @@ class SponsorsPage extends ConsumerWidget {
                   },
                 ),
               ),
+          ),
+        ],
       ),
     );
   }
@@ -99,7 +101,7 @@ class _SponsorCard extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
+                    Flexible(
                       child: Text(
                         sponsor.name,
                         style: const TextStyle(
