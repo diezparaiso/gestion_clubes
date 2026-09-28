@@ -26,6 +26,9 @@ class SponsorsPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Patrocinadores'),
+      floatingActionButton: canManage
+          ? FloatingActionButton.extended(onPressed: () => _showCreateDialog(context, ref, clubId), icon: const Icon(Icons.add_business_outlined), label: const Text('Nuevo patrocinador'))
+          : null,
       body: sponsorsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
