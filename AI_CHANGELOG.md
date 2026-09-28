@@ -1,3 +1,22 @@
+## 2026-09-28 — GPT-5.6 LUNA — cierre de Perfil y protección de cuenta
+
+### Cambios realizados
+- lib/features/auth/presentation/pages/profile_page.dart
+  - Estado de guardado visible.
+  - Errores de cambio de contraseña mostrados dentro del formulario.
+  - Mantiene validación mínima de 8 caracteres y confirmación.
+  - Responsive mediante contenedor máximo existente.
+- lib/app/router.dart
+  - Perfil y rutas autenticadas quedan protegidos por sesión.
+  - Mis rifas requiere sesión mediante dashboard_view.
+  - Se mantiene acceso público únicamente para rutas públicas explícitas.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se han modificado Stripe, club_payments ni club_payments_backend.
+
+### Estado
+- Perfil/cambio de contraseña y protección de rutas de cuenta: cerrado a nivel de frontend.
+- Sigue pendiente validación real con Supabase staging y ejecución de flutter analyze/tests.
+
 ## 2026-09-28 — GPT-5.6 LUNA — cierre UX del módulo de Rifas (sin pagos reales)
 
 ### Cambios realizados
