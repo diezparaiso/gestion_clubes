@@ -6,6 +6,7 @@
   - El enlace resuelve el `slug` real del club mediante `ClubRepository.getClubById` y abre la ruta pública existente `/club/:clubSlug`.
   - Sustituido el saludo basado directamente en el email por una presentación más legible derivada de su parte local.
   - Sustituido el avatar estático `PM` por iniciales calculadas a partir del usuario.
+  - La cabecera se distribuye con `Wrap` para evitar desbordamientos en móvil/tablet.
   - Se mantienen los permisos y las rutas privadas existentes.
 - No se modifican migraciones, RPC, políticas ni Supabase remoto.
 - No se modifican Stripe, `club_payments` ni `club_payments_backend`.
