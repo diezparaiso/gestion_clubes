@@ -1,3 +1,20 @@
+## 2026-09-28 — GPT-5.6 LUNA — definición funcional del flujo de incorporación
+
+### Cambios
+- `lib/features/clubs/presentation/pages/platform_home_page.dart`
+  - Añadida una sección pública «¿Cómo se incorpora un club?».
+  - Se explican las cuatro etapas previstas: solicitud, revisión, alta del club y configuración de cobros.
+  - Se aclara que los datos bancarios no se solicitan en la incorporación inicial.
+- Creado `docs/FLUJO_INCORPORACION_CLUBES.md`.
+  - Define el flujo funcional desde la solicitud pública hasta la activación.
+  - Separa estado de solicitud y estado operativo del club.
+  - Define la futura bandeja de soporte, revisión, alta, configuración y Stripe Connect.
+- No se modifica Supabase remoto, migraciones, RPC ni Edge Functions.
+- No se modifica Stripe, `club_payments` ni `club_payments_backend`.
+
+### Validación
+Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome después de estos cambios.
+
 ## 2026-09-28 — GPT-5.6 LUNA — cierre del flujo de entrada pública
 
 ### Cambios
