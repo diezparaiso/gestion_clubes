@@ -168,7 +168,8 @@
 - [ ] Completar revisión visual del dashboard en Flutter Web/Chrome.
 - [x] Completar/repasar CRUD y estados de Noticias.
 - [x] Cerrar centro de Notificaciones y estados vacíos/error.
-- [ ] Revisar Perfil y gestión de cuenta.
+- [x] Revisar Perfil y gestión de cuenta.
+- [x] Mejorar responsive de Configuración del club y acceso a Usuarios y permisos.
 - [x] Cerrar flujo Equipos → Jugadores → Personal: CRUD/estado, navegación, filtros, responsive y estados vacíos.
 - [x] Auditoría de Rifas excluyendo checkout/pago real: listado, detalle, Cesta, Sorteo puro, Mensual, área del socio y página pública.
 - [ ] Mejorar mensajes de error y estados de carga de la aplicación.
