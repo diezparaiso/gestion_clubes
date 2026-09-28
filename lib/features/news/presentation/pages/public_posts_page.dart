@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/repositories/post_repository.dart';
 import '../../domain/entities/post.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra la imagen opcional de las noticias públicas.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade navegación pública consistente y acceso al login.
 class PublicPostsPage extends StatefulWidget {
   const PublicPostsPage({super.key, required this.clubSlug});
   final String clubSlug;
@@ -23,7 +25,19 @@ class _PublicPostsPageState extends State<PublicPostsPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Noticias del club')),
+        appBar: AppBar(
+          title: const Text('Noticias del club'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: FilledButton.icon(
+                onPressed: () => context.go('/login'),
+                icon: const Icon(Icons.login, size: 18),
+                label: const Text('Acceder'),
+              ),
+            ),
+          ],
+        ),
         body: FutureBuilder<List<Post>>(
           future: _posts,
           builder: (context, snapshot) {
