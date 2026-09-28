@@ -125,6 +125,7 @@
 - [x] Marcados los cuatro archivos fuente modificados con `MODIFICADO POR GPT-5.6 LUNA`.
 
 ### Próximo bloque sin pagos
+- [x] Cerrar módulo de Patrocinadores: gestión interna, rutas, navegación y escaparate público.
 - [ ] Auditoría responsive del resto de pantallas.
 - [ ] Revisar UX de dashboard y navegación móvil.
 - [ ] Completar/repasar CRUD y estados de Noticias.
