@@ -1,10 +1,10 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade escaparate público de patrocinadores.
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/services/supabase_service.dart';
 import '../../data/repositories/sponsor_repository.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/sponsor.dart';
 
 class PublicSponsorsPage extends StatefulWidget {
