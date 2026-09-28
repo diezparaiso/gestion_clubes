@@ -125,7 +125,9 @@ class _AuthScaffold extends StatelessWidget {
 }
 
 class _AuthBrand extends StatelessWidget {
-  GestureDetector(onTap: () => context.go('/'), child: const _AuthBrand()),
+  const _AuthBrand();
+
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-29): corrige la estructura de la marca de acceso del login.
 
   @override
   Widget build(BuildContext context) {
