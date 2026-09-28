@@ -1,5 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos view/manage en acciones de la pantalla.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive; sin cambios de Supabase ni Payments/Stripe.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estado de error y reintento de Eventos.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -96,7 +97,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
         ],
       ),
       const SizedBox(height: 24),
-      Expanded(child: events.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar los eventos.')), data: (items) {
+      Expanded(child: events.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => Center(child: _EventsLoadError(onRetry: () => ref.invalidate(eventsProvider))), data: (items) {
         final query = _searchController.text.trim().toLowerCase();
         final filtered = items.where((event) {
           final text = '${event.title} ${event.location ?? ''} ${event.description}'.toLowerCase();
@@ -111,6 +112,26 @@ class _EventsPageState extends ConsumerState<EventsPage> {
     final saved = await showDialog<bool>(context: context, builder: (_) => const _CreateEventDialog());
     if (saved == true) ref.invalidate(eventsProvider);
   }
+}
+
+class _EventsLoadError extends StatelessWidget {
+  const _EventsLoadError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      const Icon(Icons.error_outline, size: 40),
+      const SizedBox(height: 12),
+      const Text('No se han podido cargar los eventos.'),
+      const SizedBox(height: 8),
+      const Text('Puedes reintentarlo sin salir de Eventos.'),
+      const SizedBox(height: 16),
+      OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+    ],
+  );
 }
 
 class _EventCard extends StatelessWidget {
