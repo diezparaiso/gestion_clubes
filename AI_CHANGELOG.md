@@ -1,3 +1,38 @@
+## 2026-09-28 — GPT-5.6 LUNA — primera fase de incorporación autónoma de clubes
+
+### Cambios de arquitectura
+- Se define una estrategia por fases para que los clubes puedan iniciar su incorporación sin intervención manual inmediata.
+- Fase 1: solicitud pública de incorporación.
+- Fase 2: cola persistente de solicitudes para soporte.
+- Fase 3: alta autónoma completa con creación del espacio del club.
+- Fase financiera: Stripe Connect para que Stripe recopile KYC y datos bancarios; la plataforma conservará únicamente el identificador de cuenta conectada y estados de capacidad.
+
+### Cambios de código
+- Creado `lib/features/clubs/presentation/pages/club_join_request_page.dart`.
+  - Formulario público responsive.
+  - Datos básicos del club y responsable.
+  - Intereses funcionales.
+  - Aviso explícito para no introducir datos bancarios.
+  - Confirmación visual.
+  - Esta fase no persiste ni envía datos todavía.
+- Modificado `lib/app/router.dart`.
+  - Nueva ruta pública `/solicitar-incorporacion`.
+  - No requiere autenticación.
+- Modificado `lib/features/auth/presentation/pages/login_page.dart`.
+  - Añadido acceso directo «¿Quieres incorporar tu club? Solicitar incorporación».
+- Creado `docs/ARQUITECTURA_INCORPORACION_CLUBES.md`.
+  - Documenta modelo de datos futuro, estados, seguridad y separación de Stripe.
+
+### Límites deliberados
+- No se modifica Supabase remoto.
+- No se crean migraciones/RPC/Edge Functions.
+- No se toca Stripe, `club_payments` ni `club_payments_backend`.
+- No se almacenan datos bancarios.
+- La conexión real con soporte queda pendiente de backend.
+
+### Validación
+- Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome tras estos cambios.
+
 ## 2026-09-28 — GPT-5.6 LUNA — mejora del dashboard y acceso a la web pública
 
 ### Cambios realizados
