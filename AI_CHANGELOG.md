@@ -1064,3 +1064,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregida la política de lectura de `raffle_tickets`: la propiedad del comprador usa `buyer_profile_id`, no `profile_id`.
 - Así se mantiene el acceso de un usuario a sus propias participaciones sin ampliar `raffles_view`.
 - No se ejecuta Supabase remoto ni se modifica Payments/Stripe.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — mejora de estados del dashboard
+- El dashboard deja de ocultar los estados de carga y error de sus estadísticas.
+- Mientras se consultan las estadísticas muestra un estado de carga explícito.
+- Si la consulta falla, muestra un mensaje no bloqueante y permite reintentar sin abandonar el dashboard.
+- Se mantienen los permisos por módulo ya existentes y no se modifica Supabase remoto ni Payments/Stripe.
+- Validación de compilación/análisis y prueba visual en Chrome: pendientes de ejecución local.
