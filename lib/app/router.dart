@@ -1,5 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): refuerza permisos por ruta en equipos y jugadores.
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade ruta pública para solicitudes de incorporación de clubes.\nimport 'package:flutter_riverpod/flutter_riverpod.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade ruta pública para solicitudes de incorporación de clubes.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade landing pública de la plataforma en '/'.\nimport 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/application/auth_controller.dart';
@@ -8,6 +9,7 @@ import '../features/auth/presentation/pages/register_page.dart';
 import '../features/auth/presentation/pages/profile_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
 import '../features/clubs/presentation/pages/club_join_request_page.dart';
+import '../features/clubs/presentation/pages/platform_home_page.dart';
 import '../features/clubs/presentation/pages/public_club_page.dart';
 import '../features/clubs/presentation/pages/club_settings_page.dart';
 import '../features/clubs/presentation/pages/club_access_management_page.dart';
@@ -60,7 +62,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     redirect: (context, state) {
       final location = state.uri.path;
       final isAuthRoute = location == '/login' || location == '/register';
-      final isPublicRoute = isAuthRoute || location == '/privacy' || location == '/solicitar-incorporacion' || location.startsWith('/r/') || location.startsWith('/club/');
+      final isPublicRoute = isAuthRoute || location == '/' || location == '/privacy' || location == '/solicitar-incorporacion' || location.startsWith('/r/') || location.startsWith('/club/');
       final isPublicRaffle = location.startsWith('/r/');
       final isPublicClub = location.startsWith('/club/');
       final isPublicPrivacy = location == '/privacy';
@@ -79,6 +81,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(path: '/', name: 'platform-home', builder: (context, state) => const PlatformHomePage()),
       GoRoute(path: '/login', name: 'login', builder: (context, state) => const LoginPage()),
       GoRoute(path: '/register', name: 'register', builder: (context, state) => const RegisterPage()),
       GoRoute(path: '/solicitar-incorporacion', name: 'club-join-request', builder: (context, state) => const ClubJoinRequestPage()),
