@@ -1,3 +1,19 @@
+## 2026-09-28 — GPT-5.6 LUNA — endurecimiento de la solicitud de incorporación
+
+### Cambios
+- `club_join_request_page.dart`
+  - Añadido tipo de entidad.
+  - Añadido sitio web opcional.
+  - Añadida aceptación explícita de la información de privacidad.
+  - Enlace a la política de privacidad existente.
+  - La validación impide continuar sin aceptar la privacidad.
+- Se mantiene el carácter frontend-only de esta fase.
+- No se persisten datos ni se modifica Supabase remoto.
+- No se solicitan datos bancarios.
+
+### Arquitectura
+La futura recepción real de la solicitud deberá aplicar consentimiento/información de privacidad, validación server-side y controles de acceso antes de almacenar los datos de contacto.
+
 ## 2026-09-28 — GPT-5.6 LUNA — primera fase de incorporación autónoma de clubes
 
 ### Cambios de arquitectura
