@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/repositories/event_repository.dart';
 import '../../domain/entities/event.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra fecha y hora reales en la agenda pública.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade navegación pública consistente y acceso al login.
 class PublicEventsPage extends StatefulWidget {
   const PublicEventsPage({super.key, required this.clubSlug});
   final String clubSlug;
@@ -29,7 +31,19 @@ class _PublicEventsPageState extends State<PublicEventsPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Eventos del club')),
+        appBar: AppBar(
+          title: const Text('Eventos del club'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: FilledButton.icon(
+                onPressed: () => context.go('/login'),
+                icon: const Icon(Icons.login, size: 18),
+                label: const Text('Acceder'),
+              ),
+            ),
+          ],
+        ),
         body: FutureBuilder<List<ClubEvent>>(
           future: _events,
           builder: (context, snapshot) {
