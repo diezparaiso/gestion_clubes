@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive; sin cambios de Supabase ni Payments/Stripe.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estados de carga y error de tesorería.; sin cambios de Supabase ni Payments/Stripe.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -141,11 +142,11 @@ class _FinancePageState extends ConsumerState<FinancePage> {
             ),
             const SizedBox(height: 16),
             Expanded(child: transactions.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => const Center(child: Text('No se han podido cargar los movimientos.')),
+              loading: () => _FinanceLoading(message: 'Cargando movimientos…'),
+              error: (error, stack) => _FinanceError(onRetry: () => ref.invalidate(financeTransactionsProvider)),
               data: (items) => openingBalance.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => const Center(child: Text('No se ha podido cargar el saldo inicial.')),
+                loading: () => _FinanceLoading(message: 'Cargando saldo inicial…'),
+                error: (error, stack) => _FinanceError(onRetry: () => ref.invalidate(openingBalanceProvider)),
                 data: (balance) {
                   final query = _searchController.text.trim().toLowerCase();
                   final filtered = items.where((item) {
@@ -193,6 +194,49 @@ class _FinancePageState extends ConsumerState<FinancePage> {
 String _categoryLabel(String category) => switch (category) {
   'membership' => 'Cuotas', 'sponsorship' => 'Patrocinio', 'raffle' => 'Rifa', 'event' => 'Evento', 'equipment' => 'Equipamiento', 'federation' => 'Federación', 'facilities' => 'Instalaciones', 'salaries' => 'Salarios', 'supplies' => 'Suministros', _ => 'Otros',
 };
+
+class _FinanceLoading extends StatelessWidget {
+  const _FinanceLoading({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: const [
+        SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5)),
+        SizedBox(width: 12),
+        Text('Cargando…'),
+      ],
+    ),
+  );
+}
+
+class _FinanceError extends StatelessWidget {
+  const _FinanceError({required this.onRetry});
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline_rounded, color: Theme.of(context).colorScheme.error),
+            const SizedBox(height: 8),
+            const Text('No se han podido cargar los datos.', style: TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            const Text('Puedes reintentarlo sin salir de Tesorería.'),
+            const SizedBox(height: 12),
+            TextButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Reintentar')),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
 class _FinanceContent extends StatelessWidget {
   const _FinanceContent({required this.transactions, required this.visibleTransactions, required this.openingBalance});
