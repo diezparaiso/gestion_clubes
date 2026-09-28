@@ -17,6 +17,7 @@ import '../../application/dashboard_stats_provider.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): el Excel solo solicita módulos con permiso de lectura.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): incorpora Patrocinadores en navegación desktop/mobile.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso directo a la web pública y mejora la identificación del usuario.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estados de carga y error de estadísticas del dashboard.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -52,7 +53,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
-    final stats = ref.watch(dashboardStatsProvider).valueOrNull;
+    final statsAsync = ref.watch(dashboardStatsProvider);
+    final stats = statsAsync.valueOrNull;
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 900;
@@ -202,7 +204,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
               ],
             ),
             const SizedBox(height: 32),
-            _buildMetricGrid(isDesktop, stats),
+            _buildDashboardStats(context, isDesktop, statsAsync),
             const SizedBox(height: 32),
             Text('Acciones rápidas', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 14),
@@ -210,6 +212,68 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             const SizedBox(height: 32),
             _buildActivitySection(context, isDesktop, stats),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardStats(BuildContext context, bool isDesktop, AsyncValue<DashboardStats> statsAsync) {
+    return statsAsync.when(
+      loading: () => _buildStatsLoading(isDesktop),
+      error: (error, stack) => _buildStatsError(context, error, isDesktop),
+      data: (stats) => _buildMetricGrid(isDesktop, stats),
+    );
+  }
+
+  Widget _buildStatsLoading(bool isDesktop) {
+    final width = isDesktop ? double.infinity : double.infinity;
+    return SizedBox(
+      width: width,
+      height: isDesktop ? 154 : 310,
+      child: Card(
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5)),
+              SizedBox(width: 12),
+              Text('Cargando el estado del club…'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsError(BuildContext context, Object error, bool isDesktop) {
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.error_outline_rounded, color: Theme.of(context).colorScheme.error),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('No se han podido cargar las estadísticas.', style: TextStyle(fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 4),
+                    const Text('Puedes continuar usando el resto de la gestión del club.'),
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      onPressed: () => ref.invalidate(dashboardStatsProvider),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
