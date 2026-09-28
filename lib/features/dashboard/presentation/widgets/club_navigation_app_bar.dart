@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../auth/application/auth_controller.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): navegación basada en permisos en lugar de roles.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso al módulo de patrocinadores.
 
 /// Barra común de navegación de la gestión del club.
 /// MODIFICADO POR GPT-5.6 LUNA (2026-09-26): navegación centralizada por rol.
@@ -30,6 +31,7 @@ class ClubNavigationAppBar extends ConsumerWidget implements PreferredSizeWidget
       if (can('raffles_view')) (label: 'Rifas', path: '/raffles', icon: Icons.confirmation_number_outlined),
       if (can('news_view')) (label: 'Noticias', path: '/news', icon: Icons.article_outlined),
       if (can('events_view')) (label: 'Eventos', path: '/events', icon: Icons.event_outlined),
+      if (can('sponsors_manage')) (label: 'Patrocinadores', path: '/sponsors', icon: Icons.business_outlined),
       if (can('notifications_view')) (label: 'Notificaciones', path: '/notifications', icon: Icons.notifications_outlined),
       if (can('club_settings_view')) (label: 'Configuración', path: '/settings', icon: Icons.settings_outlined),
       if (can('access_manage')) (label: 'Usuarios y permisos', path: '/settings/access', icon: Icons.manage_accounts_outlined),
