@@ -1,3 +1,22 @@
+## 2026-09-28 — GPT-5.6 LUNA — nueva home pública del club
+
+### Cambios realizados
+- lib/features/clubs/presentation/pages/public_club_page.dart
+  - La página pública pasa a ser la home principal del club.
+  - Cabecera pública con navegación y botón **Acceder** arriba a la derecha.
+  - Hero con nombre del club y accesos a noticias/eventos.
+  - Bloques públicos para Noticias, Eventos, Equipos y Patrocinadores.
+  - Enlaces a web y redes sociales existentes.
+  - Diseño responsive para móvil, tablet y escritorio.
+  - Mantiene las rutas públicas existentes y no expone gestión interna.
+- El botón **Acceder** dirige a /login; la autenticación existente continúa llevando al área privada.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se han modificado Stripe, club_payments ni club_payments_backend.
+
+### Estado
+- Home pública del club: cerrada a nivel de frontend.
+- Pendiente validación visual en Flutter Web/Chrome y con datos reales de Supabase staging.
+
 ## 2026-09-28 — GPT-5.6 LUNA — cierre de Perfil y protección de cuenta
 
 ### Cambios realizados
