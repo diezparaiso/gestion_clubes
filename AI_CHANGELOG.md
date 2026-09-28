@@ -1,3 +1,28 @@
+## 2026-09-28 — GPT-5.6 LUNA — cierre UX del módulo de Rifas (sin pagos reales)
+
+### Cambios realizados
+- lib/features/raffles/presentation/pages/raffles_page.dart
+  - Cabecera responsive.
+  - Buscador y filtro de estado adaptados a pantallas estrechas.
+  - Se mantienen permisos raffles_manage.
+- lib/features/raffles/presentation/pages/raffle_detail_page.dart
+  - Cabecera responsive.
+  - Validación del ganador manual de Cesta para aceptar solo números participantes y confirmados.
+  - Se mantiene el sorteo criptográficamente aleatorio existente para Sorteo puro.
+- lib/features/raffles/presentation/pages/my_raffles_page.dart
+  - Ajuste UX de cabecera y estados vacíos existentes.
+- lib/features/raffles/presentation/pages/public_raffle_page.dart
+  - La rifa queda visualmente cerrada cuando está finalizada/cancelada/agota números o supera su fecha final.
+  - Se impide seleccionar números y reservar cuando está cerrada.
+  - Se mantiene la reserva simulada; el pago real continúa bloqueado.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se ha modificado club_payments, club_payments_backend ni Stripe.
+
+### Estado
+- Frontend de Rifas: cerrado en lo que no depende de pagos reales.
+- Checkout, suscripciones, webhooks, recibos PDF/email e idempotencia Stripe permanecen deliberadamente pendientes.
+- Falta validar Flutter Web/Chrome, responsive real y rifas contra Supabase staging.
+
 ## 2026-09-28 — GPT-5.6 LUNA — cierre del flujo Equipos → Jugadores → Personal
 
 ### Cambios realizados
