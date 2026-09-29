@@ -446,15 +446,15 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       final club = await _publicClubFuture;
       if (!mounted) return;
       if (club == null || club.slug.trim().isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(this.context).showSnackBar(
           const SnackBar(content: Text('No se ha podido localizar la página pública del club.')),
         );
         return;
       }
-      context.go('/club/${Uri.encodeComponent(club.slug)}');
+      this.context.go('/club/${Uri.encodeComponent(club.slug)}');
     } catch (_) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
+      ScaffoldMessenger.of(this.context).showSnackBar(
         const SnackBar(content: Text('No se ha podido abrir la página pública del club.')),
       );
     }
