@@ -1225,3 +1225,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/clubs/presentation/pages/club_onboarding_page.dart`: el error al cargar los clubes disponibles ahora ofrece un botón `Reintentar` que invalida `availableClubsProvider`.
 - Se conserva la posibilidad de crear un club aunque el listado no esté disponible.
 - No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — equipos: reintento de temporadas en formulario
+- `lib/features/teams/presentation/pages/teams_page.dart`: si el selector de temporadas falla al crear/editar un equipo, ahora muestra `Reintentar` e invalida `seasonsProvider`.
+- Evita dejar el formulario bloqueado únicamente por un fallo transitorio de carga de temporadas.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
