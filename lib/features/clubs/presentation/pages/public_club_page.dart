@@ -87,7 +87,6 @@ class _PublicClubPageState extends State<PublicClubPage> {
       );
 
   Widget _content(BuildContext context, Club club) {
-    final theme = Theme.of(context);
     return FutureBuilder<(List<ClubEvent>, List<Post>)>(
       future: Future.wait([_events, _posts]).then((values) => (values[0] as List<ClubEvent>, values[1] as List<Post>)),
       builder: (context, snapshot) {
