@@ -1251,3 +1251,16 @@ This file is the permanent handoff log between AI assistants working on this rep
 - No quedan cambios funcionales pendientes identificados en esta tanda que justifiquen tocar código adicional sin una nueva necesidad concreta.
 - La validación definitiva corresponde ahora a la ejecución local de `flutter analyze` y `flutter test` después del pull.
 - No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — auditoría responsive/PWA, tests y permisos final
+- Auditoría estática final de las pantallas internas y públicas para Chrome/Web y tamaños móvil/tablet/escritorio.
+- Confirmado el patrón responsive existente en Dashboard, Home pública, web pública del club, Socios, Tesorería, Equipos, Plantilla, Personal, Noticias, Eventos, Patrocinadores, Rifas, Perfil, Configuración y Onboarding.
+- `events_page.dart`: el diálogo de alta deja de imponer un ancho rígido de 460 px y pasa a limitarse mediante `ConstrainedBox`, evitando forzar ancho fijo en ventanas estrechas.
+- `public_raffle_page.dart`: el bloque QR pasa de `Row` a `Wrap` para evitar desbordamientos en móvil.
+- `sponsors_page.dart`: el encabezado de cada patrocinador usa `Wrap` y la capacidad de gestión se resuelve mediante `ClubRolePermissions`, manteniendo la autorización alineada con la matriz central.
+- PWA: `web/manifest.json` incorpora `scope: "./"` y `lang: "es"`; se conservan `start_url`, `standalone`, colores de tema e iconos 192/512 y maskable.
+- Tests adicionales: se amplía la cobertura de `ClubRolePermissions` para patrocinadores, accesos y configuración, y se añade cobertura de la ruta `/sponsors`.
+- `auth_state_test.dart`: corregida la estructura del archivo para que toda la suite de grupos de pruebas quede dentro de `main()`.
+- No se modifican Supabase remoto, migraciones, RPC, Edge Functions, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente de validación externa/local: ejecutar `flutter analyze --no-pub`, `flutter test --reporter expanded`, `flutter build web` y revisión visual/instalación PWA en Chrome.
