@@ -30,11 +30,6 @@ class _PublicSponsorsPageState extends State<PublicSponsorsPage> {
     _sponsors = SponsorRepository(client).getPublicSponsors(widget.clubSlug);
   }
 
-  void _retry() {
-    setState(() {
-      _events = EventRepository().listPublicEvents(widget.clubSlug);
-    });
-  }
 
   void _retry() {
     final client = SupabaseService.isConfigured ? Supabase.instance.client : null;
@@ -123,35 +118,7 @@ class _SponsorPublicCard extends StatelessWidget {
   }
 }
 
-class _PublicLoadError extends StatelessWidget {
-  const _PublicLoadError({required this.message, required this.onRetry});
 
-  final String message;
-  final VoidCallback onRetry;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.cloud_off_outlined, size: 42, color: Theme.of(context).colorScheme.error),
-            const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center),
-            const SizedBox(height: 12),
-            FilledButton.icon(
-              onPressed: onRetry,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Reintentar'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
 
 class _PublicLoadError extends StatelessWidget {
   const _PublicLoadError({required this.message, required this.onRetry});
