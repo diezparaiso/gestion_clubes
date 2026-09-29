@@ -43,7 +43,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
         await client.auth.signInWithPassword(email: email, password: _current.text);
       }
       await client.auth.updateUser(UserAttributes(password: _newPassword.text));
-      await client.from('profiles').update({'must_change_password': false}).eq('id', client.auth.currentUser!.id);
+      await client.rpc('clear_must_change_password');
       if (!mounted) return;
       final wasRecovery = ref.read(authControllerProvider).passwordRecovery;
       ref.read(authControllerProvider.notifier).clearPasswordChangeRequirement();
