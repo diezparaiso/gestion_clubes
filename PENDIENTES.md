@@ -195,3 +195,8 @@
 - [ ] Cualquier despliegue de migraciones/RPC/Edge Functions que requiera validación externa.
 
 > Regla de trabajo: cualquier archivo modificado por ChatGPT debe llevar un marcador `MODIFICADO POR GPT-5.6 LUNA` y cada intervención debe registrarse también en `AI_CHANGELOG.md`. No se consideran terminadas las tareas que dependan de infraestructura externa hasta validarlas allí.
+
+
+### Cierre incremental — 2026-09-29
+- [x] Web pública del club: estado de carga, error recuperable al cargar el club y reintento de la actualidad (noticias/eventos).
+- [ ] Validar visualmente en Flutter Web/Chrome y ejecutar `flutter analyze --no-pub` + `flutter test --reporter expanded` en entorno local antes de declarar el bloque validado.
