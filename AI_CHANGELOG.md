@@ -1198,3 +1198,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - No se modifica el backend de pagos ni se habilita checkout; el módulo mantiene su separación actual respecto a Payments/Stripe.
 - No se modifican Supabase remoto ni migraciones.
 - Pendiente: validación local con `flutter analyze` y `flutter test`.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre de seguridad de contexto en Eventos
+- `lib/features/events/presentation/pages/events_page.dart`: protegido el uso de `BuildContext` en la validación de fecha/hora del diálogo de alta tras una operación asíncrona.
+- Si el diálogo ya no está montado, se sale sin intentar actualizar estado ni mostrar el `SnackBar`.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+- Pendiente: validación local acumulada después de completar esta tanda.
