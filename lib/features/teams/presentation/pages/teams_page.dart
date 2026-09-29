@@ -132,7 +132,20 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
             const SizedBox(height: 24),
             Expanded(child: teams.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => Center(child: _TeamsLoadError(onRetry: () => ref.invalidate(teamsProvider))),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('No se ha podido cargar los equipos.'),
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      onPressed: () => ref.invalidate(teamsProvider),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              ),
               data: (items) {
                 final query = _searchController.text.trim().toLowerCase();
                 final filtered = items.where((team) {
