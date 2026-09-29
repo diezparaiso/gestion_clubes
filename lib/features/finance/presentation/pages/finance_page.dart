@@ -143,7 +143,7 @@ class _FinancePageState extends ConsumerState<FinancePage> {
             const SizedBox(height: 16),
             Expanded(child: transactions.when(
               loading: () => _FinanceLoading(message: 'Cargando movimientos…'),
-              error: (error, stack) => _FinanceError(onRetry: () => ref.invalidate(financeTransactionsProvider)),
+              error: (error, stack) => _FinanceError(onRetry: () => ref.invalidate(transactionsProvider)),
               data: (items) => openingBalance.when(
                 loading: () => _FinanceLoading(message: 'Cargando saldo inicial…'),
                 error: (error, stack) => _FinanceError(onRetry: () => ref.invalidate(openingBalanceProvider)),
@@ -203,7 +203,7 @@ class _FinanceLoading extends StatelessWidget {
   Widget build(BuildContext context) => Center(
     child: Row(
       mainAxisSize: MainAxisSize.min,
-      children: const [
+      children: [
         SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5)),
         SizedBox(width: 12),
         Text(message),
