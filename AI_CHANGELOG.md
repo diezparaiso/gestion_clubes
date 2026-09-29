@@ -1176,3 +1176,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - No se cambia la lógica de producción; se corrige una prueba desactualizada respecto al comportamiento ya definido.
 - No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
 - Pendiente: ejecutar localmente `flutter test` después del pull para confirmar la suite completa.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — limpieza final del último aviso de analyzer
+- `lib/features/sponsors/presentation/pages/sponsors_page.dart`: añadido `context.mounted` antes de reutilizar el `BuildContext` después de `updateSponsor`, tanto en éxito como en error.
+- Se elimina el aviso `use_build_context_synchronously` sin cambiar el flujo funcional.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente: validación local final con `flutter analyze` y `flutter test`.
