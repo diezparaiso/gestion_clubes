@@ -435,7 +435,7 @@ class _InviteMemberDialogState extends ConsumerState<_InviteMemberDialog> {
                       );
                     }
                   } finally {
-                    setState(() => _loading = false);
+                    if (mounted) setState(() => _loading = false);
                   }
                 },
           child: _loading
