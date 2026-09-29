@@ -107,7 +107,20 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
           const SizedBox(height: 16),
           Expanded(child: staff.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => Center(child: _StaffLoadError(onRetry: () => ref.invalidate(staffProvider))),
+            error: (error, stack) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('No se ha podido cargar el personal.'),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: () => ref.invalidate(teamStaffProvider(teamId)),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            ),
             data: (items) {
               final query = _searchController.text.trim().toLowerCase();
               final filtered = items.where((member) {
