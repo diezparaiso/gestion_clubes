@@ -64,6 +64,7 @@
 ## 3. Seguridad y permisos
 - [ ] Ejecutar migraciones 032–044 en Supabase cuando corresponda (solo mediante despliegue controlado).
 - [ ] Verificar todas las políticas RLS en una base de pruebas.
+- [x] Auditar repositories con escrituras directas y alinear sus fronteras RLS con la matriz central; migración 045 preparada.
 - [x] Revisar cada pantalla contra club_role_permissions.
 - [x] Separar permisos _view y _manage en la UI en los módulos ya cerrados.
 - [x] Revisar dashboard/sidebar para ocultar acciones no permitidas por rol.
@@ -75,6 +76,7 @@
 - [x] Alta de accesos bloquea también en backend el rol `club_president`.
 - [x] Gestión de accesos restringida al presidente.
 - [x] Alinear Patrocinadores con el permiso central sponsors_manage; migraciones 043–044 preparadas, pendientes de aplicar y probar en staging.
+- [x] Alinear las políticas de escritura principales con *_manage mediante migración 045; pendiente de aplicar y probar en staging.
 
 ## 4. Perfil y autenticación
 - [ ] Probar flujo completo de must_change_password en Web/Chrome y staging.
