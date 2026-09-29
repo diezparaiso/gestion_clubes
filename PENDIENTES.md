@@ -1,7 +1,7 @@
 <!-- MODIFICADO POR GPT-5.6 LUNA (2026-09-27): sincroniza el inventario de módulos cerrados y pendientes reales. -->
 # PENDIENTES DEL PROYECTO
 
-> Última actualización: 2026-09-28 — GPT-5.6 LUNA
+> Última actualización: 2026-09-29 — GPT-5.6 LUNA
 
 > Los puntos marcados como pendientes de staging, Supabase, proveedores o producción requieren una validación externa y no se cierran solo con cambios de código.
 > Inventario de trabajo pendiente. La trazabilidad cronológica permanece en AI_CHANGELOG.md.
@@ -62,7 +62,7 @@
 - [x] Sin IDs ficticios.
 
 ## 3. Seguridad y permisos
-- [ ] Ejecutar migraciones 032–040 en Supabase cuando corresponda (solo mediante despliegue controlado).
+- [ ] Ejecutar migraciones 032–044 en Supabase cuando corresponda (solo mediante despliegue controlado).
 - [ ] Verificar todas las políticas RLS en una base de pruebas.
 - [x] Revisar cada pantalla contra club_role_permissions.
 - [x] Separar permisos _view y _manage en la UI en los módulos ya cerrados.
@@ -74,6 +74,7 @@
 - [x] Nombramiento de presidente reservado al administrador de plataforma.
 - [x] Alta de accesos bloquea también en backend el rol `club_president`.
 - [x] Gestión de accesos restringida al presidente.
+- [x] Alinear Patrocinadores con el permiso central sponsors_manage; migraciones 043–044 preparadas, pendientes de aplicar y probar en staging.
 
 ## 4. Perfil y autenticación
 - [ ] Probar flujo completo de must_change_password en Web/Chrome y staging.
