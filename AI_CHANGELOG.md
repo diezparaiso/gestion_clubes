@@ -1237,3 +1237,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Noticias y Eventos: se protegen las refrescos de providers despues de operaciones asincronas y dialogos.
 - Se evita usar la referencia de Riverpod cuando la pantalla ya no esta montada.
 - Sin cambios en Supabase, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — seguridad del diálogo de invitación de miembros
+- `lib/features/clubs/presentation/pages/club_members_page.dart`: el `finally` del diálogo de invitación comprueba `mounted` antes de ejecutar `setState`.
+- Evita un posible `setState() called after dispose` si el diálogo se desmonta durante la operación asíncrona.
+- Sin cambios en Supabase, migraciones, Stripe ni Payments.
