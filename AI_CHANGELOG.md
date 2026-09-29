@@ -1,3 +1,30 @@
+## 2026-09-29 — GPT-5.6 LUNA — cierre de auditoría RLS del Módulo 2
+
+### Hallazgo principal
+- La auditoría de repositories confirmó que varios módulos realizan escrituras directas mediante Supabase y dependen de RLS para la frontera real de seguridad.
+- Se detectó que las políticas antiguas basadas en is_club_manager daban al secretario acceso de escritura más amplio que la matriz central de permisos.
+- Añadida supabase/migrations/045_central_permission_rls_alignment.sql.
+- 045 alinea RLS con los permisos *_view / *_manage:
+  - members_manage para socios.
+  - teams_manage para temporadas, equipos y personal.
+  - players_manage para jugadores y asignaciones.
+  - finance_view / finance_manage para tesorería.
+  - raffles_manage para rifas.
+  - news_manage para noticias.
+  - events_manage para eventos.
+  - club_settings_manage para configuración del club.
+  - access_manage para membresías/accesos.
+- Se mantiene separada la lectura pública de contenidos.
+- Ampliado club_role_permissions_test.dart para comprobar explícitamente que el secretario no obtiene permisos de equipos, jugadores, rifas ni patrocinadores.
+- No se ejecutan migraciones contra Supabase remoto.
+
+### Estado del módulo
+- Auditoría de UI/rutas: completada.
+- Auditoría de repositories/escrituras: completada.
+- Alineación RLS preparada: completada en código/migraciones.
+- Validación real RLS/RPC con usuarios: pendiente de staging.
+- Payments/Stripe no modificados.
+
 ## 2026-09-29 — GPT-5.6 LUNA — endurecimiento del estado de autenticación
 
 ### Cambios
