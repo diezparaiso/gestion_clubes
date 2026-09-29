@@ -1264,3 +1264,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `auth_state_test.dart`: corregida la estructura del archivo para que toda la suite de grupos de pruebas quede dentro de `main()`.
 - No se modifican Supabase remoto, migraciones, RPC, Edge Functions, Stripe, `club_payments` ni `club_payments_backend`.
 - Pendiente de validación externa/local: ejecutar `flutter analyze --no-pub`, `flutter test --reporter expanded`, `flutter build web` y revisión visual/instalación PWA en Chrome.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — corrección de responsive en Patrocinadores
+- `sponsors_page.dart`: sustituido `Flexible` dentro de `Wrap` por `ConstrainedBox`, evitando una combinación de widgets no válida y manteniendo el nombre del patrocinador limitado a dos líneas en anchos estrechos.
+- Sin cambios en Supabase remoto, migraciones, Stripe ni Payments.
