@@ -14,7 +14,7 @@ class SponsorsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(authControllerProvider);
     final clubId = auth.clubId;
-    final canManage = auth.role == 'club_president';
+    final canManage = ClubRolePermissions.has(auth.role, 'sponsors_manage');
 
     if (clubId == null) {
       return const Scaffold(
@@ -95,8 +95,10 @@ class _SponsorCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     Flexible(
                       child: Text(
