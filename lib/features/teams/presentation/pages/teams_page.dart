@@ -269,7 +269,21 @@ class _TeamFormDialogState extends ConsumerState<_TeamFormDialog> {
         const SizedBox(height: 12),
         seasons.when(
           loading: () => const LinearProgressIndicator(),
-          error: (error, stack) => const Align(alignment: Alignment.centerLeft, child: Text('No se han podido cargar las temporadas.')),
+          error: (error, stack) => Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('No se han podido cargar las temporadas.'),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () => ref.invalidate(seasonsProvider),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Reintentar'),
+                ),
+              ],
+            ),
+          ),
           data: (items) => DropdownButtonFormField<Season>(
             initialValue: _selectedSeason ??
                 (widget.team == null
