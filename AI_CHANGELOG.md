@@ -1157,3 +1157,15 @@ This file is the permanent handoff log between AI assistants working on this rep
 - No se modifican migraciones, RPC, políticas ni Supabase remoto.
 - No se modifican Stripe, `club_payments` ni `club_payments_backend`.
 - Validación local con Flutter analyzer/tests y revisión visual en Chrome: pendiente; no se declara validado hasta ejecutar esas comprobaciones.
+
+### 2026-09-29 — GPT-5.6 LUNA — corrección de errores de analyzer en módulos no-pagos
+- Corregido `lib/app/router.dart`: import de Riverpod y eliminación de variables locales públicas no utilizadas.
+- Corregido `dashboard_page.dart`: propagación correcta de `statsAsync` y uso seguro de `State.context` tras operaciones asíncronas.
+- Corregido `finance_page.dart`: provider de reintento alineado con `transactionsProvider` y eliminación de un `const` incompatible con un valor dinámico.
+- Corregidos los reintentos de carga de Plantilla, Personal y Equipos para invalidar los providers reales.
+- Corregida la sintaxis de `public_raffle_page.dart` en el botón de reserva.
+- Limpiada la duplicación accidental de código de eventos en `public_sponsors_page.dart`, conservando la lógica específica de patrocinadores.
+- Corregida la llamada a `_togglePublic` en `sponsors_page.dart`.
+- Eliminados avisos menores del analyzer en solicitud de incorporación, web pública del club y eventos.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente: validación local con `flutter analyze` y `flutter test` después del pull.
