@@ -212,7 +212,7 @@ class _SponsorCard extends ConsumerWidget {
                     ),
                     const SizedBox(width: 8),
                     FilledButton.icon(
-                      onPressed: canManage ? () => _togglePublic(ref) : null,
+                      onPressed: canManage ? () => _togglePublic(context, ref) : null,
                       icon: Icon(
                         sponsor.isPublic
                             ? Icons.visibility_outlined
