@@ -1231,3 +1231,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/teams/presentation/pages/teams_page.dart`: si el selector de temporadas falla al crear/editar un equipo, ahora muestra `Reintentar` e invalida `seasonsProvider`.
 - Evita dejar el formulario bloqueado únicamente por un fallo transitorio de carga de temporadas.
 - No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — ciclo de vida en Noticias y Eventos
+- Noticias y Eventos: se protegen las refrescos de providers despues de operaciones asincronas y dialogos.
+- Se evita usar la referencia de Riverpod cuando la pantalla ya no esta montada.
+- Sin cambios en Supabase, migraciones, Stripe ni Payments.
