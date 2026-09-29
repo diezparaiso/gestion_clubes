@@ -12,6 +12,7 @@ import '../../../news/domain/entities/post.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso público a patrocinadores.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): convierte la página pública del club en home principal con acceso al login.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): incorpora actualidad real de noticias y eventos públicos.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): añade reintento a la carga del club y de su actualidad pública.
 
 class PublicClubPage extends StatefulWidget {
   const PublicClubPage({super.key, required this.clubSlug});
@@ -22,16 +23,32 @@ class PublicClubPage extends StatefulWidget {
 }
 
 class _PublicClubPageState extends State<PublicClubPage> {
-  late final Future<Club> _club;
-  late final Future<List<ClubEvent>> _events;
-  late final Future<List<Post>> _posts;
+  late Future<Club> _club;
+  late Future<List<ClubEvent>> _events;
+  late Future<List<Post>> _posts;
 
   @override
   void initState() {
     super.initState();
+    _loadClub();
+    _loadContent();
+  }
+
+  void _loadClub() {
     _club = ClubRepository().getPublicClub(widget.clubSlug);
+  }
+
+  void _loadContent() {
     _events = EventRepository().listPublicEvents(widget.clubSlug);
     _posts = PostRepository().listPublicPosts(widget.clubSlug);
+  }
+
+  void _retryClub() {
+    setState(() => _loadClub());
+  }
+
+  void _retryContent() {
+    setState(() => _loadContent());
   }
 
   @override
@@ -44,7 +61,25 @@ class _PublicClubPageState extends State<PublicClubPage> {
               return const Center(child: CircularProgressIndicator());
             }
             if (snapshot.hasError || snapshot.data == null) {
-              return const Center(child: Text('Este club no está disponible.'));
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.cloud_off_outlined, size: 40),
+                      const SizedBox(height: 12),
+                      const Text('No se ha podido cargar la página del club.'),
+                      const SizedBox(height: 12),
+                      FilledButton.icon(
+                        onPressed: _retryClub,
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
             return _content(context, snapshot.data!);
           },
@@ -56,6 +91,9 @@ class _PublicClubPageState extends State<PublicClubPage> {
     return FutureBuilder<(List<ClubEvent>, List<Post>)>(
       future: Future.wait([_events, _posts]).then((values) => (values[0] as List<ClubEvent>, values[1] as List<Post>)),
       builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
         final events = snapshot.data?.$1 ?? const <ClubEvent>[];
         final posts = snapshot.data?.$2 ?? const <Post>[];
         return _contentBody(context, club, events, posts, snapshot.hasError);
@@ -148,6 +186,23 @@ class _PublicClubPageState extends State<PublicClubPage> {
               ),
             ),
           ),
+          if (contentError)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 24, 24, 0),
+              child: Center(
+                child: Column(
+                  children: [
+                    const Text('No se ha podido cargar la actualidad del club.'),
+                    const SizedBox(height: 8),
+                    OutlinedButton.icon(
+                      onPressed: _retryContent,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Reintentar actualidad'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           if (!contentError && (events.isNotEmpty || posts.isNotEmpty))
             Center(
               child: ConstrainedBox(
