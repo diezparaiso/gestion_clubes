@@ -1,3 +1,12 @@
+## 2026-09-29 — GPT-5.6 LUNA — cierre de seguridad del flujo de contraseña del Módulo 3
+
+- Detectado un punto de seguridad en el flujo `must_change_password`: aunque la interfaz obligaba al cambio, la política genérica de actualización del perfil permitía potencialmente que un cliente autenticado modificara directamente ese indicador.
+- Añadida `supabase/migrations/046_password_flag_security.sql`.
+- 046 crea `clear_must_change_password()` como RPC autenticada y restringe el privilegio UPDATE de `profiles` a las columnas editables por el usuario, dejando fuera `must_change_password`.
+- `ProfilePage` ya no actualiza directamente el indicador; utiliza la RPC después de cambiar correctamente la contraseña.
+- No se ejecuta la migración sobre Supabase remoto.
+- El flujo de recuperación mantiene el cierre de sesión posterior al cambio para evitar reutilizar la sesión temporal de recuperación.
+
 ## 2026-09-29 — GPT-5.6 LUNA — cierre de auditoría RLS del Módulo 2
 
 ### Hallazgo principal
