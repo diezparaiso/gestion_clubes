@@ -38,7 +38,6 @@ void main() {
       expect(updated.mustChangePassword, isFalse);
     });
   });
-}
 
   group('normal authentication state', () {
     test('can explicitly clear a previous recovery session', () {
@@ -54,3 +53,4 @@ void main() {
       expect(normalSignInState.mustChangePassword, isTrue);
     });
   });
+}
