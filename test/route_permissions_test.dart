@@ -32,6 +32,10 @@ void main() {
       expect(permissionForLocation('/raffles/raffle-1'), 'raffles_view');
     });
 
+    test('protects sponsor management with its dedicated permission', () {
+      expect(permissionForLocation('/sponsors'), 'sponsors_manage');
+    });
+
     test('leaves public and unknown locations without a permission requirement', () {
       expect(permissionForLocation('/login'), isNull);
       expect(permissionForLocation('/register'), isNull);
