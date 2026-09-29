@@ -1148,3 +1148,12 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Se mantienen las consultas y permisos existentes.
 - No se modifica Supabase remoto ni Payments/Stripe.
 - Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre de estados de carga y reintento de la web pública del club
+- `public_club_page.dart`: el fallo al cargar el club muestra un mensaje claro y permite reintentar la consulta.
+- La carga de noticias y eventos de actualidad muestra indicador de carga y, si falla, permite reintentar sin abandonar la página.
+- Se mantienen las consultas públicas existentes; no se exponen equipos ni datos privados.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+- Validación local con Flutter analyzer/tests y revisión visual en Chrome: pendiente; no se declara validado hasta ejecutar esas comprobaciones.
