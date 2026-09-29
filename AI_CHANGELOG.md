@@ -1205,3 +1205,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Si el diálogo ya no está montado, se sale sin intentar actualizar estado ni mostrar el `SnackBar`.
 - No se modifican Supabase remoto, migraciones, Stripe ni Payments.
 - Pendiente: validación local acumulada después de completar esta tanda.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre de actualización de temporadas en Equipos
+- `lib/features/teams/presentation/pages/teams_page.dart`: al crear o editar una temporada desde el gestor interno, se invalida `seasonsProvider` antes de reconstruir el diálogo.
+- La lista de temporadas se refresca inmediatamente sin tener que cerrar y volver a abrir la ventana.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+- Pendiente: validación local acumulada después de completar esta tanda.
