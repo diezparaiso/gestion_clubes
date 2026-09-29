@@ -89,7 +89,34 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           Expanded(child: deliveries.when(
           loading: () => const Center(child: CircularProgressIndicator()),
           error: (error, stack) => Center(
-            child: Text('Error al cargar notificaciones: $error'),
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline, size: 40),
+                  const SizedBox(height: 12),
+                  Text(
+                    'No se han podido cargar las notificaciones.',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '$error',
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  FilledButton.icon(
+                    onPressed: () {
+                      ref.invalidate(notificationDeliveriesProvider);
+                      ref.invalidate(unreadNotificationsProvider);
+                    },
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            ),
           ),
           data: (items) {
             final filtered = items.where((item) {
