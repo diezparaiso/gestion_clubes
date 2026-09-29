@@ -1183,3 +1183,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Se elimina el aviso `use_build_context_synchronously` sin cambiar el flujo funcional.
 - No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
 - Pendiente: validación local final con `flutter analyze` y `flutter test`.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre UX de Notificaciones
+- `lib/features/notifications/presentation/pages/notifications_page.dart`: el error de carga deja de ser un estado terminal y ofrece reintento directo de las consultas de notificaciones y no leídas.
+- Se conserva el filtrado, marcado como leído y marcado masivo existentes.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente: validación local con `flutter analyze` y `flutter test`.
