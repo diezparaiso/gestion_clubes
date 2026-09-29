@@ -61,6 +61,22 @@ void main() {
       }
     });
 
+    test('sponsors management is restricted to the president', () {
+      expect(ClubRolePermissions.has('club_president', 'sponsors_manage'), isTrue);
+      for (final role in const ['club_treasurer', 'club_secretary', 'team_manager', 'coach', 'staff', 'member', 'parent_guardian', 'player', 'follower']) {
+        expect(ClubRolePermissions.has(role, 'sponsors_manage'), isFalse);
+      }
+    });
+
+    test('access and settings management are restricted consistently', () {
+      expect(ClubRolePermissions.has('club_president', 'access_manage'), isTrue);
+      expect(ClubRolePermissions.has('club_president', 'club_settings_manage'), isTrue);
+      for (final role in const ['club_treasurer', 'club_secretary', 'team_manager', 'coach', 'staff', 'member', 'parent_guardian', 'player', 'follower']) {
+        expect(ClubRolePermissions.has(role, 'access_manage'), isFalse);
+        expect(ClubRolePermissions.has(role, 'club_settings_manage'), isFalse);
+      }
+    });
+
     test('unknown role or permission is denied by default', () {
       expect(ClubRolePermissions.has('unknown_role', 'dashboard_view'), isFalse);
       expect(ClubRolePermissions.has(null, 'dashboard_view'), isFalse);
