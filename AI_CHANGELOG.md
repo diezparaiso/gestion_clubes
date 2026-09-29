@@ -1190,3 +1190,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Se conserva el filtrado, marcado como leído y marcado masivo existentes.
 - No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
 - Pendiente: validación local con `flutter analyze` y `flutter test`.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre del reintento real de Mis rifas
+- `lib/features/raffles/presentation/pages/my_raffles_page.dart`: sustituido el refresco visual mediante `markNeedsBuild()` por un estado `ConsumerStatefulWidget` con futuro de datos reutilizable y recarga real al pulsar `Reintentar`.
+- El reintento vuelve a consultar suscripciones mensuales y participaciones pagadas.
+- No se modifica el backend de pagos ni se habilita checkout; el módulo mantiene su separación actual respecto a Payments/Stripe.
+- No se modifican Supabase remoto ni migraciones.
+- Pendiente: validación local con `flutter analyze` y `flutter test`.
