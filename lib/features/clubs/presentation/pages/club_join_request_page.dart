@@ -107,7 +107,7 @@ class _ClubJoinRequestPageState extends State<ClubJoinRequestPage> {
                 _field(_province, 'Provincia', required: true),
               ]),
               DropdownButtonFormField<String>(
-                value: _clubType,
+                initialValue: _clubType,
                 decoration: const InputDecoration(labelText: 'Tipo de entidad'),
                 items: const [
                   DropdownMenuItem(value: 'Club deportivo', child: Text('Club deportivo')),
