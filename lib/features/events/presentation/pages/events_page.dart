@@ -53,7 +53,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
               final clubId = ref.read(authControllerProvider).clubId;
               if (clubId == null) return;
               final club = await ref.read(clubRepositoryProvider).getClubById(clubId);
-              final url = Uri.base.replace(path: '/club/' + club.slug + '/events').toString();
+              final url = Uri.base.replace(path: '/club/${club.slug}/events').toString();
               await Clipboard.setData(ClipboardData(text: url));
               if (!context.mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(
