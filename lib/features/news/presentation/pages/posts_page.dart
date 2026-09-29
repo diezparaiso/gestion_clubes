@@ -70,7 +70,7 @@ class PostsPage extends ConsumerWidget {
 
   Future<void> _showPostDialog(BuildContext context, WidgetRef ref, {Post? post}) async {
     final saved = await showDialog<bool>(context: context, builder: (_) => _PostDialog(post: post));
-    if (saved == true) ref.invalidate(postsProvider);
+    if (saved == true && context.mounted) ref.invalidate(postsProvider);
   }
 
   Future<void> _deletePost(BuildContext context, WidgetRef ref, Post post) async {
@@ -88,7 +88,7 @@ class PostsPage extends ConsumerWidget {
     if (confirmed != true) return;
     try {
       await ref.read(postRepositoryProvider).deletePost(post.id);
-      ref.invalidate(postsProvider);
+      if (context.mounted) ref.invalidate(postsProvider);
     } catch (_) {
       if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se ha podido eliminar la noticia.')));
     }
