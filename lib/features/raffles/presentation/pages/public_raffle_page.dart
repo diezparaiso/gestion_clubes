@@ -99,7 +99,7 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
               ),
           const SizedBox(height: 24),
           if (isClosed) const Card(child: Padding(padding: EdgeInsets.all(16), child: Text('Esta rifa ya no admite nuevas reservas.'))),
-          Card(child: Padding(padding: const EdgeInsets.all(20), child: Row(children: [QrImageView(data: shareUrl, size: 120), const SizedBox(width: 20), const Expanded(child: Text('Comparte esta rifa escaneando el código QR. Los pagos reales están desactivados por ahora.'))]))),
+          Card(child: Padding(padding: const EdgeInsets.all(20), child: Wrap(spacing: 20, runSpacing: 16, crossAxisAlignment: WrapCrossAlignment.center, children: [QrImageView(data: shareUrl, size: 120), const SizedBox(width: 240, child: Text('Comparte esta rifa escaneando el código QR. Los pagos reales están desactivados por ahora.'))]))),
         ]),
       ),
     );
