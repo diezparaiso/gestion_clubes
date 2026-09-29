@@ -1,3 +1,21 @@
+## 2026-09-29 — GPT-5.6 LUNA — auditoría de seguridad y alineación RLS de patrocinadores
+
+### Hallazgo y corrección
+- Revisadas las migraciones de permisos 032–040 y la matriz ClubRolePermissions.
+- Detectada una discrepancia real en Patrocinadores:
+  - Flutter ya utilizaba sponsors_manage.
+  - El enum SQL club_permission todavía no contenía sponsors_manage.
+  - Las políticas/RPC históricas de patrocinadores utilizaban is_club_manager, que incluía también al secretario.
+- Añadida supabase/migrations/043_sponsors_permission_enum.sql para incorporar sponsors_manage al enum SQL.
+- Añadida supabase/migrations/044_sponsors_permissions_alignment.sql para que SELECT, INSERT, UPDATE y las RPC de patrocinadores utilicen has_club_permission(..., 'sponsors_manage').
+- La matriz queda coherente: la gestión de patrocinadores corresponde al permiso central sponsors_manage.
+- Las migraciones son preparadas en GitHub, pero no se ejecutan contra Supabase remoto.
+
+### Validación pendiente
+- Aplicar 043–044 en una base de pruebas/staging.
+- Verificar RLS/RPC con usuarios de los distintos roles.
+- No se modifica Payments/Stripe.
+
 ## 2026-09-29 — GPT-5.6 LUNA — revisión de páginas públicas y autenticación
 
 ### Cambios
