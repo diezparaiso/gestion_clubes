@@ -1,3 +1,14 @@
+## 2026-09-29 — GPT-5.6 LUNA — endurecimiento del estado de autenticación
+
+### Cambios
+- Normalización de inicio de sesión y registro: ambos flujos limpian explícitamente passwordRecovery y mustChangePassword antes de seleccionar club.
+- Se evita que un estado previo de recuperación pueda arrastrarse a una autenticación normal.
+- Ampliada la cobertura unitaria del estado de autenticación para ambos indicadores.
+
+### Validación
+- Pendiente ejecutar flutter analyze --no-pub y flutter test --reporter expanded en local.
+- No se modifica Supabase remoto.
+
 ## 2026-09-29 — GPT-5.6 LUNA — auditoría de seguridad y alineación RLS de patrocinadores
 
 ### Hallazgo y corrección
