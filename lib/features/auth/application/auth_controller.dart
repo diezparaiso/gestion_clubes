@@ -163,6 +163,7 @@ class AuthController extends Notifier<AuthState> {
         status: AuthStatus.needsClub,
         email: email,
         passwordRecovery: false,
+        mustChangePassword: false,
         clearError: true,
       );
     } on AuthException catch (error) {
@@ -178,7 +179,13 @@ class AuthController extends Notifier<AuthState> {
       if (SupabaseService.isConfigured) {
         await Supabase.instance.client.auth.signUp(email: email, password: password);
       }
-      state = state.copyWith(status: AuthStatus.needsClub, email: email, clearError: true);
+      state = state.copyWith(
+        status: AuthStatus.needsClub,
+        email: email,
+        passwordRecovery: false,
+        mustChangePassword: false,
+        clearError: true,
+      );
     } on AuthException catch (error) {
       state = state.copyWith(status: AuthStatus.error, errorMessage: error.message);
     } catch (_) {
