@@ -1243,3 +1243,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `lib/features/clubs/presentation/pages/club_members_page.dart`: el `finally` del diálogo de invitación comprueba `mounted` antes de ejecutar `setState`.
 - Evita un posible `setState() called after dispose` si el diálogo se desmonta durante la operación asíncrona.
 - Sin cambios en Supabase, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre de tanda de módulos no-pagos
+- Cerrada la tanda de endurecimiento funcional y UX de los módulos internos revisados: Dashboard, Socios, Equipos, Plantilla, Personal, Tesorería, Noticias, Eventos, Patrocinadores, Configuración del club, Onboarding, Notificaciones y Mis rifas.
+- Se consolidan estados de carga/error con reintento, refrescos reales, protección de ciclo de vida asíncrono y alineación de permisos donde se detectaron incidencias.
+- No quedan cambios funcionales pendientes identificados en esta tanda que justifiquen tocar código adicional sin una nueva necesidad concreta.
+- La validación definitiva corresponde ahora a la ejecución local de `flutter analyze` y `flutter test` después del pull.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
