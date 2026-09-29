@@ -110,7 +110,7 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
   Future<void> _showCreateDialog(BuildContext context, WidgetRef ref) async {
     final saved = await showDialog<bool>(context: context, builder: (_) => const _CreateEventDialog());
-    if (saved == true) ref.invalidate(eventsProvider);
+    if (saved == true && context.mounted) ref.invalidate(eventsProvider);
   }
 }
 
