@@ -2,6 +2,8 @@
     "name": "Gestión Clubes",
     "short_name": "Gestión Clubes",
     "start_url": "./",
+    "scope": "./",
+    "lang": "es",
     "display": "standalone",
     "background_color": "#b71c1c",
     "theme_color": "#b71c1c",
