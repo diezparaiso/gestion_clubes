@@ -84,7 +84,19 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
             Wrap(spacing: 8, runSpacing: 8, children: List.generate(raffle.totalNumbers, (index) => _numberTile(raffle, index + 1, isClosed))),
           ]))),
           const SizedBox(height: 16),
-          FilledButton.icon(onPressed: isClosed || _selectedNumbers.isEmpty ? null : _showReservationDialog, icon: const Icon(Icons.confirmation_number_outlined), label: Text(isClosed ? 'Rifa cerrada' : (_selectedNumbers.isEmpty ? 'Selecciona números' : 'Reservar ${_selectedNumbers.length} número(s)')),
+          FilledButton.icon(
+                onPressed: isClosed || _selectedNumbers.isEmpty
+                    ? null
+                    : _showReservationDialog,
+                icon: const Icon(Icons.confirmation_number_outlined),
+                label: Text(
+                  isClosed
+                      ? 'Rifa cerrada'
+                      : (_selectedNumbers.isEmpty
+                          ? 'Selecciona números'
+                          : 'Reservar ${_selectedNumbers.length} número(s)'),
+                ),
+              ),
           const SizedBox(height: 24),
           if (isClosed) const Card(child: Padding(padding: EdgeInsets.all(16), child: Text('Esta rifa ya no admite nuevas reservas.'))),
           Card(child: Padding(padding: const EdgeInsets.all(20), child: Row(children: [QrImageView(data: shareUrl, size: 120), const SizedBox(width: 20), const Expanded(child: Text('Comparte esta rifa escaneando el código QR. Los pagos reales están desactivados por ahora.'))]))),
