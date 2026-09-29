@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/sponsor_repository.dart';
 import '../../domain/entities/sponsor.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): integra navegación y control de gestión del módulo.
 class SponsorsPage extends ConsumerWidget {
   const SponsorsPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final clubId = ref.watch(authControllerProvider).clubId;
+    final auth = ref.watch(authControllerProvider);
+    final clubId = auth.clubId;
+    final canManage = ClubRolePermissions.has(auth.role, 'sponsors_manage');
 
     if (clubId == null) {
       return const Scaffold(
@@ -21,23 +25,15 @@ class SponsorsPage extends ConsumerWidget {
     final sponsorsAsync = ref.watch(clubSponsorsProvider(clubId));
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Patrocinadores'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.business_outlined),
-            tooltip: 'Nuevo patrocinador',
-            onPressed: () => _showCreateDialog(context, ref, clubId),
-          ),
-        ],
-      ),
+      appBar: const ClubNavigationAppBar(title: 'Patrocinadores'),
+      floatingActionButton: canManage
+          ? FloatingActionButton.extended(onPressed: () => _showCreateDialog(context, ref, clubId), icon: const Icon(Icons.add_business_outlined), label: const Text('Nuevo patrocinador'))
+          : null,
       body: sponsorsAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
         data: (sponsors) => sponsors.isEmpty
-            ? const Center(
-                child: Text('No hay patrocinadores. ¡Agrega uno para generar ingresos!'),
-              )
+            ? const Center(child: Text('No hay patrocinadores.'))
             : ListView.separated(
                 padding: const EdgeInsets.all(16),
                 itemCount: sponsors.length,
@@ -45,6 +41,7 @@ class SponsorsPage extends ConsumerWidget {
                 itemBuilder: (context, index) => _SponsorCard(
                   sponsor: sponsors[index],
                   clubId: clubId,
+                  canManage: canManage,
                   onChanged: () {
                     ref.invalidate(clubSponsorsProvider(clubId));
                     ref.invalidate(activeSponsorsProvider(clubId));
@@ -69,11 +66,13 @@ class SponsorsPage extends ConsumerWidget {
 class _SponsorCard extends ConsumerWidget {
   final Sponsor sponsor;
   final String clubId;
+  final bool canManage;
   final VoidCallback onChanged;
 
   const _SponsorCard({
     required this.sponsor,
     required this.clubId,
+    required this.canManage,
     required this.onChanged,
   });
 
@@ -96,12 +95,17 @@ class _SponsorCard extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    Expanded(
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 260),
                       child: Text(
                         sponsor.name,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
@@ -207,13 +211,13 @@ class _SponsorCard extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton.icon(
-                      onPressed: () => _showEditDialog(context, ref),
+                      onPressed: canManage ? () => _showEditDialog(context, ref) : null,
                       icon: const Icon(Icons.edit_outlined),
                       label: const Text('Editar'),
                     ),
                     const SizedBox(width: 8),
                     FilledButton.icon(
-                      onPressed: () => _togglePublic(ref),
+                      onPressed: canManage ? () => _togglePublic(context, ref) : null,
                       icon: Icon(
                         sponsor.isPublic
                             ? Icons.visibility_outlined
@@ -241,7 +245,7 @@ class _SponsorCard extends ConsumerWidget {
     ).then((_) => onChanged());
   }
 
-  Future<void> _togglePublic(WidgetRef ref) async {
+  Future<void> _togglePublic(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(sponsorRepositoryProvider).updateSponsor(
             sponsorId: sponsor.id,
@@ -254,9 +258,11 @@ class _SponsorCard extends ConsumerWidget {
             status: sponsor.status,
             isPublic: !sponsor.isPublic,
           );
+      if (!context.mounted) return;
       onChanged();
     } catch (e) {
-      // Error manejado silenciosamente
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se ha podido cambiar la visibilidad: $e')));
     }
   }
 
@@ -493,10 +499,20 @@ class _SponsorFormDialogState extends ConsumerState<_SponsorFormDialog> {
   }
 
   Future<void> _handleSave() async {
-    if (nameController.text.isEmpty) {
+    if (nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('El nombre es requerido')),
       );
+      return;
+    }
+
+    final amount = double.tryParse(amountController.text.trim().replaceAll(',', '.'));
+    if (amount == null || amount < 0) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Introduce un importe anual válido.')));
+      return;
+    }
+    if (endDate.isBefore(startDate)) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('La fecha de fin no puede ser anterior a la de inicio.')));
       return;
     }
 
@@ -516,7 +532,7 @@ class _SponsorFormDialogState extends ConsumerState<_SponsorFormDialog> {
               contactPhone: phoneController.text.isEmpty ? null : phoneController.text,
               contractStartDate: startDate,
               contractEndDate: endDate,
-              annualAmount: double.parse(amountController.text),
+              annualAmount: amount,
               benefits:
                   benefitsController.text.isEmpty ? null : benefitsController.text,
               isPublic: isPublic,

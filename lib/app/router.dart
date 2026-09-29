@@ -1,4 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): refuerza permisos por ruta en equipos y jugadores.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade ruta pública para solicitudes de incorporación de clubes.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade landing pública de la plataforma en '/'.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -7,6 +9,8 @@ import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/auth/presentation/pages/profile_page.dart';
 import '../features/clubs/presentation/pages/club_onboarding_page.dart';
+import '../features/clubs/presentation/pages/club_join_request_page.dart';
+import '../features/clubs/presentation/pages/platform_home_page.dart';
 import '../features/clubs/presentation/pages/public_club_page.dart';
 import '../features/clubs/presentation/pages/club_settings_page.dart';
 import '../features/clubs/presentation/pages/club_access_management_page.dart';
@@ -27,10 +31,15 @@ import '../features/raffles/domain/entities/raffle.dart';
 import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
 import '../features/legal/presentation/pages/privacy_page.dart';
+import '../features/sponsors/presentation/pages/sponsors_page.dart';
+import '../features/sponsors/presentation/pages/public_sponsors_page.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): expone la matriz de permisos para cobertura unitaria.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): integra rutas internas y públicas de patrocinadores.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierra protección de perfil y Mis rifas para usuarios autenticados.
 String? permissionForLocation(String location) {
   if (location == '/dashboard') return 'dashboard_view';
+  if (location == '/my-raffles') return 'dashboard_view';
   if (location == '/members') return 'members_view';
   if (location == '/teams') return 'teams_view';
   if (RegExp(r'^/teams/[^/]+/players(?:/|$)').hasMatch(location)) return 'players_view';
@@ -43,26 +52,25 @@ String? permissionForLocation(String location) {
   if (location == '/notifications') return 'notifications_view';
   if (location == '/settings/access') return 'access_manage';
   if (location == '/settings') return 'club_settings_view';
+  if (location == '/sponsors') return 'sponsors_manage';
   return null;
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
   return GoRouter(
-    initialLocation: '/login',
+    initialLocation: '/',
     redirect: (context, state) {
       final location = state.uri.path;
       final isAuthRoute = location == '/login' || location == '/register';
-      final isPublicRaffle = location.startsWith('/r/');
-      final isPublicClub = location.startsWith('/club/');
-      final isPublicPrivacy = location == '/privacy';
+      final isPublicRoute = isAuthRoute || location == '/' || location == '/privacy' || location == '/solicitar-incorporacion' || location.startsWith('/r/') || location.startsWith('/club/');
       final isSignedIn = authState.status == AuthStatus.signedIn;
       final needsClub = authState.status == AuthStatus.needsClub;
 
       if (needsClub && location != '/onboarding') return '/onboarding';
       if (isSignedIn && isAuthRoute) return authState.mustChangePassword ? '/profile/password' : '/dashboard';
       if (isSignedIn && authState.mustChangePassword && location != '/profile/password') return '/profile/password';
-      if (!isSignedIn && !needsClub && !isAuthRoute && !isPublicRaffle && !isPublicClub && !isPublicPrivacy) return '/login';
+      if (!isSignedIn && !needsClub && !isPublicRoute) return '/login';
       if (isSignedIn && !authState.mustChangePassword) {
         final requiredPermission = permissionForLocation(location);
         if (requiredPermission != null && !ClubRolePermissions.has(authState.role, requiredPermission)) return '/dashboard';
@@ -70,14 +78,21 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      GoRoute(path: '/', name: 'platform-home', builder: (context, state) => const PlatformHomePage()),
       GoRoute(path: '/login', name: 'login', builder: (context, state) => const LoginPage()),
       GoRoute(path: '/register', name: 'register', builder: (context, state) => const RegisterPage()),
+      GoRoute(path: '/solicitar-incorporacion', name: 'club-join-request', builder: (context, state) => const ClubJoinRequestPage()),
       GoRoute(path: '/onboarding', name: 'onboarding', builder: (context, state) => const ClubOnboardingPage()),
       GoRoute(path: '/privacy', name: 'privacy', builder: (context, state) => const PrivacyPage()),
       GoRoute(
         path: '/r/:clubSlug/:raffleSlug',
         name: 'public-raffle',
         builder: (context, state) => PublicRafflePage(clubSlug: state.pathParameters['clubSlug']!, raffleSlug: state.pathParameters['raffleSlug']!),
+      ),
+      GoRoute(
+        path: '/club/:clubSlug/sponsors',
+        name: 'public-sponsors',
+        builder: (context, state) => PublicSponsorsPage(clubSlug: state.pathParameters['clubSlug']!),
       ),
       GoRoute(
         path: '/club/:clubSlug/news',
@@ -110,6 +125,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(path: '/news', name: 'news', builder: (context, state) => const PostsPage()),
+      GoRoute(path: '/sponsors', name: 'sponsors', builder: (context, state) => const SponsorsPage()),
       GoRoute(path: '/events', name: 'events', builder: (context, state) => const EventsPage()),
       GoRoute(path: '/notifications', name: 'notifications', builder: (context, state) => const NotificationsPage()),
       GoRoute(path: '/settings/access', name: 'settings-access', builder: (context, state) => const ClubAccessManagementPage()),

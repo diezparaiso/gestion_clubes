@@ -1,4 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): cierra la gestión de rifas mensuales y respeta raffles_manage en acciones.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX del detalle; responsive, refresco y validación de ganador.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora errores y reintento de participaciones e histórico mensual.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../auth/application/auth_controller.dart';
@@ -44,7 +46,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
         future: _raffle,
         builder: (context, raffleSnapshot) {
           if (raffleSnapshot.connectionState != ConnectionState.done) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-          if (raffleSnapshot.hasError || raffleSnapshot.data == null) return const MissingRafflePage();
+          if (raffleSnapshot.hasError || raffleSnapshot.data == null) return Center(child: _RaffleDetailLoadError(onRetry: _retryRaffle));
           final raffle = raffleSnapshot.data!;
           final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'raffles_manage');
           if (_ticketsRaffleId != raffle.id) {
@@ -61,10 +63,10 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
           future: _tickets!,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-            if (snapshot.hasError) return const Center(child: Text('No se han podido cargar las participaciones.'));
+            if (snapshot.hasError) return Center(child: _RaffleDetailLoadError(message: 'No se han podido cargar las participaciones.', onRetry: _retryTickets));
             final tickets = snapshot.data!;
             return ListView(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), children: [
-              Row(children: [Expanded(child: Text('Participaciones', style: Theme.of(context).textTheme.headlineMedium)), if (canManage) FilledButton.icon(onPressed: _drawing || _draw != null || raffle.winningNumber != null ? null : () => raffle.type == RaffleType.cesta ? _setBasketWinner(raffle, tickets) : _confirmDraw(tickets), icon: Icon(raffle.type == RaffleType.cesta ? Icons.emoji_events_outlined : Icons.casino_outlined), label: Text(raffle.type == RaffleType.cesta ? 'Elegir ganador' : 'Sortear'))]),
+              Wrap(spacing: 12, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [Text('Participaciones', style: Theme.of(context).textTheme.headlineMedium), if (canManage) FilledButton.icon(onPressed: _drawing || _draw != null || raffle.winningNumber != null ? null : () => raffle.type == RaffleType.cesta ? _setBasketWinner(raffle, tickets) : _confirmDraw(tickets), icon: Icon(raffle.type == RaffleType.cesta ? Icons.emoji_events_outlined : Icons.casino_outlined), label: Text(raffle.type == RaffleType.cesta ? 'Elegir ganador' : 'Sortear'))]),
               const SizedBox(height: 8),
               Text('${tickets.length} participaciones registradas. Solo las confirmadas participan en el sorteo.'),
               const SizedBox(height: 8),
@@ -98,6 +100,26 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
       );
         },
       );
+
+  void _retryRaffle() {
+    if (!mounted || widget.clubId == null) return;
+    setState(() {
+      _ticketsRaffleId = null;
+      _raffle = ref.read(raffleRepositoryProvider).getRaffle(clubId: widget.clubId!, raffleId: widget.raffleId);
+    });
+  }
+
+  void _retryTickets() {
+    final id = _ticketsRaffleId;
+    if (id == null) return;
+    setState(() => _tickets = ref.read(raffleRepositoryProvider).listTickets(id));
+  }
+
+  void _retryMonthlyResults() {
+    final id = _ticketsRaffleId;
+    if (id == null) return;
+    setState(() => _monthlyResults = ref.read(raffleRepositoryProvider).listMonthlyResults(id));
+  }
 
   Widget _monthlySection(Raffle raffle, bool canManage) {
     return Column(
@@ -138,12 +160,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
               );
             }
             if (snapshot.hasError) {
-              return const Card(
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Text('No se ha podido cargar el histórico mensual.'),
-                ),
-              );
+              return Card(child: Padding(padding: const EdgeInsets.all(20), child: _InlineRetryError(message: 'No se ha podido cargar el histórico mensual.', onRetry: _retryMonthlyResults)));
             }
             final results = snapshot.data ?? const <MonthlyRaffleResult>[];
             if (results.isEmpty) {
@@ -224,7 +241,7 @@ class _RaffleDetailPageState extends ConsumerState<RaffleDetailPage> {
       content: TextField(controller: numberController, keyboardType: TextInputType.number, decoration: InputDecoration(labelText: 'Número participante', hintText: 'Entre 1 y ${raffle.totalNumbers}')),
       actions: [
         TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-        FilledButton(onPressed: () { final n = int.tryParse(numberController.text); if (n != null) Navigator.pop(context, n); }, child: const Text('Confirmar')),
+        FilledButton(onPressed: () { final n = int.tryParse(numberController.text); if (n != null && n >= 1 && n <= raffle.totalNumbers && confirmed.any((ticket) => ticket.number == n)) Navigator.pop(context, n); }, child: const Text('Confirmar')),
       ],
     ));
     numberController.dispose();
@@ -380,4 +397,20 @@ class MissingRafflePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => const Scaffold(body: Center(child: Text('Abre la rifa desde el listado del club.')));
+}
+
+class _RaffleDetailLoadError extends StatelessWidget {
+  const _RaffleDetailLoadError({this.message = 'No se ha podido cargar la rifa.', required this.onRetry});
+  final String message;
+  final VoidCallback onRetry;
+  @override
+  Widget build(BuildContext context) => Center(child: Column(mainAxisSize: MainAxisSize.min, children: [const Icon(Icons.error_outline, size: 42), const SizedBox(height: 12), Text(message), const SizedBox(height: 16), FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]));
+}
+
+class _InlineRetryError extends StatelessWidget {
+  const _InlineRetryError({required this.message, required this.onRetry});
+  final String message;
+  final VoidCallback onRetry;
+  @override
+  Widget build(BuildContext context) => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(message), const SizedBox(height: 12), TextButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Reintentar'))]);
 }

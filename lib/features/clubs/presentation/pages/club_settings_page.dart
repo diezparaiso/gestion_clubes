@@ -7,23 +7,75 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade acceso directo a la gestión de usuarios y permisos.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Separa consulta y edición mediante club_settings_manage.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive de cabecera y acciones de configuración.
 
 import '../../../auth/application/auth_controller.dart';
 import '../../data/repositories/club_repository.dart';
 import '../../domain/entities/club.dart';
 
-class ClubSettingsPage extends ConsumerWidget {
+class ClubSettingsPage extends ConsumerStatefulWidget {
   const ClubSettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final clubId = ref.watch(authControllerProvider).clubId;
-    if (clubId == null) return const Scaffold(body: Center(child: Text('No hay un club seleccionado.')));
-    return FutureBuilder<Club>(future: ref.read(clubRepositoryProvider).getClubById(clubId), builder: (context, snapshot) {
-      if (snapshot.connectionState != ConnectionState.done) return const Scaffold(body: Center(child: CircularProgressIndicator()));
-      if (snapshot.hasError || snapshot.data == null) return const Scaffold(body: Center(child: Text('No se ha podido cargar la configuración.')));
-      return _ClubSettingsForm(club: snapshot.data!);
-    });
+  ConsumerState<ClubSettingsPage> createState() => _ClubSettingsPageState();
+}
+
+class _ClubSettingsPageState extends ConsumerState<ClubSettingsPage> {
+  Future<Club?>? _clubFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  void _load() {
+    final clubId = ref.read(authControllerProvider).clubId;
+    _clubFuture = clubId == null
+        ? Future.value(null)
+        : ref.read(clubRepositoryProvider).getClubById(clubId);
+  }
+
+  void _retry() {
+    setState(_load);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: const ClubNavigationAppBar(title: 'Configuración'),
+      body: FutureBuilder<Club?>(
+        future: _clubFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.error_outline, size: 40),
+                  const SizedBox(height: 12),
+                  const Text('No se ha podido cargar la configuración.'),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: _retry,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            );
+          }
+          final club = snapshot.data;
+          if (club == null) {
+            return const Center(child: Text('No hay un club seleccionado.'));
+          }
+          return _ClubSettingsForm(club: club);
+        },
+      ),
+    );
   }
 }
 
@@ -72,19 +124,40 @@ class _ClubSettingsFormState extends ConsumerState<_ClubSettingsForm> {
     final auth = ref.watch(authControllerProvider);
     final canManage = ClubRolePermissions.has(auth.role, 'club_settings_manage');
     return Scaffold(
-    appBar: const ClubNavigationAppBar(title: 'Configuración'),
     body: ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       children: [
-        Row(
-          children: [
-            Expanded(child: Text('Perfil público', style: Theme.of(context).textTheme.headlineMedium)),
-            OutlinedButton.icon(
-              onPressed: ClubRolePermissions.has(auth.role, 'access_manage') ? () => context.push('/settings/access') : null,
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final compact = constraints.maxWidth < 700;
+            final title = Text(
+              'Perfil público',
+              style: Theme.of(context).textTheme.headlineMedium,
+            );
+            final accessButton = OutlinedButton.icon(
+              onPressed: ClubRolePermissions.has(auth.role, 'access_manage')
+                  ? () => context.push('/settings/access')
+                  : null,
               icon: const Icon(Icons.manage_accounts_outlined),
               label: const Text('Usuarios y permisos'),
-            ),
-          ],
+            );
+            if (compact) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  title,
+                  const SizedBox(height: 12),
+                  Align(alignment: Alignment.centerLeft, child: accessButton),
+                ],
+              );
+            }
+            return Row(
+              children: [
+                Expanded(child: title),
+                accessButton,
+              ],
+            );
+          },
         ),
         const SizedBox(height: 8),
         const Text('Estos datos se mostrarán en la página pública del club.'),

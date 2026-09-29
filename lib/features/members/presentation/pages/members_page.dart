@@ -1,4 +1,6 @@
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora estados de carga y error de Socios; añade reintento sin cambios de Supabase ni Payments/Stripe.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos view/manage en acciones de la pantalla.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive; sin cambios de Supabase ni Payments/Stripe.
 import 'package:club_payments/club_payments.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -60,13 +62,14 @@ class _MembersPageState extends ConsumerState<MembersPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Expanded(
-                    child: Text(
-                      'Directorio de socios',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
+                  Text(
+                    'Directorio de socios',
+                    style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   if (canManage)
                     FilledButton.icon(
@@ -79,9 +82,13 @@ class _MembersPageState extends ConsumerState<MembersPage> {
               const SizedBox(height: 8),
               const Text('Consulta y administra las personas vinculadas al club.'),
               const SizedBox(height: 24),
-              Row(
+              Wrap(
+                spacing: 12,
+                runSpacing: 8,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Expanded(
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(minWidth: 240, maxWidth: 520),
                     child: TextField(
                       controller: _searchController,
                       onChanged: (_) => setState(() {}),
@@ -91,19 +98,39 @@ class _MembersPageState extends ConsumerState<MembersPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 12),
                   DropdownButton<MemberStatus?>(
-                  value: _statusFilter,
-                  hint: const Text('Estado'),
-                  items: [const DropdownMenuItem<MemberStatus?>(value: null, child: Text('Todos los estados')), ...MemberStatus.values.map((status) => DropdownMenuItem<MemberStatus?>(value: status, child: Text(_statusLabel(status))))],
-                  onChanged: (value) => setState(() => _statusFilter = value),
-                ),
-                const SizedBox(width: 12),
-                DropdownButton<MembershipType?>(
-                  value: _membershipTypeFilter,
-                  hint: const Text('Tipo'),
-                  items: [const DropdownMenuItem<MembershipType?>(value: null, child: Text('Todos los tipos')), ...MembershipType.values.map((type) => DropdownMenuItem<MembershipType?>(value: type, child: Text(_membershipTypeLabel(type))))],
-                  onChanged: (value) => setState(() => _membershipTypeFilter = value),
+                    value: _statusFilter,
+                    hint: const Text('Estado'),
+                    items: [
+                      const DropdownMenuItem<MemberStatus?>(
+                        value: null,
+                        child: Text('Todos los estados'),
+                      ),
+                      ...MemberStatus.values.map(
+                        (status) => DropdownMenuItem<MemberStatus?>(
+                          value: status,
+                          child: Text(_statusLabel(status)),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) => setState(() => _statusFilter = value),
+                  ),
+                  DropdownButton<MembershipType?>(
+                    value: _membershipTypeFilter,
+                    hint: const Text('Tipo'),
+                    items: [
+                      const DropdownMenuItem<MembershipType?>(
+                        value: null,
+                        child: Text('Todos los tipos'),
+                      ),
+                      ...MembershipType.values.map(
+                        (type) => DropdownMenuItem<MembershipType?>(
+                          value: type,
+                          child: Text(_membershipTypeLabel(type)),
+                        ),
+                      ),
+                    ],
+                    onChanged: (value) => setState(() => _membershipTypeFilter = value),
                   ),
                 ],
               ),
@@ -111,8 +138,11 @@ class _MembersPageState extends ConsumerState<MembersPage> {
               Expanded(
                 child: members.when(
                   loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) =>
-                      const Center(child: Text('No se ha podido cargar el listado.')),
+                  error: (error, stack) => Center(
+                    child: _MembersLoadError(
+                      onRetry: () => ref.invalidate(membersProvider),
+                    ),
+                  ),
                   data: (items) {
                     final query = _searchController.text.toLowerCase();
                     final filtered = items.where((member) {
@@ -174,6 +204,32 @@ class _MembersPageState extends ConsumerState<MembersPage> {
         SnackBar(content: Text('Cuota cobrada a ${member.name}.')),
       );
     }
+  }
+}
+
+class _MembersLoadError extends StatelessWidget {
+  const _MembersLoadError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.error_outline, size: 40),
+        const SizedBox(height: 12),
+        const Text('No se ha podido cargar el listado.'),
+        const SizedBox(height: 8),
+        const Text('Puedes reintentarlo sin salir de Socios.'),
+        const SizedBox(height: 16),
+        OutlinedButton.icon(
+          onPressed: onRetry,
+          icon: const Icon(Icons.refresh),
+          label: const Text('Reintentar'),
+        ),
+      ],
+    );
   }
 }
 

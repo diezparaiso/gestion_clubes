@@ -1,6 +1,10 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Corrige el rango visual de números y la reserva pública.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre UX público de rifas; estado de cierre y selección responsive.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso al login desde la página pública de la rifa.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): corrige el estado de cierre en la selección de números.
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -30,7 +34,19 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Rifa del club')),
+        appBar: AppBar(
+          title: const Text('Rifa del club'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: FilledButton.icon(
+                onPressed: () => context.go('/login'),
+                icon: const Icon(Icons.login, size: 18),
+                label: const Text('Acceder'),
+              ),
+            ),
+          ],
+        ),
         body: FutureBuilder<Raffle>(
           future: _raffle,
           builder: (context, snapshot) {
@@ -44,6 +60,7 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
   Widget _content(BuildContext context, Raffle raffle) {
     final shareUrl = Uri.base.replace(path: '/r/${widget.clubSlug}/${widget.raffleSlug}').toString();
     final occupiedCount = raffle.occupiedNumbers.length + _reservedNumbers.length;
+    final isClosed = raffle.status == RaffleStatus.closed || raffle.status == RaffleStatus.soldOut || raffle.status == RaffleStatus.drawn || raffle.status == RaffleStatus.cancelled || DateTime.now().isAfter(raffle.endAt);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 760),
@@ -58,27 +75,40 @@ class _PublicRafflePageState extends State<PublicRafflePage> {
           Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('${raffle.ticketPrice.toStringAsFixed(2).replaceAll('.', ',')} € por número', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 4),
-            Text('${raffle.totalNumbers - occupiedCount} disponibles de ${raffle.totalNumbers}'),
+            Text('${(raffle.totalNumbers - occupiedCount).clamp(0, raffle.totalNumbers)} disponibles de ${raffle.totalNumbers}'),
           if (raffle.type == RaffleType.mensual) ...[
             const SizedBox(height: 4),
             Text('Renovación mensual el día ${raffle.monthlyDay ?? '-'}.'),
           ],
             const SizedBox(height: 20),
-            Wrap(spacing: 8, runSpacing: 8, children: List.generate(raffle.totalNumbers, (index) => _numberTile(raffle, index + 1))),
+            Wrap(spacing: 8, runSpacing: 8, children: List.generate(raffle.totalNumbers, (index) => _numberTile(raffle, index + 1, isClosed))),
           ]))),
           const SizedBox(height: 16),
-          FilledButton.icon(onPressed: _selectedNumbers.isEmpty ? null : _showReservationDialog, icon: const Icon(Icons.confirmation_number_outlined), label: Text(_selectedNumbers.isEmpty ? 'Selecciona números' : 'Reservar ${_selectedNumbers.length} número(s)')),
+          FilledButton.icon(
+                onPressed: isClosed || _selectedNumbers.isEmpty
+                    ? null
+                    : _showReservationDialog,
+                icon: const Icon(Icons.confirmation_number_outlined),
+                label: Text(
+                  isClosed
+                      ? 'Rifa cerrada'
+                      : (_selectedNumbers.isEmpty
+                          ? 'Selecciona números'
+                          : 'Reservar ${_selectedNumbers.length} número(s)'),
+                ),
+              ),
           const SizedBox(height: 24),
-          Card(child: Padding(padding: const EdgeInsets.all(20), child: Row(children: [QrImageView(data: shareUrl, size: 120), const SizedBox(width: 20), const Expanded(child: Text('Comparte esta rifa escaneando el código QR. Los pagos reales están desactivados por ahora.'))]))),
+          if (isClosed) const Card(child: Padding(padding: EdgeInsets.all(16), child: Text('Esta rifa ya no admite nuevas reservas.'))),
+          Card(child: Padding(padding: const EdgeInsets.all(20), child: Wrap(spacing: 20, runSpacing: 16, crossAxisAlignment: WrapCrossAlignment.center, children: [QrImageView(data: shareUrl, size: 120), const SizedBox(width: 240, child: Text('Comparte esta rifa escaneando el código QR. Los pagos reales están desactivados por ahora.'))]))),
         ]),
       ),
     );
   }
 
-  Widget _numberTile(Raffle raffle, int number) {
+  Widget _numberTile(Raffle raffle, int number, bool isClosed) {
     final isOccupied = raffle.occupiedNumbers.contains(number) || _reservedNumbers.contains(number);
     final isSelected = _selectedNumbers.contains(number);
-    return SizedBox(width: 48, height: 42, child: OutlinedButton(onPressed: isOccupied ? null : () => setState(() => isSelected ? _selectedNumbers.remove(number) : _selectedNumbers.add(number)), style: OutlinedButton.styleFrom(padding: EdgeInsets.zero, backgroundColor: isOccupied ? Colors.grey.shade300 : (isSelected ? Theme.of(context).colorScheme.primaryContainer : null), foregroundColor: isOccupied ? Colors.grey.shade600 : null, disabledForegroundColor: Colors.grey.shade600), child: Text(number.toString().padLeft(2, '0'))));
+    return SizedBox(width: 48, height: 42, child: OutlinedButton(onPressed: isClosed || isOccupied ? null : () => setState(() => isSelected ? _selectedNumbers.remove(number) : _selectedNumbers.add(number)), style: OutlinedButton.styleFrom(padding: EdgeInsets.zero, backgroundColor: isOccupied ? Colors.grey.shade300 : (isSelected ? Theme.of(context).colorScheme.primaryContainer : null), foregroundColor: isOccupied ? Colors.grey.shade600 : null, disabledForegroundColor: Colors.grey.shade600), child: Text(number.toString().padLeft(2, '0'))));
   }
 
   Future<void> _showReservationDialog() async {

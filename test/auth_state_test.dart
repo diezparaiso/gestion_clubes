@@ -38,19 +38,22 @@ void main() {
       expect(updated.mustChangePassword, isFalse);
     });
   });
-}
 
   group('normal authentication state', () {
-    test('can explicitly clear a previous recovery session', () {
+    test('normal authentication state can clear both recovery flags', () {
       const recoveryState = AuthState(
         status: AuthStatus.signedIn,
         passwordRecovery: true,
         mustChangePassword: true,
       );
 
-      final normalSignInState = recoveryState.copyWith(passwordRecovery: false);
+      final normalSignInState = recoveryState.copyWith(
+        passwordRecovery: false,
+        mustChangePassword: false,
+      );
 
       expect(normalSignInState.passwordRecovery, isFalse);
-      expect(normalSignInState.mustChangePassword, isTrue);
+      expect(normalSignInState.mustChangePassword, isFalse);
     });
   });
+}

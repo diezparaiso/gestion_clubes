@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../auth/application/auth_controller.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora responsive y reintento del listado de accesos.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): módulo funcional de gestión de accesos del club.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): la protección de la pantalla usa access_manage.
 
@@ -164,9 +165,9 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
       floatingActionButton: FloatingActionButton.extended(onPressed: _saving ? null : _createUser, icon: const Icon(Icons.person_add_alt_1), label: const Text('Dar de alta')),
       body: Padding(
         padding: const EdgeInsets.all(20),
-        child: _loading ? const Center(child: CircularProgressIndicator()) : _error != null ? Center(child: Text(_error!)) :
+        child: _loading ? const Center(child: CircularProgressIndicator()) : _error != null ? _AccessLoadError(onRetry: _load) :
         RefreshIndicator(onRefresh: _load, child: ListView(children: [
-          Text('Accesos del club', style: Theme.of(context).textTheme.headlineMedium),
+          Wrap(spacing: 12, runSpacing: 8, crossAxisAlignment: WrapCrossAlignment.center, children: [Text('Accesos del club', style: Theme.of(context).textTheme.headlineMedium), if (_saving) const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2))]),
           const SizedBox(height: 8),
           const Text('Asigna roles y revoca accesos. Los permisos de cada rol se aplican automáticamente.'),
           const SizedBox(height: 20),
@@ -189,4 +190,21 @@ class _ClubAccessManagementPageState extends ConsumerState<ClubAccessManagementP
       ),
     );
   }
+}
+
+
+class _AccessLoadError extends StatelessWidget {
+  const _AccessLoadError({required this.onRetry});
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) => Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+    const Icon(Icons.error_outline, size: 42),
+    const SizedBox(height: 12),
+    const Text('No se han podido cargar los accesos.'),
+    const SizedBox(height: 6),
+    const Text('Puedes reintentarlo sin salir de Usuarios y permisos.'),
+    const SizedBox(height: 16),
+    FilledButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+  ]));
 }

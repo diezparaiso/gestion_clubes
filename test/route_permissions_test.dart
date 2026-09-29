@@ -7,6 +7,7 @@ void main() {
   group('permissionForLocation', () {
     test('requires view permissions for protected top-level routes', () {
       expect(permissionForLocation('/dashboard'), 'dashboard_view');
+      expect(permissionForLocation('/my-raffles'), 'dashboard_view');
       expect(permissionForLocation('/members'), 'members_view');
       expect(permissionForLocation('/teams'), 'teams_view');
       expect(permissionForLocation('/finance'), 'finance_view');
@@ -31,13 +32,16 @@ void main() {
       expect(permissionForLocation('/raffles/raffle-1'), 'raffles_view');
     });
 
+    test('protects sponsor management with its dedicated permission', () {
+      expect(permissionForLocation('/sponsors'), 'sponsors_manage');
+    });
+
     test('leaves public and unknown locations without a permission requirement', () {
       expect(permissionForLocation('/login'), isNull);
       expect(permissionForLocation('/register'), isNull);
       expect(permissionForLocation('/privacy'), isNull);
       expect(permissionForLocation('/profile'), isNull);
       expect(permissionForLocation('/profile/password'), isNull);
-      expect(permissionForLocation('/my-raffles'), isNull);
       expect(permissionForLocation('/club/demo'), isNull);
       expect(permissionForLocation('/club/demo/news'), isNull);
       expect(permissionForLocation('/club/demo/events'), isNull);

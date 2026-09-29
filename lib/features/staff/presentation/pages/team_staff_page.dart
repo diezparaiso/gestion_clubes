@@ -26,6 +26,16 @@ class TeamStaffPage extends ConsumerStatefulWidget {
 }
 
 class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre del flujo Equipos → Personal; filtros, responsive y estados vacíos.
+  final _searchController = TextEditingController();
+  bool _showInactive = true;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _newStaff() async {
     final clubId = ref.read(authControllerProvider).clubId;
     if (clubId == null) return;
@@ -53,30 +63,96 @@ class _TeamStaffPageState extends ConsumerState<TeamStaffPage> {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(child: Text('Cuerpo técnico', style: Theme.of(context).textTheme.headlineMedium)),
-            FilledButton.icon(onPressed: canManage ? _newStaff : null, icon: const Icon(Icons.person_add_alt_1), label: const Text('Añadir personal')),
-          ]),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Text('Cuerpo técnico', style: Theme.of(context).textTheme.headlineMedium),
+              if (canManage)
+                FilledButton.icon(
+                  onPressed: _newStaff,
+                  icon: const Icon(Icons.person_add_alt_1),
+                  label: const Text('Añadir personal'),
+                ),
+            ],
+          ),
           const SizedBox(height: 8),
           const Text('Entrenadores y personal asignado a este equipo.'),
-          const SizedBox(height: 24),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 220, maxWidth: 520),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    labelText: 'Buscar persona o cargo',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
+              FilterChip(
+                label: const Text('Mostrar inactivos'),
+                selected: _showInactive,
+                onSelected: (value) => setState(() => _showInactive = value),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
           Expanded(child: staff.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => const Center(child: Text('No se ha podido cargar el personal.')),
-            data: (items) => Card(child: ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: items.length,
-              separatorBuilder: (_, index) => const Divider(height: 1),
-              itemBuilder: (context, index) {
-                final member = items[index];
-                return ListTile(
-                  leading: const CircleAvatar(backgroundColor: Color(0xFFE8EFEC), child: Icon(Icons.sports_outlined, color: Color(0xFF168B68))),
-                  title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.w700)),
-                  subtitle: Text(member.role),
-                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [member.isActive ? const Icon(Icons.check_circle_outline, color: Color(0xFF168B68)) : const Icon(Icons.cancel_outlined, color: Color(0xFF9BA9BC)), if (canManage) IconButton(tooltip: 'Editar personal', onPressed: () => _editStaff(member), icon: const Icon(Icons.edit_outlined))]),
-                );
-              },
-            )),
+            error: (error, stack) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('No se ha podido cargar el personal.'),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: () => ref.invalidate(teamStaffProvider(teamId)),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            ),
+            data: (items) {
+              final query = _searchController.text.trim().toLowerCase();
+              final filtered = items.where((member) {
+                final matchesText = query.isEmpty || member.name.toLowerCase().contains(query) || member.role.toLowerCase().contains(query);
+                return matchesText && (_showInactive || member.isActive);
+              }).toList();
+              if (filtered.isEmpty) {
+                return Center(child: Text(items.isEmpty ? 'Todavía no hay personal asignado.' : 'No hay personal que coincida con el filtro.'));
+              }
+              return RefreshIndicator(
+                onRefresh: () => ref.refresh(teamStaffProvider(teamId).future),
+                child: Card(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) {
+                      final member = filtered[index];
+                      return ListTile(
+                        leading: const CircleAvatar(backgroundColor: Color(0xFFE8EFEC), child: Icon(Icons.sports_outlined, color: Color(0xFF168B68))),
+                        title: Text(member.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+                        subtitle: Text(member.role),
+                        trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                          member.isActive ? const Icon(Icons.check_circle_outline, color: Color(0xFF168B68)) : const Icon(Icons.cancel_outlined, color: Color(0xFF9BA9BC)),
+                          if (canManage) IconButton(tooltip: 'Editar personal', onPressed: () => _editStaff(member), icon: const Icon(Icons.edit_outlined)),
+                        ]),
+                      );
+                    },
+                  ),
+                ),
+              );
+            },
           )),
         ]),
       ),

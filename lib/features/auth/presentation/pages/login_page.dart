@@ -12,7 +12,7 @@ class LoginPage extends ConsumerStatefulWidget {
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): añade recuperación de contraseña.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-27): añade recuperación de contraseña.\n// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso público a la solicitud de incorporación de clubes.\n// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): conecta el acceso con la landing pública de la plataforma.
 
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
@@ -81,6 +81,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             ),
             const SizedBox(height: 4),
             TextButton(onPressed: () => context.go('/register'), child: const Text('Crear una cuenta')),
+            TextButton(onPressed: () => context.go('/solicitar-incorporacion'), child: const Text('¿Quieres incorporar tu club? Solicitar incorporación')),
+            TextButton(onPressed: () => context.go('/'), child: const Text('Volver a la plataforma')),
           ],
         ),
       ),
@@ -124,6 +126,8 @@ class _AuthScaffold extends StatelessWidget {
 
 class _AuthBrand extends StatelessWidget {
   const _AuthBrand();
+
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-29): corrige la estructura de la marca de acceso del login.
 
   @override
   Widget build(BuildContext context) {

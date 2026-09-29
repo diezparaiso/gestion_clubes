@@ -1,5 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añade edición y borrado de noticias y muestra todos los estados.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): acciones de gestión condicionadas a news_manage.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora responsive de cabecera y estado de error de Noticias.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -31,17 +32,22 @@ class PostsPage extends ConsumerWidget {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(child: Text('Noticias del club', style: Theme.of(context).textTheme.headlineMedium)),
-            IconButton(tooltip: 'Copiar enlace público', onPressed: () async { final clubId = ref.read(authControllerProvider).clubId; if (clubId == null) return; final club = await ref.read(clubRepositoryProvider).getClubById(clubId); final url = Uri.base.replace(path: '/club/${club.slug}/news').toString(); await Clipboard.setData(ClipboardData(text: url)); if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público de noticias copiado.'))); }, icon: const Icon(Icons.link_outlined)), const SizedBox(width: 8),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+            Text('Noticias del club', style: Theme.of(context).textTheme.headlineMedium),
+            IconButton(tooltip: 'Copiar enlace público', onPressed: () async { final clubId = ref.read(authControllerProvider).clubId; if (clubId == null) return; final club = await ref.read(clubRepositoryProvider).getClubById(clubId); final url = Uri.base.replace(path: '/club/${club.slug}/news').toString(); await Clipboard.setData(ClipboardData(text: url)); if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público de noticias copiado.'))); }, icon: const Icon(Icons.link_outlined)),
             FilledButton.icon(onPressed: canManage ? () => _showPostDialog(context, ref) : null, icon: const Icon(Icons.add), label: const Text('Nueva noticia')),
-          ]),
+            ],
+          ),
           const SizedBox(height: 8),
           const Text('Publica avisos y novedades para la comunidad.'),
           const SizedBox(height: 24),
           Expanded(child: posts.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => const Center(child: Text('No se han podido cargar las noticias.')),
+            error: (error, stack) => Center(child: _PostsLoadError(onRetry: () => ref.invalidate(postsProvider))),
             data: (items) => items.isEmpty
                 ? const Center(child: Text('Todavía no hay noticias.'))
                 : ListView.separated(
@@ -64,7 +70,7 @@ class PostsPage extends ConsumerWidget {
 
   Future<void> _showPostDialog(BuildContext context, WidgetRef ref, {Post? post}) async {
     final saved = await showDialog<bool>(context: context, builder: (_) => _PostDialog(post: post));
-    if (saved == true) ref.invalidate(postsProvider);
+    if (saved == true && context.mounted) ref.invalidate(postsProvider);
   }
 
   Future<void> _deletePost(BuildContext context, WidgetRef ref, Post post) async {
@@ -82,11 +88,31 @@ class PostsPage extends ConsumerWidget {
     if (confirmed != true) return;
     try {
       await ref.read(postRepositoryProvider).deletePost(post.id);
-      ref.invalidate(postsProvider);
+      if (context.mounted) ref.invalidate(postsProvider);
     } catch (_) {
       if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('No se ha podido eliminar la noticia.')));
     }
   }
+}
+
+class _PostsLoadError extends StatelessWidget {
+  const _PostsLoadError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      const Icon(Icons.error_outline, size: 40),
+      const SizedBox(height: 12),
+      const Text('No se han podido cargar las noticias.'),
+      const SizedBox(height: 8),
+      const Text('Puedes reintentarlo sin salir de Noticias.'),
+      const SizedBox(height: 16),
+      OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+    ],
+  );
 }
 
 class _PostCard extends StatelessWidget {

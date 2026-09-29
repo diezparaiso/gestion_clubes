@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../data/repositories/post_repository.dart';
 import '../../domain/entities/post.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra la imagen opcional de las noticias públicas.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade navegación pública consistente y acceso al login.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): añade reintento ante errores de carga pública.
 class PublicPostsPage extends StatefulWidget {
   const PublicPostsPage({super.key, required this.clubSlug});
   final String clubSlug;
@@ -13,7 +16,7 @@ class PublicPostsPage extends StatefulWidget {
 }
 
 class _PublicPostsPageState extends State<PublicPostsPage> {
-  late final Future<List<Post>> _posts;
+  late Future<List<Post>> _posts;
 
   @override
   void initState() {
@@ -21,14 +24,32 @@ class _PublicPostsPageState extends State<PublicPostsPage> {
     _posts = PostRepository().listPublicPosts(widget.clubSlug);
   }
 
+  void _retry() {
+    setState(() {
+      _posts = PostRepository().listPublicPosts(widget.clubSlug);
+    });
+  }
+
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Noticias del club')),
+        appBar: AppBar(
+          title: const Text('Noticias del club'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12),
+              child: FilledButton.icon(
+                onPressed: () => context.go('/login'),
+                icon: const Icon(Icons.login, size: 18),
+                label: const Text('Acceder'),
+              ),
+            ),
+          ],
+        ),
         body: FutureBuilder<List<Post>>(
           future: _posts,
           builder: (context, snapshot) {
             if (snapshot.connectionState != ConnectionState.done) return const Center(child: CircularProgressIndicator());
-            if (snapshot.hasError) return const Center(child: Text('No se han podido cargar las noticias.'));
+            if (snapshot.hasError) return _PublicLoadError(message: 'No se han podido cargar las noticias.', onRetry: _retry);
             final posts = snapshot.data!;
             if (posts.isEmpty) return const Center(child: Text('Todavía no hay noticias publicadas.'));
             return ListView.separated(
@@ -76,4 +97,34 @@ class _PublicPostsPageState extends State<PublicPostsPage> {
           },
         ),
       );
+}
+
+class _PublicLoadError extends StatelessWidget {
+  const _PublicLoadError({required this.message, required this.onRetry});
+
+  final String message;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.cloud_off_outlined, size: 42, color: Theme.of(context).colorScheme.error),
+            const SizedBox(height: 12),
+            Text(message, textAlign: TextAlign.center),
+            const SizedBox(height: 12),
+            FilledButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Reintentar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

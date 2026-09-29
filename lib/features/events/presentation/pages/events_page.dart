@@ -1,4 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos view/manage en acciones de la pantalla.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive; sin cambios de Supabase ni Payments/Stripe.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estado de error y reintento de Eventos.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -39,17 +41,63 @@ class _EventsPageState extends ConsumerState<EventsPage> {
     final events = ref.watch(eventsProvider);
     final canManage = ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'events_manage');
     return Scaffold(appBar: const ClubNavigationAppBar(title: 'Eventos'), body: Padding(padding: const EdgeInsets.fromLTRB(20, 8, 20, 24), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Row(children: [Expanded(child: Text('Agenda del club', style: Theme.of(context).textTheme.headlineMedium)), IconButton(tooltip: 'Copiar enlace público', onPressed: () async { final clubId = ref.read(authControllerProvider).clubId; if (clubId == null) return; final club = await ref.read(clubRepositoryProvider).getClubById(clubId); final url = Uri.base.replace(path: '/club/${club.slug}/events').toString(); await Clipboard.setData(ClipboardData(text: url)); if (!context.mounted) return; ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Enlace público de la agenda copiado.'))); }, icon: const Icon(Icons.link_outlined)), const SizedBox(width: 8), if (canManage) FilledButton.icon(onPressed: () => _showCreateDialog(context, ref), icon: const Icon(Icons.add), label: const Text('Nuevo evento'))]),
+      Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          Text('Agenda del club', style: Theme.of(context).textTheme.headlineMedium),
+          IconButton(
+            tooltip: 'Copiar enlace público',
+            onPressed: () async {
+              final clubId = ref.read(authControllerProvider).clubId;
+              if (clubId == null) return;
+              final club = await ref.read(clubRepositoryProvider).getClubById(clubId);
+              final url = Uri.base.replace(path: '/club/${club.slug}/events').toString();
+              await Clipboard.setData(ClipboardData(text: url));
+              if (!context.mounted) return;
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Enlace público de la agenda copiado.')),
+              );
+            },
+            icon: const Icon(Icons.link_outlined),
+          ),
+          if (canManage)
+            FilledButton.icon(
+              onPressed: () => _showCreateDialog(context, ref),
+              icon: const Icon(Icons.add),
+              label: const Text('Nuevo evento'),
+            ),
+        ],
+      ),
       const SizedBox(height: 8),
       const Text('Organiza partidos, reuniones y actividades del club.'),
       const SizedBox(height: 16),
-      Row(children: [
-        Expanded(child: TextField(controller: _searchController, onChanged: (_) => setState(() {}), decoration: const InputDecoration(hintText: 'Buscar evento, ubicación o descripción', prefixIcon: Icon(Icons.search)))),
-        const SizedBox(width: 12),
-        FilterChip(label: const Text('Solo públicos'), selected: _publicOnly, onSelected: (value) => setState(() => _publicOnly = value)),
-      ]),
+      Wrap(
+        spacing: 12,
+        runSpacing: 8,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          ConstrainedBox(
+            constraints: const BoxConstraints(minWidth: 240, maxWidth: 520),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (_) => setState(() {}),
+              decoration: const InputDecoration(
+                hintText: 'Buscar evento, ubicación o descripción',
+                prefixIcon: Icon(Icons.search),
+              ),
+            ),
+          ),
+          FilterChip(
+            label: const Text('Solo públicos'),
+            selected: _publicOnly,
+            onSelected: (value) => setState(() => _publicOnly = value),
+          ),
+        ],
+      ),
       const SizedBox(height: 24),
-      Expanded(child: events.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => const Center(child: Text('No se han podido cargar los eventos.')), data: (items) {
+      Expanded(child: events.when(loading: () => const Center(child: CircularProgressIndicator()), error: (error, stack) => Center(child: _EventsLoadError(onRetry: () => ref.invalidate(eventsProvider))), data: (items) {
         final query = _searchController.text.trim().toLowerCase();
         final filtered = items.where((event) {
           final text = '${event.title} ${event.location ?? ''} ${event.description}'.toLowerCase();
@@ -62,8 +110,28 @@ class _EventsPageState extends ConsumerState<EventsPage> {
 
   Future<void> _showCreateDialog(BuildContext context, WidgetRef ref) async {
     final saved = await showDialog<bool>(context: context, builder: (_) => const _CreateEventDialog());
-    if (saved == true) ref.invalidate(eventsProvider);
+    if (saved == true && context.mounted) ref.invalidate(eventsProvider);
   }
+}
+
+class _EventsLoadError extends StatelessWidget {
+  const _EventsLoadError({required this.onRetry});
+
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      const Icon(Icons.error_outline, size: 40),
+      const SizedBox(height: 12),
+      const Text('No se han podido cargar los eventos.'),
+      const SizedBox(height: 8),
+      const Text('Puedes reintentarlo sin salir de Eventos.'),
+      const SizedBox(height: 16),
+      OutlinedButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+    ],
+  );
 }
 
 class _EventCard extends StatelessWidget {
@@ -111,8 +179,11 @@ class _CreateEventDialogState extends ConsumerState<_CreateEventDialog> {
     setState(() => _saving = true);
     try {
       if (!_endAt.isAfter(_startAt)) {
-        if (mounted) setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('La hora de fin debe ser posterior a la de inicio.')));
+        if (!mounted) return;
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('La hora de fin debe ser posterior a la de inicio.')),
+        );
         return;
       }
       await ref.read(eventRepositoryProvider).createEvent(clubId: clubId, title: _titleController.text, description: _descriptionController.text, location: _locationController.text, startAt: _startAt, endAt: _endAt, type: _type, visibility: _visibility);
@@ -125,7 +196,7 @@ class _CreateEventDialogState extends ConsumerState<_CreateEventDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(title: const Text('Nuevo evento'), content: SizedBox(width: 460, child: Form(key: _formKey, child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [TextFormField(controller: _titleController, decoration: const InputDecoration(labelText: 'Título'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null), const SizedBox(height: 12), TextFormField(controller: _descriptionController, minLines: 3, maxLines: 6, decoration: const InputDecoration(labelText: 'Descripción'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null), const SizedBox(height: 12), TextFormField(controller: _locationController, decoration: const InputDecoration(labelText: 'Ubicación')), const SizedBox(height: 12),
+  Widget build(BuildContext context) => AlertDialog(title: const Text('Nuevo evento'), content: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 460), child: Form(key: _formKey, child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [TextFormField(controller: _titleController, decoration: const InputDecoration(labelText: 'Título'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null), const SizedBox(height: 12), TextFormField(controller: _descriptionController, minLines: 3, maxLines: 6, decoration: const InputDecoration(labelText: 'Descripción'), validator: (value) => value == null || value.trim().isEmpty ? 'Campo obligatorio' : null), const SizedBox(height: 12), TextFormField(controller: _locationController, decoration: const InputDecoration(labelText: 'Ubicación')), const SizedBox(height: 12),
               Row(children: [
                 Expanded(child: OutlinedButton.icon(
                   onPressed: _saving ? null : () async {

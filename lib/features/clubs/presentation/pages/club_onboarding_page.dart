@@ -76,9 +76,22 @@ class _ClubOnboardingPageState extends ConsumerState<ClubOnboardingPage> {
                   error: (error, _) => Card(
                     child: Padding(
                       padding: const EdgeInsets.all(20),
-                      child: Text(
-                        'No se han podido cargar tus clubes. Puedes crear uno nuevo.\n\n$error',
-                        style: const TextStyle(color: Colors.red),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'No se han podido cargar tus clubes.',
+                            style: TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                          ),
+                          const SizedBox(height: 6),
+                          Text('Puedes crear uno nuevo o reintentarlo.\\n$error'),
+                          const SizedBox(height: 12),
+                          OutlinedButton.icon(
+                            onPressed: () => ref.invalidate(availableClubsProvider),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Reintentar'),
+                          ),
+                        ],
                       ),
                     ),
                   ),

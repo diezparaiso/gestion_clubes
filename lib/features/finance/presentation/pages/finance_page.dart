@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estados de carga y error de tesorería; sin cambios de Supabase ni Payments/Stripe.
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -51,82 +53,100 @@ class _FinancePageState extends ConsumerState<FinancePage> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(child: Text('Control financiero', style: Theme.of(context).textTheme.headlineMedium)),
-              IconButton(onPressed: () => _exportTransactions(context, ref), tooltip: 'Exportar CSV', icon: const Icon(Icons.download_outlined)),
-              const SizedBox(width: 8),
-              if (ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'finance_manage'))
-                FilledButton.icon(onPressed: () => _showTransactionDialog(context, ref), icon: const Icon(Icons.add_chart_outlined), label: const Text('Nuevo movimiento')),
-            ]),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text('Control financiero', style: Theme.of(context).textTheme.headlineMedium),
+                IconButton(
+                  onPressed: () => _exportTransactions(context, ref),
+                  tooltip: 'Exportar CSV',
+                  icon: const Icon(Icons.download_outlined),
+                ),
+                if (ClubRolePermissions.has(ref.watch(authControllerProvider).role, 'finance_manage'))
+                  FilledButton.icon(
+                    onPressed: () => _showTransactionDialog(context, ref),
+                    icon: const Icon(Icons.add_chart_outlined),
+                    label: const Text('Nuevo movimiento'),
+                  ),
+              ],
+            ),
             const SizedBox(height: 8),
             const Text('Registra ingresos y gastos y consulta el saldo del club.'),
             const SizedBox(height: 16),
-            Row(children: [
-              Expanded(child: TextField(
-                controller: _searchController,
-                onChanged: (_) => setState(() {}),
-                decoration: const InputDecoration(
-                  hintText: 'Buscar descripción o categoría',
-                  prefixIcon: Icon(Icons.search),
-                ),
-              )),
-              const SizedBox(width: 12),
-              DropdownButton<TransactionType?>(
-                value: _typeFilter,
-                hint: const Text('Tipo'),
-                items: [
-                  const DropdownMenuItem<TransactionType?>(
-                    value: null,
-                    child: Text('Todos'),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 240, maxWidth: 520),
+                  child: TextField(
+                    controller: _searchController,
+                    onChanged: (_) => setState(() {}),
+                    decoration: const InputDecoration(
+                      hintText: 'Buscar descripción o categoría',
+                      prefixIcon: Icon(Icons.search),
+                    ),
                   ),
-                  ...TransactionType.values.map(
-                    (type) => DropdownMenuItem<TransactionType?>(
-                      value: type,
-                      child: Text(
-                        type == TransactionType.income ? 'Ingresos' : 'Gastos',
+                ),
+                DropdownButton<TransactionType?>(
+                  value: _typeFilter,
+                  hint: const Text('Tipo'),
+                  items: [
+                    const DropdownMenuItem<TransactionType?>(
+                      value: null,
+                      child: Text('Todos'),
+                    ),
+                    ...TransactionType.values.map(
+                      (type) => DropdownMenuItem<TransactionType?>(
+                        value: type,
+                        child: Text(
+                          type == TransactionType.income ? 'Ingresos' : 'Gastos',
+                        ),
                       ),
                     ),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _typeFilter = value),
-              ),
-              const SizedBox(width: 12),
-              DropdownButton<String?>(
-                value: _categoryFilter,
-                hint: const Text('Categoría'),
-                items: [
-                  const DropdownMenuItem<String?>(
-                    value: null,
-                    child: Text('Todas'),
-                  ),
-                  ...const [
-                    'membership',
-                    'sponsorship',
-                    'raffle',
-                    'event',
-                    'equipment',
-                    'federation',
-                    'facilities',
-                    'salaries',
-                    'supplies',
-                    'other',
-                  ].map(
-                    (category) => DropdownMenuItem<String?>(
-                      value: category,
-                      child: Text(_categoryLabel(category)),
+                  ],
+                  onChanged: (value) => setState(() => _typeFilter = value),
+                ),
+                DropdownButton<String?>(
+                  value: _categoryFilter,
+                  hint: const Text('Categoría'),
+                  items: [
+                    const DropdownMenuItem<String?>(
+                      value: null,
+                      child: Text('Todas'),
                     ),
-                  ),
-                ],
-                onChanged: (value) => setState(() => _categoryFilter = value),
-              ),
-            ]),
+                    ...const [
+                      'membership',
+                      'sponsorship',
+                      'raffle',
+                      'event',
+                      'equipment',
+                      'federation',
+                      'facilities',
+                      'salaries',
+                      'supplies',
+                      'other',
+                    ].map(
+                      (category) => DropdownMenuItem<String?>(
+                        value: category,
+                        child: Text(_categoryLabel(category)),
+                      ),
+                    ),
+                  ],
+                  onChanged: (value) => setState(() => _categoryFilter = value),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
             Expanded(child: transactions.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => const Center(child: Text('No se han podido cargar los movimientos.')),
+              loading: () => _FinanceLoading(message: 'Cargando movimientos…'),
+              error: (error, stack) => _FinanceError(onRetry: () => ref.invalidate(transactionsProvider)),
               data: (items) => openingBalance.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (error, stack) => const Center(child: Text('No se ha podido cargar el saldo inicial.')),
+                loading: () => _FinanceLoading(message: 'Cargando saldo inicial…'),
+                error: (error, stack) => _FinanceError(onRetry: () => ref.invalidate(openingBalanceProvider)),
                 data: (balance) {
                   final query = _searchController.text.trim().toLowerCase();
                   final filtered = items.where((item) {
@@ -174,6 +194,49 @@ class _FinancePageState extends ConsumerState<FinancePage> {
 String _categoryLabel(String category) => switch (category) {
   'membership' => 'Cuotas', 'sponsorship' => 'Patrocinio', 'raffle' => 'Rifa', 'event' => 'Evento', 'equipment' => 'Equipamiento', 'federation' => 'Federación', 'facilities' => 'Instalaciones', 'salaries' => 'Salarios', 'supplies' => 'Suministros', _ => 'Otros',
 };
+
+class _FinanceLoading extends StatelessWidget {
+  const _FinanceLoading({required this.message});
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5)),
+        SizedBox(width: 12),
+        Text(message),
+      ],
+    ),
+  );
+}
+
+class _FinanceError extends StatelessWidget {
+  const _FinanceError({required this.onRetry});
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) => Center(
+    child: Card(
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline_rounded, color: Theme.of(context).colorScheme.error),
+            const SizedBox(height: 8),
+            const Text('No se han podido cargar los datos.', style: TextStyle(fontWeight: FontWeight.w700)),
+            const SizedBox(height: 4),
+            const Text('Puedes reintentarlo sin salir de Tesorería.'),
+            const SizedBox(height: 12),
+            TextButton.icon(onPressed: onRetry, icon: const Icon(Icons.refresh_rounded), label: const Text('Reintentar')),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
 class _FinanceContent extends StatelessWidget {
   const _FinanceContent({required this.transactions, required this.visibleTransactions, required this.openingBalance});

@@ -1,3 +1,487 @@
+## 2026-09-29 — GPT-5.6 LUNA — cierre de seguridad del flujo de contraseña del Módulo 3
+
+- Detectado un punto de seguridad en el flujo `must_change_password`: aunque la interfaz obligaba al cambio, la política genérica de actualización del perfil permitía potencialmente que un cliente autenticado modificara directamente ese indicador.
+- Añadida `supabase/migrations/046_password_flag_security.sql`.
+- 046 crea `clear_must_change_password()` como RPC autenticada y restringe el privilegio UPDATE de `profiles` a las columnas editables por el usuario, dejando fuera `must_change_password`.
+- `ProfilePage` ya no actualiza directamente el indicador; utiliza la RPC después de cambiar correctamente la contraseña.
+- No se ejecuta la migración sobre Supabase remoto.
+- El flujo de recuperación mantiene el cierre de sesión posterior al cambio para evitar reutilizar la sesión temporal de recuperación.
+
+## 2026-09-29 — GPT-5.6 LUNA — cierre de auditoría RLS del Módulo 2
+
+### Hallazgo principal
+- La auditoría de repositories confirmó que varios módulos realizan escrituras directas mediante Supabase y dependen de RLS para la frontera real de seguridad.
+- Se detectó que las políticas antiguas basadas en is_club_manager daban al secretario acceso de escritura más amplio que la matriz central de permisos.
+- Añadida supabase/migrations/045_central_permission_rls_alignment.sql.
+- 045 alinea RLS con los permisos *_view / *_manage:
+  - members_manage para socios.
+  - teams_manage para temporadas, equipos y personal.
+  - players_manage para jugadores y asignaciones.
+  - finance_view / finance_manage para tesorería.
+  - raffles_manage para rifas.
+  - news_manage para noticias.
+  - events_manage para eventos.
+  - club_settings_manage para configuración del club.
+  - access_manage para membresías/accesos.
+- Se mantiene separada la lectura pública de contenidos.
+- Ampliado club_role_permissions_test.dart para comprobar explícitamente que el secretario no obtiene permisos de equipos, jugadores, rifas ni patrocinadores.
+- No se ejecutan migraciones contra Supabase remoto.
+
+### Estado del módulo
+- Auditoría de UI/rutas: completada.
+- Auditoría de repositories/escrituras: completada.
+- Alineación RLS preparada: completada en código/migraciones.
+- Validación real RLS/RPC con usuarios: pendiente de staging.
+- Payments/Stripe no modificados.
+
+## 2026-09-29 — GPT-5.6 LUNA — endurecimiento del estado de autenticación
+
+### Cambios
+- Normalización de inicio de sesión y registro: ambos flujos limpian explícitamente passwordRecovery y mustChangePassword antes de seleccionar club.
+- Se evita que un estado previo de recuperación pueda arrastrarse a una autenticación normal.
+- Ampliada la cobertura unitaria del estado de autenticación para ambos indicadores.
+
+### Validación
+- Pendiente ejecutar flutter analyze --no-pub y flutter test --reporter expanded en local.
+- No se modifica Supabase remoto.
+
+## 2026-09-29 — GPT-5.6 LUNA — auditoría de seguridad y alineación RLS de patrocinadores
+
+### Hallazgo y corrección
+- Revisadas las migraciones de permisos 032–040 y la matriz ClubRolePermissions.
+- Detectada una discrepancia real en Patrocinadores:
+  - Flutter ya utilizaba sponsors_manage.
+  - El enum SQL club_permission todavía no contenía sponsors_manage.
+  - Las políticas/RPC históricas de patrocinadores utilizaban is_club_manager, que incluía también al secretario.
+- Añadida supabase/migrations/043_sponsors_permission_enum.sql para incorporar sponsors_manage al enum SQL.
+- Añadida supabase/migrations/044_sponsors_permissions_alignment.sql para que SELECT, INSERT, UPDATE y las RPC de patrocinadores utilicen has_club_permission(..., 'sponsors_manage').
+- La matriz queda coherente: la gestión de patrocinadores corresponde al permiso central sponsors_manage.
+- Las migraciones son preparadas en GitHub, pero no se ejecutan contra Supabase remoto.
+
+### Validación pendiente
+- Aplicar 043–044 en una base de pruebas/staging.
+- Verificar RLS/RPC con usuarios de los distintos roles.
+- No se modifica Payments/Stripe.
+
+## 2026-09-29 — GPT-5.6 LUNA — revisión de páginas públicas y autenticación
+
+### Cambios
+- Corregida la estructura inválida de la marca de acceso en `login_page.dart`.
+- Noticias, Eventos y Patrocinadores públicos incorporan reintento ante errores de carga.
+- Se mantiene el acceso público y el botón «Acceder» existente.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+
+### Validación
+Analyzer/tests y validación visual en Flutter Web/Chrome: pendientes de ejecución.
+
+## 2026-09-29 — GPT-5.6 LUNA — estados de Rifas
+
+### Cambios
+- Listado de Rifas: error de carga con botón Reintentar.
+- Detalle de Rifa: reintento de carga de la rifa, participaciones e histórico mensual.
+- Mis rifas: error de carga con opción de reintento.
+- Rifa pública: corregida la propagación del estado de cierre al selector de números.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, club_payments ni club_payments_backend.
+
+### Validación
+Pendiente ejecutar analyzer/tests y validación visual en Flutter Web/Chrome.
+
+## 2026-09-29 — GPT-5.6 LUNA — estados de accesos y miembros del club
+
+### Cambios
+- lib/features/clubs/presentation/pages/club_access_management_page.dart
+  - El error de carga de accesos ahora ofrece reintento sin abandonar la pantalla.
+  - La cabecera del contenido se adapta mejor a anchuras reducidas.
+  - Se mantiene intacta la gestión existente de roles, revocaciones y alta mediante las operaciones ya existentes.
+- lib/features/clubs/presentation/pages/club_members_page.dart
+  - El error del listado de miembros ahora ofrece reintento sobre sus proveedores.
+  - Se evita mostrar directamente el detalle técnico de la excepción en la interfaz.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, club_payments ni club_payments_backend.
+
+### Validación
+Pendiente ejecutar analyzer/tests y validación visual en Flutter Web/Chrome.
+
+## 2026-09-28 — GPT-5.6 LUNA — cierre UX de Perfil y Configuración
+
+### Cambios
+- `lib/features/auth/presentation/pages/profile_page.dart`
+  - Reorganizada la pantalla de perfil.
+  - Mejorados estados de error/guardado y adaptación móvil.
+  - Añadidos autofill hints y navegación de teclado para contraseñas.
+  - Mantiene el flujo existente de recuperación/cambio obligatorio.
+- `lib/features/clubs/presentation/pages/club_settings_page.dart`
+  - Cabecera responsive para pantallas estrechas.
+  - La acción «Usuarios y permisos» pasa a disposición vertical en móvil.
+- No se modifica Supabase remoto ni Payments/Stripe.
+
+### Validación
+Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome.
+
+## 2026-09-28 — GPT-5.6 LUNA — definición funcional del flujo de incorporación
+
+### Cambios
+- `lib/features/clubs/presentation/pages/platform_home_page.dart`
+  - Añadida una sección pública «¿Cómo se incorpora un club?».
+  - Se explican las cuatro etapas previstas: solicitud, revisión, alta del club y configuración de cobros.
+  - Se aclara que los datos bancarios no se solicitan en la incorporación inicial.
+- Creado `docs/FLUJO_INCORPORACION_CLUBES.md`.
+  - Define el flujo funcional desde la solicitud pública hasta la activación.
+  - Separa estado de solicitud y estado operativo del club.
+  - Define la futura bandeja de soporte, revisión, alta, configuración y Stripe Connect.
+- No se modifica Supabase remoto, migraciones, RPC ni Edge Functions.
+- No se modifica Stripe, `club_payments` ni `club_payments_backend`.
+
+### Validación
+Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome después de estos cambios.
+
+## 2026-09-28 — GPT-5.6 LUNA — cierre del flujo de entrada pública
+
+### Cambios
+- `lib/app/router.dart`
+  - La landing `/` pasa a ser la entrada inicial de la aplicación.
+  - Se mantiene como ruta pública y no requiere autenticación.
+- `lib/features/auth/presentation/pages/login_page.dart`
+  - El identificador de la plataforma permite volver a `/`.
+  - Añadido **Volver a la plataforma**.
+- `lib/features/clubs/presentation/pages/club_join_request_page.dart`
+  - Añadido acceso **Plataforma** en la cabecera.
+  - Tras la confirmación de la solicitud se vuelve a la landing pública.
+- No se modifica Supabase remoto ni la infraestructura de pagos.
+
+### Flujo resultante
+`/` → landing → `/login` o `/solicitar-incorporacion`.
+Desde login y solicitud se puede regresar a la landing.
+
+### Validación
+Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome.
+
+## 2026-09-28 — GPT-5.6 LUNA — landing pública de la plataforma
+
+### Cambios
+- Creado `lib/features/clubs/presentation/pages/platform_home_page.dart`.
+  - Nueva portada pública de la plataforma.
+  - Presenta de forma resumida Socios, Tesorería, Rifas y porras, Noticias/avisos, Patrocinadores y Web pública.
+  - CTA **Incorporar mi club** hacia `/solicitar-incorporacion`.
+  - CTA **Ya tengo acceso** hacia `/login`.
+  - Enlace público a privacidad.
+  - Diseño responsive para móvil, tablet y escritorio.
+- Modificado `lib/app/router.dart`.
+  - Añadida la ruta pública `/`.
+  - La landing no requiere autenticación.
+  - Se mantiene `/login` como acceso al área privada.
+- No se modifica Supabase remoto.
+- No se modifica Stripe, `club_payments` ni `club_payments_backend`.
+- No se almacenan ni transmiten datos desde la landing.
+
+### Arquitectura
+La entrada pública queda separada de la web pública de cada club:
+`/` → plataforma; `/club/:clubSlug` → club; rutas privadas → gestión autenticada.
+La incorporación continúa inicialmente mediante `/solicitar-incorporacion`; el alta autónoma y Stripe Connect quedan para fases posteriores.
+
+### Validación
+Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome después de estos cambios.
+
+## 2026-09-28 — GPT-5.6 LUNA — endurecimiento de la solicitud de incorporación
+
+### Cambios
+- `club_join_request_page.dart`
+  - Añadido tipo de entidad.
+  - Añadido sitio web opcional.
+  - Añadida aceptación explícita de la información de privacidad.
+  - Enlace a la política de privacidad existente.
+  - La validación impide continuar sin aceptar la privacidad.
+- Se mantiene el carácter frontend-only de esta fase.
+- No se persisten datos ni se modifica Supabase remoto.
+- No se solicitan datos bancarios.
+
+### Arquitectura
+La futura recepción real de la solicitud deberá aplicar consentimiento/información de privacidad, validación server-side y controles de acceso antes de almacenar los datos de contacto.
+
+## 2026-09-28 — GPT-5.6 LUNA — primera fase de incorporación autónoma de clubes
+
+### Cambios de arquitectura
+- Se define una estrategia por fases para que los clubes puedan iniciar su incorporación sin intervención manual inmediata.
+- Fase 1: solicitud pública de incorporación.
+- Fase 2: cola persistente de solicitudes para soporte.
+- Fase 3: alta autónoma completa con creación del espacio del club.
+- Fase financiera: Stripe Connect para que Stripe recopile KYC y datos bancarios; la plataforma conservará únicamente el identificador de cuenta conectada y estados de capacidad.
+
+### Cambios de código
+- Creado `lib/features/clubs/presentation/pages/club_join_request_page.dart`.
+  - Formulario público responsive.
+  - Datos básicos del club y responsable.
+  - Intereses funcionales.
+  - Aviso explícito para no introducir datos bancarios.
+  - Confirmación visual.
+  - Esta fase no persiste ni envía datos todavía.
+- Modificado `lib/app/router.dart`.
+  - Nueva ruta pública `/solicitar-incorporacion`.
+  - No requiere autenticación.
+- Modificado `lib/features/auth/presentation/pages/login_page.dart`.
+  - Añadido acceso directo «¿Quieres incorporar tu club? Solicitar incorporación».
+- Creado `docs/ARQUITECTURA_INCORPORACION_CLUBES.md`.
+  - Documenta modelo de datos futuro, estados, seguridad y separación de Stripe.
+
+### Límites deliberados
+- No se modifica Supabase remoto.
+- No se crean migraciones/RPC/Edge Functions.
+- No se toca Stripe, `club_payments` ni `club_payments_backend`.
+- No se almacenan datos bancarios.
+- La conexión real con soporte queda pendiente de backend.
+
+### Validación
+- Pendiente ejecutar `flutter analyze`, `flutter test` y validación visual Web/Chrome tras estos cambios.
+
+## 2026-09-28 — GPT-5.6 LUNA — mejora del dashboard y acceso a la web pública
+
+### Cambios realizados
+- `lib/features/dashboard/presentation/pages/dashboard_page.dart`
+  - Añadido acceso directo **Ver web pública** desde la cabecera del área privada.
+  - El enlace resuelve el `slug` real del club mediante `ClubRepository.getClubById` y abre la ruta pública existente `/club/:clubSlug`.
+  - Sustituido el saludo basado directamente en el email por una presentación más legible derivada de su parte local.
+  - Sustituido el avatar estático `PM` por iniciales calculadas a partir del usuario.
+  - La cabecera se distribuye con `Wrap` para evitar desbordamientos en móvil/tablet.
+  - Se mantienen los permisos y las rutas privadas existentes.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+
+### Estado
+Dashboard con separación más clara entre área privada de gestión y web pública del club. Pendiente validación visual/compilación en Flutter Web/Chrome.
+
+## 2026-09-28 — GPT-5.6 LUNA — acceso consistente al login en rifas públicas
+
+### Cambios realizados
+- `lib/features/raffles/presentation/pages/public_raffle_page.dart`
+  - Añadido botón **Acceder** en la cabecera de la rifa pública.
+  - Reutiliza la ruta existente `/login`.
+  - No modifica la reserva simulada ni integra pagos reales.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+
+### Estado
+La navegación pública dispone ahora de acceso al login desde home, noticias, eventos, patrocinadores y rifas públicas. Pendiente validación visual/compilación en Flutter Web/Chrome.
+
+## 2026-09-28 — GPT-5.6 LUNA — consistencia de navegación pública
+
+### Cambios realizados
+- `lib/features/events/presentation/pages/public_events_page.dart`
+  - Añadido botón **Acceder** en la cabecera pública.
+- `lib/features/news/presentation/pages/public_posts_page.dart`
+  - Añadido botón **Acceder** en la cabecera pública.
+- `lib/features/sponsors/presentation/pages/public_sponsors_page.dart`
+  - Añadido botón **Acceder** en la cabecera pública.
+- Las tres páginas reutilizan la ruta existente `/login`.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+
+### Revisión adicional
+- Se ha comprobado que el modelo actual de equipos no dispone de una consulta pública equivalente a las de noticias/eventos.
+- Las tablas `teams` y `seasons` tienen políticas de lectura para usuarios autenticados, por lo que no se ha creado una falsa página pública de equipos que dependa de datos que un visitante anónimo no puede consultar.
+- La publicación pública de equipos queda pendiente de diseñar/validar dentro del modelo de acceso de Supabase, sin tocarlo en esta ronda.
+
+### Estado
+- Navegación pública: coherente con acceso al login desde home, noticias, eventos y patrocinadores.
+- Equipos públicos: pendiente por dependencia del modelo de acceso de datos.
+- Pendiente validación visual/compilación en Flutter Web/Chrome.
+
+## 2026-09-28 — GPT-5.6 LUNA — actualidad real en la home pública
+
+### Cambios realizados
+- lib/features/clubs/presentation/pages/public_club_page.dart
+  - La home pública ahora consulta las noticias y eventos públicos existentes.
+  - Muestra una sección «Actualidad» con la última noticia y el próximo evento cuando existen.
+  - Los bloques enlazan a las páginas públicas completas de noticias y eventos.
+  - No se duplica lógica de acceso a datos: reutiliza los repositorios existentes.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se han modificado Stripe, club_payments ni club_payments_backend.
+
+### Estado
+- Home pública: portada + navegación + actualidad real del club.
+- Pendiente validación visual/compilación en Flutter Web/Chrome.
+
+## 2026-09-28 — GPT-5.6 LUNA — nueva home pública del club
+
+### Cambios realizados
+- lib/features/clubs/presentation/pages/public_club_page.dart
+  - La página pública pasa a ser la home principal del club.
+  - Cabecera pública con navegación y botón **Acceder** arriba a la derecha.
+  - Hero con nombre del club y accesos a noticias/eventos.
+  - Bloques públicos para Noticias, Eventos, Equipos y Patrocinadores.
+  - Enlaces a web y redes sociales existentes.
+  - Diseño responsive para móvil, tablet y escritorio.
+  - Mantiene las rutas públicas existentes y no expone gestión interna.
+- El botón **Acceder** dirige a /login; la autenticación existente continúa llevando al área privada.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se han modificado Stripe, club_payments ni club_payments_backend.
+
+### Estado
+- Home pública del club: cerrada a nivel de frontend.
+- Pendiente validación visual en Flutter Web/Chrome y con datos reales de Supabase staging.
+
+## 2026-09-28 — GPT-5.6 LUNA — cierre de Perfil y protección de cuenta
+
+### Cambios realizados
+- lib/features/auth/presentation/pages/profile_page.dart
+  - Estado de guardado visible.
+  - Errores de cambio de contraseña mostrados dentro del formulario.
+  - Mantiene validación mínima de 8 caracteres y confirmación.
+  - Responsive mediante contenedor máximo existente.
+- lib/app/router.dart
+  - Perfil y rutas autenticadas quedan protegidos por sesión.
+  - Mis rifas requiere sesión mediante dashboard_view.
+  - Se mantiene acceso público únicamente para rutas públicas explícitas.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se han modificado Stripe, club_payments ni club_payments_backend.
+
+### Estado
+- Perfil/cambio de contraseña y protección de rutas de cuenta: cerrado a nivel de frontend.
+- Sigue pendiente validación real con Supabase staging y ejecución de flutter analyze/tests.
+
+## 2026-09-28 — GPT-5.6 LUNA — cierre UX del módulo de Rifas (sin pagos reales)
+
+### Cambios realizados
+- lib/features/raffles/presentation/pages/raffles_page.dart
+  - Cabecera responsive.
+  - Buscador y filtro de estado adaptados a pantallas estrechas.
+  - Se mantienen permisos raffles_manage.
+- lib/features/raffles/presentation/pages/raffle_detail_page.dart
+  - Cabecera responsive.
+  - Validación del ganador manual de Cesta para aceptar solo números participantes y confirmados.
+  - Se mantiene el sorteo criptográficamente aleatorio existente para Sorteo puro.
+- lib/features/raffles/presentation/pages/my_raffles_page.dart
+  - Ajuste UX de cabecera y estados vacíos existentes.
+- lib/features/raffles/presentation/pages/public_raffle_page.dart
+  - La rifa queda visualmente cerrada cuando está finalizada/cancelada/agota números o supera su fecha final.
+  - Se impide seleccionar números y reservar cuando está cerrada.
+  - Se mantiene la reserva simulada; el pago real continúa bloqueado.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se ha modificado club_payments, club_payments_backend ni Stripe.
+
+### Estado
+- Frontend de Rifas: cerrado en lo que no depende de pagos reales.
+- Checkout, suscripciones, webhooks, recibos PDF/email e idempotencia Stripe permanecen deliberadamente pendientes.
+- Falta validar Flutter Web/Chrome, responsive real y rifas contra Supabase staging.
+
+## 2026-09-28 — GPT-5.6 LUNA — cierre del flujo Equipos → Jugadores → Personal
+
+### Cambios realizados
+- lib/features/players/presentation/pages/team_players_page.dart: búsqueda por nombre/dorsal, filtro de inactivos, cabecera responsive, estados vacíos y refresco manual.
+- lib/features/players/presentation/pages/team_players_page.dart: corregida la liberación de todos los TextEditingController del diálogo de edición.
+- lib/features/staff/presentation/pages/team_staff_page.dart: búsqueda por persona/cargo, filtro de inactivos, cabecera responsive, estados vacíos y refresco manual.
+- Se mantiene el flujo existente Equipos → Plantilla → Personal y los permisos players_manage / teams_manage.
+- No se han modificado migraciones, RPC, políticas ni Supabase remoto.
+- No se ha modificado club_payments, club_payments_backend ni Stripe.
+
+### Estado
+- Flujo frontend Equipos → Jugadores → Personal: cerrado a nivel de UI/código.
+- Sigue pendiente la validación real de RLS/RPC en staging y la ejecución de flutter analyze/tests en un entorno local/CI.
+
+## 2026-09-28 — GPT-5.6 LUNA — cierre del módulo de notificaciones
+
+### Objetivo
+Cerrar el centro de notificaciones del usuario sin tocar Supabase remoto, migraciones, RPC, Stripe ni los módulos de pagos.
+
+### Cambios
+1. `lib/features/notifications/presentation/pages/notifications_page.dart`
+   - Búsqueda y filtro de no leídas adaptados a pantallas estrechas.
+   - Marcar una notificación como leída y marcar todas como leídas con manejo visible de errores.
+   - Mantiene el acceso protegido por `notifications_view`.
+2. `lib/features/notifications/data/repositories/notification_delivery_repository.dart`
+   - El modo demo ahora conserva el estado de lectura durante la sesión.
+   - Se pueden probar realmente las acciones de marcar una/todas como leídas sin Supabase.
+   - El comportamiento conectado a Supabase/RPC existente no se modifica.
+
+### Alcance y seguridad
+- No se modifican migraciones Supabase.
+- No se ejecuta ninguna operación sobre Supabase remoto.
+- No se modifican RPC.
+- No se modifica Stripe ni ningún módulo de pagos.
+
+### Estado
+Centro de notificaciones del usuario cerrado a nivel de frontend. La validación de RLS/RPC y notificaciones reales queda para staging/infraestructura externa.
+
+## 2026-09-28 — GPT-5.6 LUNA — cierre del módulo de patrocinadores
+
+### Objetivo
+Cerrar el módulo de patrocinadores de extremo a extremo sin tocar Supabase remoto, migraciones, RPC, Stripe ni los módulos de pagos.
+
+### Cambios
+1. `lib/features/sponsors/presentation/pages/sponsors_page.dart`
+   - Integrada la navegación común del club.
+   - Gestión de alta/edición/visibilidad limitada en UI al presidente.
+   - Mejorado el comportamiento responsive de tarjetas y acciones.
+   - Validación de importe anual y fechas del contrato.
+   - Los errores al cambiar visibilidad dejan de ocultarse silenciosamente.
+2. `lib/features/sponsors/presentation/pages/public_sponsors_page.dart`
+   - Nueva página pública para mostrar patrocinadores activos/publicables.
+   - Enlace opcional a la web del patrocinador.
+   - Usa el repositorio existente y su RPC pública cuando Supabase está configurado.
+3. `lib/features/auth/application/auth_controller.dart`
+   - Añadido `sponsors_manage` únicamente al rol `club_president`.
+   - No se cambia ninguna tabla ni política remota.
+4. `lib/app/router.dart`
+   - Ruta interna `/sponsors` protegida por `sponsors_manage`.
+   - Ruta pública `/club/:clubSlug/sponsors`.
+5. `lib/features/dashboard/presentation/widgets/club_navigation_app_bar.dart`
+   - Añadido Patrocinadores a la navegación común.
+6. `lib/features/dashboard/presentation/pages/dashboard_page.dart`
+   - Añadido Patrocinadores a navegación desktop/mobile.
+7. `lib/features/clubs/presentation/pages/public_club_page.dart`
+   - Añadido acceso público a Patrocinadores.
+
+### Alcance y seguridad
+- No se modifican migraciones Supabase.
+- No se ejecuta ninguna operación sobre Supabase remoto.
+- No se modifica `club_payments`.
+- No se modifica `club_payments_backend`.
+- No se modifica Stripe.
+- No se introducen secretos.
+- La integración reutiliza las consultas/RPC existentes del repositorio de patrocinadores.
+
+### Estado
+El módulo queda integrado en rutas, navegación y escaparate público. La validación contra RLS/RPC real de Supabase queda, como el resto de infraestructura externa, pendiente de staging.
+## 2026-09-28 — GPT-5.6 LUNA — bloque responsive sin pagos
+
+### Objetivo
+Avanzar el desarrollo de `gestion_clubes` sin tocar Supabase remoto ni integrar todavía los módulos externos de pagos.
+
+### Rama de trabajo
+- `ai/non-payments-development`
+- PR: `#1` — Responsive UI improvements without payments/Supabase changes.
+- Base: `main`.
+
+### Archivos modificados
+1. `lib/features/members/presentation/pages/members_page.dart`
+   - Cabecera convertida de `Row` a `Wrap`.
+   - Buscador y filtros convertidos a distribución responsive.
+   - Se evita el desbordamiento horizontal en anchuras reducidas.
+2. `lib/features/finance/presentation/pages/finance_page.dart`
+   - Cabecera convertida a `Wrap`.
+   - Buscador y filtros adaptados a anchuras reducidas.
+   - No se altera el cálculo financiero ni las consultas existentes.
+3. `lib/features/events/presentation/pages/events_page.dart`
+   - Cabecera y acciones convertidas a `Wrap`.
+   - Buscador/filtro público adaptados a móvil y tablet.
+   - Se conserva la generación del enlace público existente.
+4. `lib/features/teams/presentation/pages/teams_page.dart`
+   - Cabecera y acciones convertidas a `Wrap`.
+   - Buscador/filtro de inactivos adaptados a anchuras reducidas.
+
+### Seguridad de alcance
+- No se modifican migraciones Supabase.
+- No se ejecuta ninguna operación sobre Supabase remoto.
+- No se modifica `club_payments`.
+- No se modifica `club_payments_backend`.
+- No se modifica Stripe.
+- No se introducen secretos.
+- Los cambios son exclusivamente de presentación/responsive.
+
+### Siguiente trabajo previsto
+Continuar cerrando funcionalidades y calidad del frontend que no dependan de pagos, Supabase remoto o servicios externos. Cada nueva intervención deberá documentar los archivos afectados y mantener el marcador de autoría IA.
+
 ### 2026-09-27 — GPT-5.6 LUNA — cierre de revisión de selección de club
 - Revisada la carga de múltiples clubes mediante membresías activas y la selección del club junto con su rol.
 - Añadida cobertura de `ClubAccess` para identidad del club y etiquetas de rol, incluyendo fallback para roles futuros.
@@ -686,3 +1170,167 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Corregida la política de lectura de `raffle_tickets`: la propiedad del comprador usa `buyer_profile_id`, no `profile_id`.
 - Así se mantiene el acceso de un usuario a sus propias participaciones sin ampliar `raffles_view`.
 - No se ejecuta Supabase remoto ni se modifica Payments/Stripe.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — mejora de estados del dashboard
+- El dashboard deja de ocultar los estados de carga y error de sus estadísticas.
+- Mientras se consultan las estadísticas muestra un estado de carga explícito.
+- Si la consulta falla, muestra un mensaje no bloqueante y permite reintentar sin abandonar el dashboard.
+- Se mantienen los permisos por módulo ya existentes y no se modifica Supabase remoto ni Payments/Stripe.
+- Validación de compilación/análisis y prueba visual en Chrome: pendientes de ejecución local.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — estados de Tesorería
+- Tesorería muestra estados de carga explícitos para movimientos y saldo inicial.
+- Los errores de carga ofrecen un botón de reintento sobre el proveedor afectado.
+- No se modifica Supabase remoto ni Payments/Stripe.
+- Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
+
+
+### 2026-09-28 — GPT-5.6 LUNA — estados de Socios
+- El listado de Socios mantiene el estado de carga existente y mejora el estado de error.
+- El error de carga ahora permite reintentar directamente mediante `membersProvider`, sin salir de la pantalla.
+- Añadido un mensaje no bloqueante que explica que se puede continuar trabajando en el módulo.
+- No se modifica Supabase remoto ni Payments/Stripe.
+- Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — estados de Noticias y Eventos
+- `lib/features/news/presentation/pages/posts_page.dart`
+  - Cabecera adaptada a anchuras reducidas mediante `Wrap`.
+  - El error de carga ahora permite reintentar mediante `postsProvider` sin salir de Noticias.
+- `lib/features/events/presentation/pages/events_page.dart`
+  - El error de carga ahora permite reintentar mediante `eventsProvider` sin salir de Eventos.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+- Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — estados de error de Plantilla, Personal y Equipos
+- `team_players_page.dart`: el error de carga permite reintentar mediante el proveedor de plantilla.
+- `team_staff_page.dart`: el error de carga permite reintentar mediante el proveedor de personal.
+- `teams_page.dart`: el error de carga del listado de equipos permite reintentar mediante su proveedor.
+- Se mantienen las consultas y permisos existentes.
+- No se modifica Supabase remoto ni Payments/Stripe.
+- Validación local de analyzer/tests y revisión visual en Chrome: pendientes de ejecución.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre de estados de carga y reintento de la web pública del club
+- `public_club_page.dart`: el fallo al cargar el club muestra un mensaje claro y permite reintentar la consulta.
+- La carga de noticias y eventos de actualidad muestra indicador de carga y, si falla, permite reintentar sin abandonar la página.
+- Se mantienen las consultas públicas existentes; no se exponen equipos ni datos privados.
+- No se modifican migraciones, RPC, políticas ni Supabase remoto.
+- No se modifican Stripe, `club_payments` ni `club_payments_backend`.
+- Validación local con Flutter analyzer/tests y revisión visual en Chrome: pendiente; no se declara validado hasta ejecutar esas comprobaciones.
+
+### 2026-09-29 — GPT-5.6 LUNA — corrección de errores de analyzer en módulos no-pagos
+- Corregido `lib/app/router.dart`: import de Riverpod y eliminación de variables locales públicas no utilizadas.
+- Corregido `dashboard_page.dart`: propagación correcta de `statsAsync` y uso seguro de `State.context` tras operaciones asíncronas.
+- Corregido `finance_page.dart`: provider de reintento alineado con `transactionsProvider` y eliminación de un `const` incompatible con un valor dinámico.
+- Corregidos los reintentos de carga de Plantilla, Personal y Equipos para invalidar los providers reales.
+- Corregida la sintaxis de `public_raffle_page.dart` en el botón de reserva.
+- Limpiada la duplicación accidental de código de eventos en `public_sponsors_page.dart`, conservando la lógica específica de patrocinadores.
+- Corregida la llamada a `_togglePublic` en `sponsors_page.dart`.
+- Eliminados avisos menores del analyzer en solicitud de incorporación, web pública del club y eventos.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente: validación local con `flutter analyze` y `flutter test` después del pull.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — alineación de prueba de permisos de Mis rifas
+- `test/route_permissions_test.dart`: corregida la expectativa de `/my-raffles` para exigir `dashboard_view`, coherente con la protección definida en `permissionForLocation` y con el router actual.
+- No se cambia la lógica de producción; se corrige una prueba desactualizada respecto al comportamiento ya definido.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente: ejecutar localmente `flutter test` después del pull para confirmar la suite completa.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — limpieza final del último aviso de analyzer
+- `lib/features/sponsors/presentation/pages/sponsors_page.dart`: añadido `context.mounted` antes de reutilizar el `BuildContext` después de `updateSponsor`, tanto en éxito como en error.
+- Se elimina el aviso `use_build_context_synchronously` sin cambiar el flujo funcional.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente: validación local final con `flutter analyze` y `flutter test`.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre UX de Notificaciones
+- `lib/features/notifications/presentation/pages/notifications_page.dart`: el error de carga deja de ser un estado terminal y ofrece reintento directo de las consultas de notificaciones y no leídas.
+- Se conserva el filtrado, marcado como leído y marcado masivo existentes.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente: validación local con `flutter analyze` y `flutter test`.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre del reintento real de Mis rifas
+- `lib/features/raffles/presentation/pages/my_raffles_page.dart`: sustituido el refresco visual mediante `markNeedsBuild()` por un estado `ConsumerStatefulWidget` con futuro de datos reutilizable y recarga real al pulsar `Reintentar`.
+- El reintento vuelve a consultar suscripciones mensuales y participaciones pagadas.
+- No se modifica el backend de pagos ni se habilita checkout; el módulo mantiene su separación actual respecto a Payments/Stripe.
+- No se modifican Supabase remoto ni migraciones.
+- Pendiente: validación local con `flutter analyze` y `flutter test`.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre de seguridad de contexto en Eventos
+- `lib/features/events/presentation/pages/events_page.dart`: protegido el uso de `BuildContext` en la validación de fecha/hora del diálogo de alta tras una operación asíncrona.
+- Si el diálogo ya no está montado, se sale sin intentar actualizar estado ni mostrar el `SnackBar`.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+- Pendiente: validación local acumulada después de completar esta tanda.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre de actualización de temporadas en Equipos
+- `lib/features/teams/presentation/pages/teams_page.dart`: al crear o editar una temporada desde el gestor interno, se invalida `seasonsProvider` antes de reconstruir el diálogo.
+- La lista de temporadas se refresca inmediatamente sin tener que cerrar y volver a abrir la ventana.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+- Pendiente: validación local acumulada después de completar esta tanda.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — configuración del club: carga y reintento
+- `lib/features/clubs/presentation/pages/club_settings_page.dart`: estabilizada la carga de la configuración mediante un `Future` persistente en el estado de la página.
+- Añadido estado de error con botón `Reintentar` para recuperar la configuración sin abandonar la pantalla.
+- La pantalla mantiene una única barra de navegación y el formulario conserva sus permisos de edición existentes.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — onboarding: reintento de clubes disponibles
+- `lib/features/clubs/presentation/pages/club_onboarding_page.dart`: el error al cargar los clubes disponibles ahora ofrece un botón `Reintentar` que invalida `availableClubsProvider`.
+- Se conserva la posibilidad de crear un club aunque el listado no esté disponible.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — equipos: reintento de temporadas en formulario
+- `lib/features/teams/presentation/pages/teams_page.dart`: si el selector de temporadas falla al crear/editar un equipo, ahora muestra `Reintentar` e invalida `seasonsProvider`.
+- Evita dejar el formulario bloqueado únicamente por un fallo transitorio de carga de temporadas.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — ciclo de vida en Noticias y Eventos
+- Noticias y Eventos: se protegen las refrescos de providers despues de operaciones asincronas y dialogos.
+- Se evita usar la referencia de Riverpod cuando la pantalla ya no esta montada.
+- Sin cambios en Supabase, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — seguridad del diálogo de invitación de miembros
+- `lib/features/clubs/presentation/pages/club_members_page.dart`: el `finally` del diálogo de invitación comprueba `mounted` antes de ejecutar `setState`.
+- Evita un posible `setState() called after dispose` si el diálogo se desmonta durante la operación asíncrona.
+- Sin cambios en Supabase, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — cierre de tanda de módulos no-pagos
+- Cerrada la tanda de endurecimiento funcional y UX de los módulos internos revisados: Dashboard, Socios, Equipos, Plantilla, Personal, Tesorería, Noticias, Eventos, Patrocinadores, Configuración del club, Onboarding, Notificaciones y Mis rifas.
+- Se consolidan estados de carga/error con reintento, refrescos reales, protección de ciclo de vida asíncrono y alineación de permisos donde se detectaron incidencias.
+- No quedan cambios funcionales pendientes identificados en esta tanda que justifiquen tocar código adicional sin una nueva necesidad concreta.
+- La validación definitiva corresponde ahora a la ejecución local de `flutter analyze` y `flutter test` después del pull.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — auditoría responsive/PWA, tests y permisos final
+- Auditoría estática final de las pantallas internas y públicas para Chrome/Web y tamaños móvil/tablet/escritorio.
+- Confirmado el patrón responsive existente en Dashboard, Home pública, web pública del club, Socios, Tesorería, Equipos, Plantilla, Personal, Noticias, Eventos, Patrocinadores, Rifas, Perfil, Configuración y Onboarding.
+- `events_page.dart`: el diálogo de alta deja de imponer un ancho rígido de 460 px y pasa a limitarse mediante `ConstrainedBox`, evitando forzar ancho fijo en ventanas estrechas.
+- `public_raffle_page.dart`: el bloque QR pasa de `Row` a `Wrap` para evitar desbordamientos en móvil.
+- `sponsors_page.dart`: el encabezado de cada patrocinador usa `Wrap` y la capacidad de gestión se resuelve mediante `ClubRolePermissions`, manteniendo la autorización alineada con la matriz central.
+- PWA: `web/manifest.json` incorpora `scope: "./"` y `lang: "es"`; se conservan `start_url`, `standalone`, colores de tema e iconos 192/512 y maskable.
+- Tests adicionales: se amplía la cobertura de `ClubRolePermissions` para patrocinadores, accesos y configuración, y se añade cobertura de la ruta `/sponsors`.
+- `auth_state_test.dart`: corregida la estructura del archivo para que toda la suite de grupos de pruebas quede dentro de `main()`.
+- No se modifican Supabase remoto, migraciones, RPC, Edge Functions, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente de validación externa/local: ejecutar `flutter analyze --no-pub`, `flutter test --reporter expanded`, `flutter build web` y revisión visual/instalación PWA en Chrome.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — corrección de responsive en Patrocinadores
+- `sponsors_page.dart`: sustituido `Flexible` dentro de `Wrap` por `ConstrainedBox`, evitando una combinación de widgets no válida y manteniendo el nombre del patrocinador limitado a dos líneas en anchos estrechos.
+- Sin cambios en Supabase remoto, migraciones, Stripe ni Payments.

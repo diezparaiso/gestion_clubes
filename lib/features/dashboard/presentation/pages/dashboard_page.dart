@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../data/club_export_service.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../clubs/data/repositories/club_repository.dart';
+import '../../../clubs/domain/entities/club.dart';
 import '../../application/dashboard_stats_provider.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA
@@ -13,6 +15,9 @@ import '../../application/dashboard_stats_provider.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra el rol real del acceso seleccionado.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Filtra navegación y acciones según permisos del rol.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): el Excel solo solicita módulos con permiso de lectura.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): incorpora Patrocinadores en navegación desktop/mobile.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade acceso directo a la web pública y mejora la identificación del usuario.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estados de carga y error de estadísticas del dashboard.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -22,6 +27,16 @@ class DashboardPage extends ConsumerStatefulWidget {
 
 class _DashboardPageState extends ConsumerState<DashboardPage> {
   int _selectedIndex = 0;
+  late final Future<Club?> _publicClubFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    final clubId = ref.read(authControllerProvider).clubId;
+    _publicClubFuture = clubId == null || clubId.isEmpty
+        ? Future.value(null)
+        : ref.read(clubRepositoryProvider).getClubById(clubId);
+  }
 
   static const _navigationItems = [
     (Icons.grid_view_rounded, 'Resumen'),
@@ -31,13 +46,15 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     (Icons.confirmation_number_outlined, 'Rifas'),
     (Icons.article_outlined, 'Noticias'),
     (Icons.event_outlined, 'Eventos'),
+    (Icons.business_outlined, 'Patrocinadores'),
     (Icons.settings_outlined, 'Configuración'),
   ];
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authControllerProvider);
-    final stats = ref.watch(dashboardStatsProvider).valueOrNull;
+    final statsAsync = ref.watch(dashboardStatsProvider);
+    final stats = statsAsync.valueOrNull;
     return LayoutBuilder(
       builder: (context, constraints) {
         final isDesktop = constraints.maxWidth >= 900;
@@ -46,7 +63,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             child: Row(
               children: [
                 if (isDesktop) _buildSidebar(context, authState),
-                Expanded(child: _buildContent(context, isDesktop, authState, stats)),
+                Expanded(child: _buildContent(context, isDesktop, authState, statsAsync, stats)),
               ],
             ),
           ),
@@ -60,7 +77,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
   String _navigationPermission(int index) => switch (index) {
     0 => 'dashboard_view', 1 => 'members_view', 2 => 'teams_view', 3 => 'finance_view',
-    4 => 'raffles_view', 5 => 'news_view', 6 => 'events_view', 7 => 'club_settings_view',
+    4 => 'raffles_view', 5 => 'news_view', 6 => 'events_view', 7 => 'sponsors_manage', 8 => 'club_settings_view',
     _ => 'dashboard_view',
   };
 
@@ -113,7 +130,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                 if (index == 4) context.go('/raffles');
                 if (index == 5) context.go('/news');
                 if (index == 6) context.go('/events');
-                if (index == 7) context.go('/settings');
+                if (index == 7) context.go('/sponsors');
+                if (index == 8) context.go('/settings');
               },
             );
           }),
@@ -122,10 +140,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
           const SizedBox(height: 12),
           ListTile(
             contentPadding: EdgeInsets.zero,
-            leading: const CircleAvatar(
-              backgroundColor: Color(0xFFE4B363),
-              child: Text('PM', style: TextStyle(color: Color(0xFF14213D), fontWeight: FontWeight.w800)),
-            ),
+            leading: _UserAvatar(initials: _userInitials(authState.email)),
             title: Text(authState.email ?? 'Usuario', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700), overflow: TextOverflow.ellipsis),
             subtitle: Text(authState.roleLabel, style: const TextStyle(color: Color(0xFF9BA9BC))),
             trailing: IconButton(onPressed: () => ref.read(authControllerProvider.notifier).signOut(), tooltip: 'Cerrar sesión', icon: const Icon(Icons.logout_rounded, color: Color(0xFF9BA9BC))),
@@ -135,7 +150,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  Widget _buildContent(BuildContext context, bool isDesktop, AuthState authState, DashboardStats? stats) {
+  Widget _buildContent(BuildContext context, bool isDesktop, AuthState authState, AsyncValue<DashboardStats> statsAsync, DashboardStats? stats) {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 48 : 20, vertical: isDesktop ? 34 : 24),
       child: ConstrainedBox(
@@ -143,41 +158,53 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 16,
+              runSpacing: 12,
               children: [
-                Expanded(
+                SizedBox(
+                  width: isDesktop ? 620 : double.infinity,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(authState.clubName ?? 'Tu club', style: Theme.of(context).textTheme.titleMedium),
                       const SizedBox(height: 8),
-                      Text('Hola, ${authState.email?.split('@').first ?? 'de nuevo'}', style: Theme.of(context).textTheme.headlineMedium),
+                      Text('Hola, ${_displayName(authState.email)}', style: Theme.of(context).textTheme.headlineMedium),
                       const SizedBox(height: 6),
                       const Text('Aquí tienes el estado de tu club hoy.'),
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () => _exportClub(context),
-                  tooltip: 'Exportar gestión a Excel',
-                  icon: const Icon(Icons.file_download_outlined),
-                ),
-                if (_can(authState, 'notifications_view'))
-                  IconButton(
-                    onPressed: () => context.go('/notifications'),
-                    tooltip: 'Notificaciones',
-                    icon: const Icon(Icons.notifications_none_rounded),
-                  ),
-                const SizedBox(width: 4),
-                const CircleAvatar(
-                  radius: 20,
-                  backgroundColor: Color(0xFFE4B363),
-                  child: Text('PM', style: TextStyle(color: Color(0xFF14213D), fontWeight: FontWeight.w800, fontSize: 12)),
+                Wrap(
+                  alignment: WrapAlignment.end,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 4,
+                  children: [
+                    OutlinedButton.icon(
+                      onPressed: () => _openPublicClub(context),
+                      icon: const Icon(Icons.public_rounded, size: 18),
+                      label: const Text('Ver web pública'),
+                    ),
+                    IconButton(
+                      onPressed: () => _exportClub(context),
+                      tooltip: 'Exportar gestión a Excel',
+                      icon: const Icon(Icons.file_download_outlined),
+                    ),
+                    if (_can(authState, 'notifications_view'))
+                      IconButton(
+                        onPressed: () => context.go('/notifications'),
+                        tooltip: 'Notificaciones',
+                        icon: const Icon(Icons.notifications_none_rounded),
+                      ),
+                    _UserAvatar(initials: _userInitials(authState.email), radius: 20),
+                  ],
                 ),
               ],
             ),
             const SizedBox(height: 32),
-            _buildMetricGrid(isDesktop, stats),
+            _buildDashboardStats(context, isDesktop, statsAsync),
             const SizedBox(height: 32),
             Text('Acciones rápidas', style: Theme.of(context).textTheme.titleLarge),
             const SizedBox(height: 14),
@@ -185,6 +212,67 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             const SizedBox(height: 32),
             _buildActivitySection(context, isDesktop, stats),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardStats(BuildContext context, bool isDesktop, AsyncValue<DashboardStats> statsAsync) {
+    return statsAsync.when(
+      loading: () => _buildStatsLoading(isDesktop),
+      error: (error, stack) => _buildStatsError(context),
+      data: (stats) => _buildMetricGrid(isDesktop, stats),
+    );
+  }
+
+  Widget _buildStatsLoading(bool isDesktop) {
+    return SizedBox(
+      width: double.infinity,
+      height: isDesktop ? 154 : 310,
+      child: Card(
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.5)),
+              SizedBox(width: 12),
+              Text('Cargando el estado del club…'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsError(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.error_outline_rounded, color: Theme.of(context).colorScheme.error),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('No se han podido cargar las estadísticas.', style: TextStyle(fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 4),
+                    const Text('Puedes continuar usando el resto de la gestión del club.'),
+                    const SizedBox(height: 12),
+                    TextButton.icon(
+                      onPressed: () => ref.invalidate(dashboardStatsProvider),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -353,6 +441,43 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     }
   }
 
+  Future<void> _openPublicClub(BuildContext context) async {
+    try {
+      final club = await _publicClubFuture;
+      if (!mounted) return;
+      if (club == null || club.slug.trim().isEmpty) {
+        ScaffoldMessenger.of(this.context).showSnackBar(
+          const SnackBar(content: Text('No se ha podido localizar la página pública del club.')),
+        );
+        return;
+      }
+      this.context.go('/club/${Uri.encodeComponent(club.slug)}');
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(this.context).showSnackBar(
+        const SnackBar(content: Text('No se ha podido abrir la página pública del club.')),
+      );
+    }
+  }
+
+  String _displayName(String? email) {
+    final localPart = email?.split('@').first.trim();
+    if (localPart == null || localPart.isEmpty) return 'de nuevo';
+    final words = localPart.replaceAll(RegExp(r'[._-]+'), ' ').trim().split(RegExp(r'\s+'));
+    return words.map((word) {
+      if (word.isEmpty) return word;
+      return '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}';
+    }).join(' ');
+  }
+
+  String _userInitials(String? email) {
+    final name = _displayName(email);
+    if (name == 'de nuevo') return 'U';
+    final words = name.split(' ').where((word) => word.isNotEmpty).toList();
+    if (words.length == 1) return words.first.substring(0, 1).toUpperCase();
+    return '${words.first.substring(0, 1)}${words.last.substring(0, 1)}'.toUpperCase();
+  }
+
   String _formatCurrency(double value) => '${value.toStringAsFixed(2).replaceAll('.', ',')} €';
 
   Widget _buildBottomNavigation() {
@@ -372,11 +497,35 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
         if (index == 4) context.go('/raffles');
         if (index == 5) context.go('/news');
         if (index == 6) context.go('/events');
-        if (index == 7) context.go('/settings');
+        if (index == 7) context.go('/sponsors');
+        if (index == 8) context.go('/settings');
       },
       destinations: visibleEntries
           .map((entry) => NavigationDestination(icon: Icon(entry.$2.$1), label: entry.$2.$2))
           .toList(),
+    );
+  }
+}
+
+class _UserAvatar extends StatelessWidget {
+  const _UserAvatar({required this.initials, this.radius = 20});
+
+  final String initials;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    return CircleAvatar(
+      radius: radius,
+      backgroundColor: const Color(0xFFE4B363),
+      child: Text(
+        initials,
+        style: TextStyle(
+          color: const Color(0xFF14213D),
+          fontWeight: FontWeight.w800,
+          fontSize: radius <= 20 ? 12 : 14,
+        ),
+      ),
     );
   }
 }

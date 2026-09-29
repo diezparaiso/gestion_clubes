@@ -29,6 +29,16 @@ class TeamPlayersPage extends ConsumerStatefulWidget {
 }
 
 class _TeamPlayersPageState extends ConsumerState<TeamPlayersPage> {
+  // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): cierre del flujo Equipos → Jugadores; filtros, responsive y estados vacíos.
+  final _searchController = TextEditingController();
+  bool _showInactive = true;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   Future<void> _editPlayer(Player player) async {
     final result = await showDialog<bool>(
       context: context,
@@ -70,39 +80,88 @@ class _TeamPlayersPageState extends ConsumerState<TeamPlayersPage> {
       body: Padding(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Plantilla', style: Theme.of(context).textTheme.headlineMedium),
-                    const SizedBox(height: 8),
-                    const Text('Jugadores asignados a este equipo.'),
-                  ],
+              Text('Plantilla', style: Theme.of(context).textTheme.headlineMedium),
+              if (canManage)
+                FilledButton.icon(
+                  onPressed: _createPlayer,
+                  icon: const Icon(Icons.person_add_alt_1),
+                  label: const Text('Nuevo jugador'),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text('Jugadores asignados a este equipo.'),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 220, maxWidth: 520),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    prefixIcon: Icon(Icons.search),
+                    labelText: 'Buscar jugador',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (_) => setState(() {}),
                 ),
               ),
-              const SizedBox(width: 16),
-              FilledButton.icon(
-                onPressed: canManage ? _createPlayer : null,
-                icon: const Icon(Icons.person_add_alt_1),
-                label: const Text('Nuevo jugador'),
+              FilterChip(
+                label: const Text('Mostrar inactivos'),
+                selected: _showInactive,
+                onSelected: (value) => setState(() => _showInactive = value),
               ),
             ],
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Expanded(child: players.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, stack) => const Center(child: Text('No se ha podido cargar la plantilla.')),
-            data: (items) => Card(child: ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: items.length,
-              separatorBuilder: (_, index) => const Divider(height: 1),
-              itemBuilder: (context, index) => _PlayerTile(
-                player: items[index],
-                onEdit: canManage ? () => _editPlayer(items[index]) : null,
+            error: (error, stack) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('No se ha podido cargar la plantilla.'),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: () => ref.invalidate(teamPlayersProvider(teamId)),
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reintentar'),
+                  ),
+                ],
               ),
-            )),
+            ),
+            data: (items) {
+              final query = _searchController.text.trim().toLowerCase();
+              final filtered = items.where((player) {
+                final matchesText = query.isEmpty || player.name.toLowerCase().contains(query) || (player.jerseyNumber?.toString() ?? '').contains(query);
+                return matchesText && (_showInactive || player.isActive);
+              }).toList();
+              if (filtered.isEmpty) {
+                return Center(child: Text(items.isEmpty ? 'Todavía no hay jugadores asignados.' : 'No hay jugadores que coincidan con el filtro.'));
+              }
+              return RefreshIndicator(
+                onRefresh: () => ref.refresh(teamPlayersProvider(teamId).future),
+                child: Card(
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    itemCount: filtered.length,
+                    separatorBuilder: (_, index) => const Divider(height: 1),
+                    itemBuilder: (context, index) => _PlayerTile(
+                      player: filtered[index],
+                      onEdit: canManage ? () => _editPlayer(filtered[index]) : null,
+                    ),
+                  ),
+                ),
+              );
+            },
           )),
         ]),
       ),
@@ -372,6 +431,11 @@ class _EditPlayerDialogState extends ConsumerState<_EditPlayerDialog> {
 
   @override
   void dispose() {
+    _phoneController.dispose();
+    _guardianNameController.dispose();
+    _guardianPhoneController.dispose();
+    _guardianEmailController.dispose();
+    _guardianRelationshipController.dispose();
     _jerseyController.dispose();
     super.dispose();
   }

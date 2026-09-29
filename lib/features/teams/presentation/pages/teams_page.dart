@@ -1,4 +1,6 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Añadida gestión de edición y activación/desactivación de equipos. Sin cambios de esquema Supabase.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-29): mejora estados de error y reintento del módulo.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): mejora responsive; sin cambios de Supabase ni Payments/Stripe.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): aplica permisos view/manage en acciones de la pantalla.
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,27 +82,70 @@ class _TeamsPageState extends ConsumerState<TeamsPage> {
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(children: [
-              Expanded(child: Text('Equipos y temporadas', style: Theme.of(context).textTheme.headlineMedium)),
-              if (canManage) OutlinedButton.icon(onPressed: () => _showSeasonManager(context), icon: const Icon(Icons.calendar_month_outlined), label: const Text('Temporadas')), if (canManage) const SizedBox(width: 10),
-              if (canManage) FilledButton.icon(onPressed: () => _showCreateTeamDialog(context), icon: const Icon(Icons.add), label: const Text('Nuevo equipo')),
-            ]),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text('Equipos y temporadas', style: Theme.of(context).textTheme.headlineMedium),
+                if (canManage)
+                  OutlinedButton.icon(
+                    onPressed: () => _showSeasonManager(context),
+                    icon: const Icon(Icons.calendar_month_outlined),
+                    label: const Text('Temporadas'),
+                  ),
+                if (canManage)
+                  FilledButton.icon(
+                    onPressed: () => _showCreateTeamDialog(context),
+                    icon: const Icon(Icons.add),
+                    label: const Text('Nuevo equipo'),
+                  ),
+              ],
+            ),
             const SizedBox(height: 12),
-            Row(children: [
-              Expanded(child: TextField(
-                controller: _searchController,
-                decoration: const InputDecoration(prefixIcon: Icon(Icons.search), labelText: 'Buscar equipo o categoría', border: OutlineInputBorder()),
-                onChanged: (_) => setState(() {}),
-              )),
-              const SizedBox(width: 12),
-              FilterChip(label: const Text('Mostrar inactivos'), selected: _showInactive, onSelected: (value) => setState(() => _showInactive = value)),
-            ]),
+            Wrap(
+              spacing: 12,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                ConstrainedBox(
+                  constraints: const BoxConstraints(minWidth: 240, maxWidth: 520),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      labelText: 'Buscar equipo o categoría',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (_) => setState(() {}),
+                  ),
+                ),
+                FilterChip(
+                  label: const Text('Mostrar inactivos'),
+                  selected: _showInactive,
+                  onSelected: (value) => setState(() => _showInactive = value),
+                ),
+              ],
+            ),
             const SizedBox(height: 8),
             const Text('Organiza las plantillas del club por categoría y temporada.'),
             const SizedBox(height: 24),
             Expanded(child: teams.when(
               loading: () => const Center(child: CircularProgressIndicator()),
-              error: (error, stack) => const Center(child: Text('No se han podido cargar los equipos.')),
+              error: (error, stack) => Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('No se ha podido cargar los equipos.'),
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      onPressed: () => ref.invalidate(teamsProvider),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
+              ),
               data: (items) {
                 final query = _searchController.text.trim().toLowerCase();
                 final filtered = items.where((team) {
@@ -224,7 +269,21 @@ class _TeamFormDialogState extends ConsumerState<_TeamFormDialog> {
         const SizedBox(height: 12),
         seasons.when(
           loading: () => const LinearProgressIndicator(),
-          error: (error, stack) => const Align(alignment: Alignment.centerLeft, child: Text('No se han podido cargar las temporadas.')),
+          error: (error, stack) => Align(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('No se han podido cargar las temporadas.'),
+                const SizedBox(height: 8),
+                OutlinedButton.icon(
+                  onPressed: () => ref.invalidate(seasonsProvider),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Reintentar'),
+                ),
+              ],
+            ),
+          ),
           data: (items) => DropdownButtonFormField<Season>(
             initialValue: _selectedSeason ??
                 (widget.team == null
@@ -257,11 +316,17 @@ class _SeasonManagerDialog extends ConsumerStatefulWidget {
 class _SeasonManagerDialogState extends ConsumerState<_SeasonManagerDialog> {
   Future<void> _edit(Season season) async {
     final result = await showDialog<bool>(context: context, builder: (_) => _SeasonFormDialog(season: season));
-    if (result == true && mounted) setState(() {});
+    if (result == true && mounted) {
+      ref.invalidate(seasonsProvider);
+      setState(() {});
+    }
   }
   Future<void> _new() async {
     final result = await showDialog<bool>(context: context, builder: (_) => const _SeasonFormDialog());
-    if (result == true && mounted) setState(() {});
+    if (result == true && mounted) {
+      ref.invalidate(seasonsProvider);
+      setState(() {});
+    }
   }
   @override
   Widget build(BuildContext context) {
