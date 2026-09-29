@@ -10,11 +10,39 @@ import '../../../../core/services/supabase_service.dart';
 import '../../../dashboard/presentation/widgets/club_navigation_app_bar.dart';
 import '../../data/repositories/raffle_repository.dart';
 
-class MyRafflesPage extends ConsumerWidget {
+class MyRafflesPage extends ConsumerStatefulWidget {
   const MyRafflesPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyRafflesPage> createState() => _MyRafflesPageState();
+}
+
+class _MyRafflesPageState extends ConsumerState<MyRafflesPage> {
+  late Future<List<dynamic>> _data;
+
+  Future<List<dynamic>> _loadData() {
+    final profileId = Supabase.instance.client.auth.currentUser?.id;
+    if (profileId == null) {
+      return Future.error(const AuthException('La sesión ha expirado.'));
+    }
+    return Future.wait([
+      ref.read(raffleRepositoryProvider).listMyMonthlySubscriptions(profileId),
+      ref.read(raffleRepositoryProvider).listMyPaidTickets(profileId),
+    ]);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _data = _loadData();
+  }
+
+  void _retry() {
+    setState(() => _data = _loadData());
+  }
+
+  @override
+  Widget build(BuildContext context) {
     if (!SupabaseService.isConfigured) {
       return const Scaffold(body: Center(child: Text('El área de rifas del socio estará disponible al conectar Supabase y el sistema de pagos.')));
     }
@@ -23,15 +51,10 @@ class MyRafflesPage extends ConsumerWidget {
       return const Scaffold(body: Center(child: Text('Inicia sesión para consultar tus rifas.')));
     }
 
-    final data = Future.wait([
-      ref.read(raffleRepositoryProvider).listMyMonthlySubscriptions(profileId),
-      ref.read(raffleRepositoryProvider).listMyPaidTickets(profileId),
-    ]);
-
     return Scaffold(
       appBar: const ClubNavigationAppBar(title: 'Mis rifas'),
       body: FutureBuilder<List<dynamic>>(
-        future: data,
+        future: _data,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
@@ -42,7 +65,7 @@ class MyRafflesPage extends ConsumerWidget {
               const Text('No se ha podido cargar tu información de rifas.'),
               const SizedBox(height: 6), const Text('Puedes reintentarlo sin salir de Mis rifas.'),
               const SizedBox(height: 16),
-              FilledButton.icon(onPressed: () => (context as Element).markNeedsBuild(), icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
+              FilledButton.icon(onPressed: _retry, icon: const Icon(Icons.refresh), label: const Text('Reintentar')),
             ]));
           }
 
