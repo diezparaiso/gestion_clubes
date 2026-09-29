@@ -1219,3 +1219,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Añadido estado de error con botón `Reintentar` para recuperar la configuración sin abandonar la pantalla.
 - La pantalla mantiene una única barra de navegación y el formulario conserva sus permisos de edición existentes.
 - No se modifican Supabase remoto, migraciones, Stripe ni Payments.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — onboarding: reintento de clubes disponibles
+- `lib/features/clubs/presentation/pages/club_onboarding_page.dart`: el error al cargar los clubes disponibles ahora ofrece un botón `Reintentar` que invalida `availableClubsProvider`.
+- Se conserva la posibilidad de crear un club aunque el listado no esté disponible.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
