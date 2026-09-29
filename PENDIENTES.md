@@ -80,6 +80,7 @@
 
 ## 4. Perfil y autenticación
 - [ ] Probar flujo completo de must_change_password en Web/Chrome y staging.
+- [x] Blindar también en backend el indicador must_change_password; migración 046 preparada, pendiente de staging.
 - [x] Blindar por código que un inicio de sesión normal no herede el estado `passwordRecovery`.
 - [ ] Probar cambio de contraseña en móvil y web.
 - [x] Implementar y revisar recuperación de contraseña.
