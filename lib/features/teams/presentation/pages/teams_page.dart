@@ -302,11 +302,17 @@ class _SeasonManagerDialog extends ConsumerStatefulWidget {
 class _SeasonManagerDialogState extends ConsumerState<_SeasonManagerDialog> {
   Future<void> _edit(Season season) async {
     final result = await showDialog<bool>(context: context, builder: (_) => _SeasonFormDialog(season: season));
-    if (result == true && mounted) setState(() {});
+    if (result == true && mounted) {
+      ref.invalidate(seasonsProvider);
+      setState(() {});
+    }
   }
   Future<void> _new() async {
     final result = await showDialog<bool>(context: context, builder: (_) => const _SeasonFormDialog());
-    if (result == true && mounted) setState(() {});
+    if (result == true && mounted) {
+      ref.invalidate(seasonsProvider);
+      setState(() {});
+    }
   }
   @override
   Widget build(BuildContext context) {
