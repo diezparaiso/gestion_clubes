@@ -179,8 +179,11 @@ class _CreateEventDialogState extends ConsumerState<_CreateEventDialog> {
     setState(() => _saving = true);
     try {
       if (!_endAt.isAfter(_startAt)) {
-        if (mounted) setState(() => _saving = false);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('La hora de fin debe ser posterior a la de inicio.')));
+        if (!mounted) return;
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('La hora de fin debe ser posterior a la de inicio.')),
+        );
         return;
       }
       await ref.read(eventRepositoryProvider).createEvent(clubId: clubId, title: _titleController.text, description: _descriptionController.text, location: _locationController.text, startAt: _startAt, endAt: _endAt, type: _type, visibility: _visibility);
