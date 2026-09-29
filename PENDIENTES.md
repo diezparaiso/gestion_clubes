@@ -88,7 +88,7 @@
 - [x] Ejecutar flutter test --reporter expanded.
 - [x] Ejecutar git diff --check.
 - [x] Revisar warnings e infos del analyzer.
-- [ ] Probar Flutter Web en Chrome.
+- [ ] Probar Flutter Web en Chrome (validación manual local).
 - [ ] Probar responsive móvil/tablet/escritorio.
 - [x] Verificar rutas con sesión cerrada mediante la matriz de permisos de ubicación y cobertura unitaria.
 - [x] Cubrir rutas de detalle de rifas, perfil, Mis rifas y páginas públicas en la matriz.
@@ -163,9 +163,9 @@
 
 ### Próximo bloque sin pagos
 - [x] Cerrar módulo de Patrocinadores: gestión interna, rutas, navegación y escaparate público.
-- [ ] Auditoría responsive del resto de pantallas.
+- [x] Auditoría responsive final del resto de pantallas; quedan solo comprobaciones manuales en Chrome.
 - [x] Revisar UX de dashboard y navegación móvil: acceso a la web pública, identidad del usuario y cabecera responsive.
-- [ ] Completar revisión visual del dashboard en Flutter Web/Chrome.
+- [ ] Completar revisión visual del dashboard en Flutter Web/Chrome (validación manual local).
 - [x] Completar/repasar CRUD y estados de Noticias.
 - [x] Cerrar centro de Notificaciones y estados vacíos/error.
 - [x] Revisar Perfil y gestión de cuenta.
@@ -182,9 +182,9 @@
 - [x] Mejorar estados de error y reintento del módulo de Rifas sin pagos reales.
 - [x] Mejorar estado de error y reintento de Usuarios y permisos.
 - [x] Mejorar estado de error y reintento de Miembros del Club.
-- [ ] Ampliar tests unitarios que no dependan de Supabase/Stripe.
-- [ ] Revisar permisos de UI frente a `*_view` / `*_manage`.
-- [ ] Revisar PWA y comportamiento móvil/tablet/escritorio.
+- [x] Ampliar tests unitarios que no dependan de Supabase/Stripe.
+- [x] Revisar permisos de UI frente a `*_view` / `*_manage`.
+- [x] Auditoría estática de PWA y comportamiento móvil/tablet/escritorio; queda prueba manual de instalación/ejecución en Chrome.
 
 ### Bloqueado deliberadamente
 - [ ] Integración real de `club_payments`.
@@ -199,4 +199,5 @@
 
 ### Cierre incremental — 2026-09-29
 - [x] Web pública del club: estado de carga, error recuperable al cargar el club y reintento de la actualidad (noticias/eventos).
-- [ ] Validar visualmente en Flutter Web/Chrome y ejecutar `flutter analyze --no-pub` + `flutter test --reporter expanded` en entorno local antes de declarar el bloque validado.
+- [x] Auditoría estática final de responsive, PWA, cobertura de tests y permisos en la rama `ai/non-payments-development`.
+- [ ] Validación local final: `flutter analyze --no-pub`, `flutter test --reporter expanded`, `flutter build web` y revisión visual/instalación PWA en Chrome.
