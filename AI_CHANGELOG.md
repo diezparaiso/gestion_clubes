@@ -1212,3 +1212,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - La lista de temporadas se refresca inmediatamente sin tener que cerrar y volver a abrir la ventana.
 - No se modifican Supabase remoto, migraciones, Stripe ni Payments.
 - Pendiente: validación local acumulada después de completar esta tanda.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — configuración del club: carga y reintento
+- `lib/features/clubs/presentation/pages/club_settings_page.dart`: estabilizada la carga de la configuración mediante un `Future` persistente en el estado de la página.
+- Añadido estado de error con botón `Reintentar` para recuperar la configuración sin abandonar la pantalla.
+- La pantalla mantiene una única barra de navegación y el formulario conserva sus permisos de edición existentes.
+- No se modifican Supabase remoto, migraciones, Stripe ni Payments.
