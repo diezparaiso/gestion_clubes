@@ -63,7 +63,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
             child: Row(
               children: [
                 if (isDesktop) _buildSidebar(context, authState),
-                Expanded(child: _buildContent(context, isDesktop, authState, stats)),
+                Expanded(child: _buildContent(context, isDesktop, authState, statsAsync, stats)),
               ],
             ),
           ),
@@ -150,7 +150,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     );
   }
 
-  Widget _buildContent(BuildContext context, bool isDesktop, AuthState authState, DashboardStats? stats) {
+  Widget _buildContent(BuildContext context, bool isDesktop, AuthState authState, AsyncValue<DashboardStats> statsAsync, DashboardStats? stats) {
     return SingleChildScrollView(
       padding: EdgeInsets.symmetric(horizontal: isDesktop ? 48 : 20, vertical: isDesktop ? 34 : 24),
       child: ConstrainedBox(
