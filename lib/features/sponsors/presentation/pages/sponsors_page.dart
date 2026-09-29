@@ -253,8 +253,10 @@ class _SponsorCard extends ConsumerWidget {
             status: sponsor.status,
             isPublic: !sponsor.isPublic,
           );
+      if (!context.mounted) return;
       onChanged();
     } catch (e) {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No se ha podido cambiar la visibilidad: $e')));
     }
   }
