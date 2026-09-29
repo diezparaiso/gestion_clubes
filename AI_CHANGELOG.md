@@ -1169,3 +1169,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Eliminados avisos menores del analyzer en solicitud de incorporación, web pública del club y eventos.
 - No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
 - Pendiente: validación local con `flutter analyze` y `flutter test` después del pull.
+
+
+### 2026-09-29 — GPT-5.6 LUNA — alineación de prueba de permisos de Mis rifas
+- `test/route_permissions_test.dart`: corregida la expectativa de `/my-raffles` para exigir `dashboard_view`, coherente con la protección definida en `permissionForLocation` y con el router actual.
+- No se cambia la lógica de producción; se corrige una prueba desactualizada respecto al comportamiento ya definido.
+- No se modifican Supabase remoto, migraciones, Stripe, `club_payments` ni `club_payments_backend`.
+- Pendiente: ejecutar localmente `flutter test` después del pull para confirmar la suite completa.
