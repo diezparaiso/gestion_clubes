@@ -1,6 +1,7 @@
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): refuerza permisos por ruta en equipos y jugadores.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade ruta pública para solicitudes de incorporación de clubes.
-// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade landing pública de la plataforma en '/'.\nimport 'package:flutter_riverpod/flutter_riverpod.dart';
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-28): añade landing pública de la plataforma en '/'.
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../features/auth/application/auth_controller.dart';
@@ -63,10 +64,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       final location = state.uri.path;
       final isAuthRoute = location == '/login' || location == '/register';
       final isPublicRoute = isAuthRoute || location == '/' || location == '/privacy' || location == '/solicitar-incorporacion' || location.startsWith('/r/') || location.startsWith('/club/');
-      final isPublicRaffle = location.startsWith('/r/');
-      final isPublicClub = location.startsWith('/club/');
-      final isPublicPrivacy = location == '/privacy';
-      final isPublicSponsors = RegExp(r'^/club/[^/]+/sponsors$').hasMatch(location);
       final isSignedIn = authState.status == AuthStatus.signedIn;
       final needsClub = authState.status == AuthStatus.needsClub;
 
