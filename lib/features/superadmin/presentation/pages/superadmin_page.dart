@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/supabase_service.dart';
 
@@ -18,6 +20,30 @@ class _SuperadminPageState extends State<SuperadminPage> {
     final rows = await Supabase.instance.client.rpc('get_platform_admin_report');
     return (rows as List).map((e) => Map<String, dynamic>.from(e as Map)).toList();
   }
+  void exportCsv(List<Map<String, dynamic>> clubs) {
+    const headers = ['Club', 'Slug', 'Estado', 'Operaciones', 'Ventas brutas EUR', 'Reembolsos EUR', 'Comision bruta EUR', 'Comision neta estimada EUR', 'Tasa'];
+    String cell(dynamic value) {
+      final text = value?.toString() ?? '';
+      return '"${text.replaceAll('"', '""')}"';
+    }
+    final rows = <List<dynamic>>[headers];
+    for (final club in clubs) {
+      rows.add([
+        club['club_name'], club['club_slug'], club['club_status'], club['sales_count'],
+        club['gross_sales'], club['refunded_sales'], club['commission_generated'],
+        club['commission_net'], n(club['commission_rate']) * 100,
+      ]);
+    }
+    final csv = '\\uFEFF' + rows.map((row) => row.map(cell).join(';')).join('\\r\\n');
+    final blob = html.Blob([utf8.encode(csv)], 'text/csv;charset=utf-8');
+    final url = html.Url.createObjectUrlFromBlob(blob);
+    final anchor = html.AnchorElement(href: url)..download = 'informe_comisiones_${DateTime.now().toIso8601String().substring(0, 10)}.csv'..style.display = 'none';
+    html.document.body?.children.add(anchor);
+    anchor.click();
+    anchor.remove();
+    html.Url.revokeObjectUrl(url);
+  }
+
   double n(dynamic x) => x is num ? x.toDouble() : double.tryParse('$x') ?? 0;
   String eur(dynamic x) => '\${n(x).toStringAsFixed(2).replaceAll('.', ',')} €';
   @override
@@ -26,7 +52,7 @@ class _SuperadminPageState extends State<SuperadminPage> {
       body: const Center(child: Padding(padding: EdgeInsets.all(24), child: Text('Acceso restringido. Se requiere el claim seguro app_metadata.platform_admin=true.'))));
     return Scaffold(
       appBar: AppBar(title: const Text('Superadmin · Plataforma'),
-        actions: [IconButton(tooltip: 'Actualizar', onPressed: () => setState(() => report = load()), icon: const Icon(Icons.refresh))]),
+        actions: [IconButton(tooltip: 'Exportar CSV', onPressed: () { final data = report; data.then((rows) => exportCsv(rows)); }, icon: const Icon(Icons.download_outlined)), IconButton(tooltip: 'Actualizar', onPressed: () => setState(() => report = load()), icon: const Icon(Icons.refresh))]),
       body: FutureBuilder<List<Map<String, dynamic>>>(future: report, builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
         if (snap.hasError) return Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
