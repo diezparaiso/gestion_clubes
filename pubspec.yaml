@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   club_payments:
     path: ../../club_payments
   flutter_riverpod: ^2.6.1
