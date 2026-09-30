@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../data/club_export_service.dart';
 
 import '../../../auth/application/auth_controller.dart';
 import '../../application/dashboard_stats_provider.dart';
+import '../../../../core/services/supabase_service.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Elimina actividad ficticia del dashboard.
@@ -172,6 +174,12 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     ),
                   ],
                 ),
+                if (SupabaseService.isConfigured && Supabase.instance.client.auth.currentUser?.appMetadata['platform_admin'] == true)
+                  IconButton(
+                    onPressed: () => context.go('/superadmin'),
+                    tooltip: 'Panel superadmin',
+                    icon: const Icon(Icons.admin_panel_settings_outlined),
+                  ),
                 if (_can(authState, 'notifications_view'))
                   IconButton(
                     onPressed: () => context.go('/notifications'),
