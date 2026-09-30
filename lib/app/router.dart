@@ -27,6 +27,7 @@ import '../features/raffles/domain/entities/raffle.dart';
 import '../features/staff/presentation/pages/team_staff_page.dart';
 import '../features/teams/presentation/pages/teams_page.dart';
 import '../features/legal/presentation/pages/privacy_page.dart';
+import '../features/superadmin/presentation/pages/superadmin_page.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): expone la matriz de permisos para cobertura unitaria.
 String? permissionForLocation(String location) {
@@ -97,6 +98,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/profile', name: 'profile', builder: (context, state) => const ProfilePage()),
       GoRoute(path: '/profile/password', name: 'profile-password', builder: (context, state) => const ProfilePage(forcePasswordChange: true)),
       GoRoute(path: '/dashboard', name: 'dashboard', builder: (context, state) => const DashboardPage()),
+      GoRoute(path: '/superadmin', name: 'superadmin', builder: (context, state) => const SuperadminPage()),
       GoRoute(path: '/finance', name: 'finance', builder: (context, state) => const FinancePage()),
       GoRoute(path: '/my-raffles', name: 'my-raffles', builder: (context, state) => const MyRafflesPage()),
       GoRoute(path: '/raffles', name: 'raffles', builder: (context, state) => const RafflesPage()),
