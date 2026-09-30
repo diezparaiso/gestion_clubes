@@ -34,7 +34,7 @@ class _SuperadminPageState extends State<SuperadminPage> {
         club['commission_net'], n(club['commission_rate']) * 100,
       ]);
     }
-    final csv = '\\uFEFF' + rows.map((row) => row.map(cell).join(';')).join('\\r\\n');
+    final csv = '\uFEFF' + rows.map((row) => row.map(cell).join(';')).join('\r\n');
     final blob = html.Blob([utf8.encode(csv)], 'text/csv;charset=utf-8');
     final url = html.Url.createObjectUrlFromBlob(blob);
     final anchor = html.AnchorElement(href: url)..download = 'informe_comisiones_${DateTime.now().toIso8601String().substring(0, 10)}.csv'..style.display = 'none';
@@ -45,7 +45,7 @@ class _SuperadminPageState extends State<SuperadminPage> {
   }
 
   double n(dynamic x) => x is num ? x.toDouble() : double.tryParse('$x') ?? 0;
-  String eur(dynamic x) => '\${n(x).toStringAsFixed(2).replaceAll('.', ',')} €';
+  String eur(dynamic x) => '${n(x).toStringAsFixed(2).replaceAll('.', ',')} €';
   @override
   Widget build(BuildContext context) {
     if (!isAdmin) return Scaffold(appBar: AppBar(title: const Text('Superadmin')),
@@ -57,7 +57,7 @@ class _SuperadminPageState extends State<SuperadminPage> {
         if (snap.connectionState == ConnectionState.waiting) return const Center(child: CircularProgressIndicator());
         if (snap.hasError) return Center(child: Padding(padding: const EdgeInsets.all(24), child: Column(mainAxisSize: MainAxisSize.min, children: [
           const Text('No se pudo cargar el informe de comisiones.'), const SizedBox(height: 8),
-          Text('\${snap.error}', textAlign: TextAlign.center),
+          Text('${snap.error}', textAlign: TextAlign.center),
           TextButton(onPressed: () => setState(() => report = load()), child: const Text('Reintentar'))])));
         final clubs = snap.data ?? [];
         final gross = clubs.fold<double>(0, (s, c) => s + n(c['gross_sales']));
@@ -75,7 +75,7 @@ class _SuperadminPageState extends State<SuperadminPage> {
             GridView.count(shrinkWrap: true, physics: const NeverScrollableScrollPhysics(),
               crossAxisCount: columns, crossAxisSpacing: 12, mainAxisSpacing: 12, childAspectRatio: columns == 1 ? 3.2 : 1.8,
               children: [
-                _Metric('Clubes', '\${clubs.length}', Icons.groups_outlined),
+                _Metric('Clubes', '${clubs.length}', Icons.groups_outlined),
                 _Metric('Ventas registradas', '$count', Icons.receipt_long_outlined),
                 _Metric('Ventas brutas', eur(gross), Icons.account_balance_wallet_outlined),
                 _Metric('Reembolsos', eur(refunds), Icons.undo),
@@ -87,14 +87,14 @@ class _SuperadminPageState extends State<SuperadminPage> {
             const SizedBox(height: 10),
             if (clubs.isEmpty) const Card(child: Padding(padding: EdgeInsets.all(20), child: Text('No hay clubes o ventas registradas en el informe.')))
             else ...clubs.map((c) => Card(margin: const EdgeInsets.only(bottom: 10), child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [Expanded(child: Text('\${c['club_name'] ?? 'Club sin nombre'}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))), Chip(label: Text('\${c['club_status'] ?? '—'}'))]),
-              if (c['club_slug'] != null) Text('/\${c['club_slug']}'),
+              Row(children: [Expanded(child: Text('${c['club_name'] ?? 'Club sin nombre'}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16))), Chip(label: Text('${c['club_status'] ?? '—'}'))]),
+              if (c['club_slug'] != null) Text('/${c['club_slug']}'),
               const SizedBox(height: 12),
               Wrap(spacing: 24, runSpacing: 12, children: [
                 _Value('Ventas brutas', eur(c['gross_sales'])), _Value('Reembolsos', eur(c['refunded_sales'])),
                 _Value('Comisión bruta', eur(c['commission_generated'])), _Value('Comisión neta estimada', eur(c['commission_net'])),
-                _Value('Operaciones', '\${c['sales_count'] ?? 0}'),
-                _Value('Tasa aplicada', '\${(n(c['commission_rate']) * 100).toStringAsFixed(2).replaceAll('.', ',')} %'),
+                _Value('Operaciones', '${c['sales_count'] ?? 0}'),
+                _Value('Tasa aplicada', '${(n(c['commission_rate']) * 100).toStringAsFixed(2).replaceAll('.', ',')} %'),
               ]),
             ])))),
             const SizedBox(height: 12),
