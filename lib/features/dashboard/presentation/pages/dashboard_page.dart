@@ -13,6 +13,7 @@ import '../../application/dashboard_stats_provider.dart';
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): Muestra el rol real del acceso seleccionado.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): Filtra navegación y acciones según permisos del rol.
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-27): el Excel solo solicita módulos con permiso de lectura.
+// MODIFICADO POR GPT-5.6 LUNA (2026-09-30): etiqueta de copia de seguridad y tooltip de descarga.
 class DashboardPage extends ConsumerStatefulWidget {
   const DashboardPage({super.key});
 
@@ -157,10 +158,19 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
                     ],
                   ),
                 ),
-                IconButton(
-                  onPressed: () => _exportClub(context),
-                  tooltip: 'Exportar gestión a Excel',
-                  icon: const Icon(Icons.file_download_outlined),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Copia de seguridad',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600),
+                    ),
+                    IconButton(
+                      onPressed: () => _exportClub(context),
+                      tooltip: 'Pulsa para descargar archivo',
+                      icon: const Icon(Icons.file_download_outlined),
+                    ),
+                  ],
                 ),
                 if (_can(authState, 'notifications_view'))
                   IconButton(
