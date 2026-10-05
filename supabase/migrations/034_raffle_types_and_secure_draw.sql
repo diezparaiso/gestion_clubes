@@ -11,6 +11,18 @@ alter table public.raffles
   add constraint raffles_winning_number_check
   check (winning_number is null or (winning_number >= 1 and winning_number <= total_numbers));
 
+alter table public.notifications
+  drop constraint if exists notifications_type_check;
+alter table public.notifications
+  add constraint notifications_type_check
+  check (type in ('news', 'event', 'raffle', 'system', 'other', 'raffle_winner', 'raffle_monthly_result'));
+
+alter table public.notifications
+  drop constraint if exists notifications_target_check;
+alter table public.notifications
+  add constraint notifications_target_check
+  check (target in ('all_members', 'managers', 'members', 'staff', 'profile'));
+
 create unique index if not exists raffle_tickets_raffle_number_unique
   on public.raffle_tickets (raffle_id, number);
 
@@ -55,9 +67,9 @@ begin
     values (notification_id, winner_profile_id);
   end if;
 
-  insert into public.audit_logs (club_id, actor_profile_id, action, entity_type, entity_id, metadata)
-  values (r.club_id, auth.uid(), 'raffle_manual_winner', 'raffle', r.id,
-          jsonb_build_object('winning_number', target_winning_number, 'raffle_type', r.raffle_type));
+    insert into public.audit_logs (club_id, actor_profile_id, action, entity_type, entity_id, data)
+    values (r.club_id, auth.uid(), 'raffle_draw', 'raffle', r.id,
+      jsonb_build_object('draw_method', 'manual', 'winning_number', target_winning_number, 'raffle_type', r.raffle_type));
 
   return jsonb_build_object(
     'id', gen_random_uuid(),
@@ -112,9 +124,9 @@ begin
 
   update public.raffles set winning_number = chosen_number, status = 'drawn' where id = r.id;
 
-  insert into public.audit_logs (club_id, actor_profile_id, action, entity_type, entity_id, metadata)
-  values (r.club_id, auth.uid(), 'raffle_random_winner', 'raffle', r.id,
-          jsonb_build_object('winning_number', chosen_number, 'raffle_type', r.raffle_type, 'random_source', 'pgcrypto'));
+    insert into public.audit_logs (club_id, actor_profile_id, action, entity_type, entity_id, data)
+    values (r.club_id, auth.uid(), 'raffle_draw', 'raffle', r.id,
+      jsonb_build_object('draw_method', 'cryptographic_random', 'winning_number', chosen_number, 'raffle_type', r.raffle_type, 'random_source', 'pgcrypto'));
 
   return jsonb_build_object(
     'id', gen_random_uuid(),

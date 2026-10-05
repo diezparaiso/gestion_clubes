@@ -1334,3 +1334,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-09-29 — GPT-5.6 LUNA — corrección de responsive en Patrocinadores
 - `sponsors_page.dart`: sustituido `Flexible` dentro de `Wrap` por `ConstrainedBox`, evitando una combinación de widgets no válida y manteniendo el nombre del patrocinador limitado a dos líneas en anchos estrechos.
 - Sin cambios en Supabase remoto, migraciones, Stripe ni Payments.
+
+### 2026-10-05 — MODIFICADO POR GITHUB COPILOT — corrección y aplicación de migraciones 032–046
+- `032_club_access_permissions.sql`: se añadieron casts explícitos a `public.club_role` y `public.club_permission` en el seed; PostgreSQL infería `permission` como `text` y rechazó el `INSERT` (SQLSTATE 42804).
+- `033_change_member_role.sql`: se añadió `DROP FUNCTION` antes de recrear `change_member_role`, porque la función preexistente recibía el parámetro `p_new_role` y PostgreSQL no permite renombrarlo mediante `CREATE OR REPLACE` (SQLSTATE 42P13).
+- `034_raffle_types_and_secure_draw.sql`: se ampliaron las restricciones existentes de tipo/destinatario para aceptar las notificaciones de ganador usadas por las RPC; se corrigió la auditoría para escribir en `audit_logs.data` y usar la acción válida `raffle_draw`.
+- `045_central_permission_rls_alignment.sql`: se añadieron drops de las políticas creadas previamente por 038 antes de recrearlas; el primer intento chocó con `seasons_manage_permission` ya existente (SQLSTATE 42710).
+- `supabase db push` terminó correctamente. `supabase migration list` confirmó que las migraciones `001`–`046` aparecen tanto en Local como en Remote. 032–044 se aplicaron antes del último intento, y 045–046 en el último.
+- No se modificaron migraciones 001–031 ni código de aplicación/pagos. No se hizo push a GitHub.

@@ -1,6 +1,8 @@
 -- MODIFICADO POR GPT-5.6 LUNA (2026-09-26): endurece cambios de rol y protege al presidente del club.
 -- No se ejecuta automáticamente sobre Supabase remoto.
 
+drop function if exists public.change_member_role(uuid, uuid, public.club_role);
+
 create or replace function public.change_member_role(
   p_club_id uuid,
   p_profile_id uuid,

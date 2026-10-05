@@ -28,7 +28,7 @@ on public.club_role_permissions
 for select to authenticated using (true);
 
 insert into public.club_role_permissions (role, permission)
-select role, permission from (values
+select role::public.club_role, permission::public.club_permission from (values
 ('club_president'::public.club_role,'dashboard_view'),('club_president','members_view'),('club_president','members_manage'),('club_president','teams_view'),('club_president','teams_manage'),('club_president','players_view'),('club_president','players_manage'),('club_president','finance_view'),('club_president','finance_manage'),('club_president','raffles_view'),('club_president','raffles_manage'),('club_president','news_view'),('club_president','news_manage'),('club_president','events_view'),('club_president','events_manage'),('club_president','notifications_view'),('club_president','club_settings_view'),('club_president','club_settings_manage'),('club_president','access_manage'),
 ('club_treasurer','dashboard_view'),('club_treasurer','finance_view'),('club_treasurer','finance_manage'),('club_treasurer','notifications_view'),
 ('club_secretary','dashboard_view'),('club_secretary','members_view'),('club_secretary','members_manage'),('club_secretary','news_view'),('club_secretary','news_manage'),('club_secretary','events_view'),('club_secretary','events_manage'),('club_secretary','notifications_view'),
