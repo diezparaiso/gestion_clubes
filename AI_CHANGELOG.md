@@ -1342,3 +1342,15 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `045_central_permission_rls_alignment.sql`: se añadieron drops de las políticas creadas previamente por 038 antes de recrearlas; el primer intento chocó con `seasons_manage_permission` ya existente (SQLSTATE 42710).
 - `supabase db push` terminó correctamente. `supabase migration list` confirmó que las migraciones `001`–`046` aparecen tanto en Local como en Remote. 032–044 se aplicaron antes del último intento, y 045–046 en el último.
 - No se modificaron migraciones 001–031 ni código de aplicación/pagos. No se hizo push a GitHub.
+- No se modificaron migraciones 001–031 ni código de aplicación/pagos. No se hizo push a GitHub.
+
+### 2026-10-05 — MODIFICADO POR GITHUB COPILOT — preparación de hardening 047
+- Añadida `supabase/migrations/047_security_hardening.sql`; no se ejecutó `supabase db push` ni se consultó/modificó el remoto durante esta intervención.
+- La migración retira SELECT de `anon`/`PUBLIC` en las tablas auditadas y concede a `anon` solo `clubs.id/public_name/slug` y las columnas explícitas usadas por la página pública de rifas. A `authenticated` le limita `profiles` a id, nombre, email y el indicador consultado por autenticación.
+- Recreada `get_public_sponsors(text)` con `DROP FUNCTION` y proyección explícita `id/name/logo_url/website`; ya no retorna `contact_email` ni otros campos de contacto. Se añadió `PublicSponsor` y se alinearon repository/página para no parsear la entidad administrativa completa.
+- Perfiles: `find_profile_for_player` y `find_profile_for_team_staff` conservan sus controles `players_manage`/`teams_manage` y solo leen/devuelven el ID.
+- Notificaciones: SELECT depende de `notification_deliveries` propias; el target se materializa por trigger y se valida también en `deliver_notification`. Se retira el INSERT directo de entregas y se preserva historial de destinos grupales.
+- Rifas: 047 sincroniza `buyer_profile_id` y `profile_id`, aborta ante discrepancias previas sin sobrescribirlas y añade una restricción de consistencia. La RPC de confirmación mantiene ejecución exclusiva de `service_role` y permite completar un dueño nulo sin reasignar uno ya fijado.
+- Ganador manual y sorteo aleatorio vuelven a comprobar club/permiso, estado, fecha final y tickets pagados; bloquean fila de rifa (y tickets pertinentes) para serializar operaciones. La reserva pública también bloquea la misma fila de rifa.
+- Añadido `docs/sql/security_checks.sql` con comprobaciones de ACL efectivas, RLS, RPC públicas, funciones `SECURITY DEFINER` y ownership de tickets. `PENDIENTES.md` refleja 032–046 aplicadas y deja 047/validación staging pendientes.
+- Flutter: `flutter analyze --no-pub` sin incidencias; `flutter test` pasó 39 pruebas. 047 permanece sin aplicar hasta revisión del propietario.

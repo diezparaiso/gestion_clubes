@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/services/supabase_service.dart';
 import '../../data/repositories/sponsor_repository.dart';
-import '../../domain/entities/sponsor.dart';
+import '../../domain/entities/public_sponsor.dart';
 
 class PublicSponsorsPage extends StatefulWidget {
   const PublicSponsorsPage({super.key, required this.clubSlug});
@@ -21,7 +21,7 @@ class PublicSponsorsPage extends StatefulWidget {
 }
 
 class _PublicSponsorsPageState extends State<PublicSponsorsPage> {
-  late Future<List<Sponsor>> _sponsors;
+  late Future<List<PublicSponsor>> _sponsors;
 
   @override
   void initState() {
@@ -54,7 +54,7 @@ class _PublicSponsorsPageState extends State<PublicSponsorsPage> {
             ),
           ],
         ),
-      body: FutureBuilder<List<Sponsor>>(
+      body: FutureBuilder<List<PublicSponsor>>(
         future: _sponsors,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
@@ -63,7 +63,7 @@ class _PublicSponsorsPageState extends State<PublicSponsorsPage> {
           if (snapshot.hasError) {
             return _PublicLoadError(message: 'No se han podido cargar los patrocinadores.', onRetry: _retry);
           }
-          final sponsors = snapshot.data ?? const <Sponsor>[];
+          final sponsors = snapshot.data ?? const <PublicSponsor>[];
           if (sponsors.isEmpty) {
             return const Center(child: Text('Actualmente no hay patrocinadores publicados.'));
           }
@@ -82,7 +82,7 @@ class _PublicSponsorsPageState extends State<PublicSponsorsPage> {
 class _SponsorPublicCard extends StatelessWidget {
   const _SponsorPublicCard({required this.sponsor});
 
-  final Sponsor sponsor;
+  final PublicSponsor sponsor;
 
   @override
   Widget build(BuildContext context) {
@@ -99,10 +99,6 @@ class _SponsorPublicCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(sponsor.name, style: Theme.of(context).textTheme.titleLarge),
-                if (sponsor.benefits != null && sponsor.benefits!.trim().isNotEmpty) ...[
-                  const SizedBox(height: 6),
-                  Text(sponsor.benefits!, style: Theme.of(context).textTheme.bodyMedium),
-                ],
               ],
             ),
             if (sponsor.website != null && sponsor.website!.trim().isNotEmpty)

@@ -1,7 +1,7 @@
-<!-- MODIFICADO POR GPT-5.6 LUNA (2026-09-27): sincroniza el inventario de módulos cerrados y pendientes reales. -->
+<!-- MODIFICADO POR GITHUB COPILOT (2026-10-05): registra 032-046 aplicadas y el hardening 047 pendiente de revisión. -->
 # PENDIENTES DEL PROYECTO
 
-> Última actualización: 2026-09-29 — GPT-5.6 LUNA
+> Última actualización: 2026-10-05 — GITHUB COPILOT
 
 > Los puntos marcados como pendientes de staging, Supabase, proveedores o producción requieren una validación externa y no se cierran solo con cambios de código.
 > Inventario de trabajo pendiente. La trazabilidad cronológica permanece en AI_CHANGELOG.md.
@@ -62,9 +62,10 @@
 - [x] Sin IDs ficticios.
 
 ## 3. Seguridad y permisos
-- [ ] Ejecutar migraciones 032–044 en Supabase cuando corresponda (solo mediante despliegue controlado).
+- [x] Aplicadas migraciones 032–046 en Supabase remoto el 2026-10-05; verificar nuevamente con `supabase migration list` si cambia el entorno.
+- [ ] Revisar y aplicar `047_security_hardening.sql` mediante despliegue controlado; después ejecutar `docs/sql/security_checks.sql` en SQL Editor.
 - [ ] Verificar todas las políticas RLS en una base de pruebas.
-- [x] Auditar repositories con escrituras directas y alinear sus fronteras RLS con la matriz central; migración 045 preparada.
+- [x] Auditar repositories con escrituras directas y alinear sus fronteras RLS con la matriz central; migración 045 aplicada.
 - [x] Revisar cada pantalla contra club_role_permissions.
 - [x] Separar permisos _view y _manage en la UI en los módulos ya cerrados.
 - [x] Revisar dashboard/sidebar para ocultar acciones no permitidas por rol.
@@ -75,12 +76,13 @@
 - [x] Nombramiento de presidente reservado al administrador de plataforma.
 - [x] Alta de accesos bloquea también en backend el rol `club_president`.
 - [x] Gestión de accesos restringida al presidente.
-- [x] Alinear Patrocinadores con el permiso central sponsors_manage; migraciones 043–044 preparadas, pendientes de aplicar y probar en staging.
-- [x] Alinear las políticas de escritura principales con *_manage mediante migración 045; pendiente de aplicar y probar en staging.
+- [x] Alinear Patrocinadores con el permiso central sponsors_manage; migraciones 043–044 aplicadas, pendientes de validar por rol en staging.
+- [x] Alinear las políticas de escritura principales con *_manage mediante migración 045; pendiente de validar por rol en staging.
+- [ ] Verificar grants efectivos, RLS, RPC públicas y funciones SECURITY DEFINER en staging con `docs/sql/security_checks.sql` después de revisar/aplicar 047.
 
 ## 4. Perfil y autenticación
 - [ ] Probar flujo completo de must_change_password en Web/Chrome y staging.
-- [x] Blindar también en backend el indicador must_change_password; migración 046 preparada, pendiente de staging.
+- [x] Blindar también en backend el indicador must_change_password; migración 046 aplicada, pendiente de probar en staging.
 - [x] Blindar por código que un inicio de sesión normal no herede el estado `passwordRecovery`.
 - [ ] Probar cambio de contraseña en móvil y web.
 - [x] Implementar y revisar recuperación de contraseña.

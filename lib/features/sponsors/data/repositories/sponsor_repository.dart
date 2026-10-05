@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/services/supabase_service.dart';
+import '../../domain/entities/public_sponsor.dart';
 import '../../domain/entities/sponsor.dart';
 
 class SponsorRepository {
@@ -52,9 +53,17 @@ class SponsorRepository {
     }
   }
 
-  Future<List<Sponsor>> getPublicSponsors(String clubSlug) async {
+  Future<List<PublicSponsor>> getPublicSponsors(String clubSlug) async {
     if (!SupabaseService.isConfigured || _supabase == null || clubSlug.trim().isEmpty) {
-      return _demoSponsors().where((s) => s.isPublic && s.isActive).toList();
+      return _demoSponsors()
+          .where((sponsor) => sponsor.isPublic && sponsor.isActive)
+          .map((sponsor) => PublicSponsor(
+                id: sponsor.id,
+                name: sponsor.name,
+                logoUrl: sponsor.logoUrl,
+                website: sponsor.website,
+              ))
+          .toList();
     }
 
     final supabase = _supabase;
@@ -65,7 +74,7 @@ class SponsorRepository {
       );
 
       return (response as List)
-          .map((e) => Sponsor.fromJson(e as Map<String, dynamic>))
+          .map((e) => PublicSponsor.fromJson(e as Map<String, dynamic>))
           .toList();
     } on PostgrestException catch (e) {
       throw Exception('Error al obtener patrocinadores públicos: ${e.message}');
@@ -232,6 +241,6 @@ final activeSponsorsProvider =
 });
 
 final publicSponsorsProvider =
-    FutureProvider.family<List<Sponsor>, String>((ref, clubSlug) {
+    FutureProvider.family<List<PublicSponsor>, String>((ref, clubSlug) {
   return ref.watch(sponsorRepositoryProvider).getPublicSponsors(clubSlug);
 });
