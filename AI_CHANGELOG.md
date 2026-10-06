@@ -1365,3 +1365,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `NotificationRepository.createNotification` acepta solo `all_members`, `managers`, `members` y `staff`; targets personales/desconocidos fallan antes de acceder a Supabase. Añadida prueba unitaria.
 - No se encontraron consultas directas adicionales a las tablas auditadas con `select('*')` ni UI de edición/borrado de notificaciones.
 - Validación: `flutter analyze --no-pub` limpio; `flutter test` pasó 40 pruebas.
+
+### 2026-10-06 — MODIFICADO POR GITHUB COPILOT — aplicación de migraciones 047–048 (Bloque 3)
+- Preflight `supabase migration list`: 001–046 coincidían en Local y Remote; 047–048 pendientes.
+- `supabase db push` aplicó exclusivamente `047_security_hardening.sql` y `048_public_raffle_acl_and_legacy_draw.sql`; no solicitó contraseña.
+- Verificación posterior `supabase migration list`: 001–048 coinciden en Local y Remote.
+- `supabase db query --linked -f docs/sql/security_checks.sql` no produjo resultados y falló con HTTP 400 / SQLSTATE 42809 (`"min" is an aggregate function`). No se insistió con comandos alternativos.
+- Añadido `docs/sql/security_checks_pending.md` con instrucciones para el precheck y los bloques 1–8 en SQL Editor.

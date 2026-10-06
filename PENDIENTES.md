@@ -62,8 +62,9 @@
 - [x] Sin IDs ficticios.
 
 ## 3. Seguridad y permisos
-- [x] Aplicadas migraciones 032–046 en Supabase remoto el 2026-10-05; verificar nuevamente con `supabase migration list` si cambia el entorno.
-- [ ] Revisar y aplicar `047_security_hardening.sql` mediante despliegue controlado; después ejecutar `docs/sql/security_checks.sql` en SQL Editor.
+- [x] Aplicadas migraciones 032–048 en Supabase remoto el 2026-10-06; `supabase migration list` confirmó Local=Remote.
+- [x] Aplicadas las migraciones 047 (`security_hardening`) y 048 (`public_raffle_acl_and_legacy_draw`) mediante `supabase db push`.
+- [ ] Ejecutar manualmente `docs/sql/security_checks.sql` en SQL Editor; `supabase db query --linked -f` falló con SQLSTATE 42809. Pasos en `docs/sql/security_checks_pending.md`.
 - [ ] Verificar todas las políticas RLS en una base de pruebas.
 - [x] Auditar repositories con escrituras directas y alinear sus fronteras RLS con la matriz central; migración 045 aplicada.
 - [x] Revisar cada pantalla contra club_role_permissions.
@@ -78,7 +79,7 @@
 - [x] Gestión de accesos restringida al presidente.
 - [x] Alinear Patrocinadores con el permiso central sponsors_manage; migraciones 043–044 aplicadas, pendientes de validar por rol en staging.
 - [x] Alinear las políticas de escritura principales con *_manage mediante migración 045; pendiente de validar por rol en staging.
-- [ ] Verificar grants efectivos, RLS, RPC públicas y funciones SECURITY DEFINER en staging con `docs/sql/security_checks.sql` después de revisar/aplicar 047.
+- [ ] Verificar grants efectivos, RLS, RPC públicas y funciones SECURITY DEFINER en staging con `docs/sql/security_checks.sql`.
 
 ## 4. Perfil y autenticación
 - [ ] Probar flujo completo de must_change_password en Web/Chrome y staging.
