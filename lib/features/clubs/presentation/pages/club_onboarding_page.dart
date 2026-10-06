@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../../../core/utils/safe_internal_location.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): permite entrar en clubes existentes donde el usuario tenga acceso activo.
 
@@ -25,15 +26,21 @@ class _ClubOnboardingPageState extends ConsumerState<ClubOnboardingPage> {
 
   Future<void> _createClub() async {
     if (!_formKey.currentState!.validate()) return;
+    final destination = _continueDestination(context);
     await ref.read(authControllerProvider.notifier).createClub(_clubNameController.text);
     if (mounted && ref.read(authControllerProvider).status == AuthStatus.signedIn) {
-      context.go('/dashboard');
+      context.go(destination);
     }
   }
 
-  void _selectClub(ClubAccess club) {
-    ref.read(authControllerProvider.notifier).selectClub(club);
-    if (mounted) context.go('/dashboard');
+  Future<void> _selectClub(ClubAccess club, String destination) async {
+    await ref.read(authControllerProvider.notifier).selectClub(club);
+    if (mounted) context.go(destination);
+  }
+
+  String _continueDestination(BuildContext context) {
+    final requestedLocation = GoRouterState.of(context).uri.queryParameters['continue'];
+    return safeInternalLocation(requestedLocation) ?? '/dashboard';
   }
 
   @override
@@ -116,7 +123,7 @@ class _ClubOnboardingPageState extends ConsumerState<ClubOnboardingPage> {
                               ),
                               subtitle: Text(club.roleLabel),
                               trailing: const Icon(Icons.arrow_forward_rounded),
-                              onTap: () => _selectClub(club),
+                              onTap: () => _selectClub(club, _continueDestination(context)),
                             ),
                           ),
                         ),

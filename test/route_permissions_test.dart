@@ -2,6 +2,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:gestion_clubes/app/router.dart';
+import 'package:gestion_clubes/core/utils/safe_internal_location.dart';
 
 void main() {
   group('permissionForLocation', () {
@@ -34,6 +35,19 @@ void main() {
 
     test('protects sponsor management with its dedicated permission', () {
       expect(permissionForLocation('/sponsors'), 'sponsors_manage');
+    });
+
+    test('redirects a direct unauthorized route to the access-denied page', () {
+      expect(unauthorizedRedirectForLocation('club_treasurer', '/members'), '/access-denied');
+      expect(unauthorizedRedirectForLocation('club_treasurer', '/access-denied'), isNull);
+      expect(unauthorizedRedirectForLocation('club_president', '/members'), isNull);
+    });
+
+    test('preserves safe direct links while the user selects a club', () {
+      expect(safeInternalLocation('/raffles/raffle-1'), '/raffles/raffle-1');
+      expect(safeInternalLocation('/teams/team-1/players?filter=active'), '/teams/team-1/players?filter=active');
+      expect(safeInternalLocation('https://outside.example/path'), isNull);
+      expect(safeInternalLocation('/login'), isNull);
     });
 
     test('leaves public and unknown locations without a permission requirement', () {

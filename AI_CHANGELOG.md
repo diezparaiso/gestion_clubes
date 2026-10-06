@@ -1380,3 +1380,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - CORS usa allowlist exacta por `ALLOWED_ORIGINS`; requiere configurar el origen real antes de invocar desde navegador.
 - Desplegada con `supabase functions deploy manage-club-user --use-api`. Deno no está instalado localmente; el deploy por API finalizó correctamente.
 - Documentado despliegue/actualización en `docs/DEPLOY_EDGE_FUNCTION.md`. Pendiente configurar `ALLOWED_ORIGINS` y probar con presidente, usuario nuevo/existente y roles rechazados.
+
+### 2026-10-06 — MODIFICADO POR GITHUB COPILOT — UX de acceso y deep links (Bloque 5)
+- Eliminada la mención pública a porras; la tarjeta presenta solo Rifas.
+- Añadida `AccessDeniedPage` y `/access-denied`; una ruta protegida sin permiso se redirige a esta página en lugar del dashboard.
+- Las recargas con sesión restaurada conservan el path/query interno durante la selección del club. Si hace falta cambiar contraseña, la continuación también se conserva y se reanuda tras completar el cambio.
+- Añadida validación de ruta de continuación interna y pruebas para redirección de rol, acceso a `/access-denied` y preservación/rechazo de URLs externas.
+- Validación enfocada: `flutter analyze --no-pub` limpio; `route_permissions_test.dart` pasó 8 pruebas.

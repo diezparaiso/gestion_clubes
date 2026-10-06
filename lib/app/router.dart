@@ -4,7 +4,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/utils/safe_internal_location.dart';
 import '../features/auth/application/auth_controller.dart';
+import '../features/auth/presentation/pages/access_denied_page.dart';
 import '../features/auth/presentation/pages/login_page.dart';
 import '../features/auth/presentation/pages/register_page.dart';
 import '../features/auth/presentation/pages/profile_page.dart';
@@ -56,6 +58,15 @@ String? permissionForLocation(String location) {
   return null;
 }
 
+String? unauthorizedRedirectForLocation(String? role, String location) {
+  if (location == '/access-denied') return null;
+  final requiredPermission = permissionForLocation(location);
+  if (requiredPermission == null || ClubRolePermissions.has(role, requiredPermission)) {
+    return null;
+  }
+  return '/access-denied';
+}
+
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authControllerProvider);
   return GoRouter(
@@ -67,13 +78,28 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isSignedIn = authState.status == AuthStatus.signedIn;
       final needsClub = authState.status == AuthStatus.needsClub;
 
-      if (needsClub && location != '/onboarding') return '/onboarding';
+      if (needsClub && location != '/onboarding') {
+        final continueLocation = safeInternalLocation(state.uri.toString());
+        final continueQuery = continueLocation == null
+            ? ''
+            : '?continue=${Uri.encodeQueryComponent(continueLocation)}';
+        return '/onboarding$continueQuery';
+      }
       if (isSignedIn && isAuthRoute) return authState.mustChangePassword ? '/profile/password' : '/dashboard';
-      if (isSignedIn && authState.mustChangePassword && location != '/profile/password') return '/profile/password';
+      if (isSignedIn && authState.mustChangePassword && location != '/profile/password') {
+        final continueLocation = safeInternalLocation(state.uri.toString());
+        final continueQuery = continueLocation == null
+            ? ''
+            : '?continue=${Uri.encodeQueryComponent(continueLocation)}';
+        return '/profile/password$continueQuery';
+      }
+      if (isSignedIn && !authState.mustChangePassword && location == '/profile/password') {
+        return safeInternalLocation(state.uri.queryParameters['continue']) ?? '/dashboard';
+      }
       if (!isSignedIn && !needsClub && !isPublicRoute) return '/login';
       if (isSignedIn && !authState.mustChangePassword) {
-        final requiredPermission = permissionForLocation(location);
-        if (requiredPermission != null && !ClubRolePermissions.has(authState.role, requiredPermission)) return '/dashboard';
+        final unauthorizedRedirect = unauthorizedRedirectForLocation(authState.role, location);
+        if (unauthorizedRedirect != null) return unauthorizedRedirect;
       }
       return null;
     },
@@ -84,6 +110,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/solicitar-incorporacion', name: 'club-join-request', builder: (context, state) => const ClubJoinRequestPage()),
       GoRoute(path: '/onboarding', name: 'onboarding', builder: (context, state) => const ClubOnboardingPage()),
       GoRoute(path: '/privacy', name: 'privacy', builder: (context, state) => const PrivacyPage()),
+      GoRoute(path: '/access-denied', name: 'access-denied', builder: (context, state) => const AccessDeniedPage()),
       GoRoute(
         path: '/r/:clubSlug/:raffleSlug',
         name: 'public-raffle',

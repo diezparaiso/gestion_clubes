@@ -150,7 +150,7 @@ class PlatformHomePage extends StatelessWidget {
                               _FeatureCard(
                                 width: width,
                                 icon: Icons.confirmation_number_outlined,
-                                title: 'Rifas y porras',
+                                title: 'Rifas',
                                 description:
                                     'Prepara sorteos y experiencias digitales para tus socios.',
                               ),
