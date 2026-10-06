@@ -71,7 +71,8 @@
 - [x] Separar permisos _view y _manage en la UI en los módulos ya cerrados.
 - [x] Revisar dashboard/sidebar para ocultar acciones no permitidas por rol.
 - [x] Verificar revoke_member_access y su política de seguridad en código/migraciones.
-- [ ] Revisar Edge Function manage-club-user desplegada con secretos solo en Supabase.
+- [x] Endurecer y desplegar `manage-club-user` mediante `--use-api`; secretos permanecen solo en el entorno de Supabase.
+- [ ] Configurar `ALLOWED_ORIGINS` con el origen real de Flutter Web y probar el alta con presidente activo y cuentas nueva/existente.
 - [x] Añadir cobertura inicial de seguridad para la matriz de permisos por rol; quedan pruebas de integración RLS/RPC para staging.
 - [x] Cambio de rol impide dejar el club sin presidente.
 - [x] Nombramiento de presidente reservado al administrador de plataforma.

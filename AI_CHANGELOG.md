@@ -1372,3 +1372,11 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Verificación posterior `supabase migration list`: 001–048 coinciden en Local y Remote.
 - `supabase db query --linked -f docs/sql/security_checks.sql` no produjo resultados y falló con HTTP 400 / SQLSTATE 42809 (`"min" is an aggregate function`). No se insistió con comandos alternativos.
 - Añadido `docs/sql/security_checks_pending.md` con instrucciones para el precheck y los bloques 1–8 en SQL Editor.
+
+### 2026-10-06 — MODIFICADO POR GITHUB COPILOT — endurecimiento y despliegue de manage-club-user (Bloque 4)
+- JWT verificado en Auth server-side; solo permite actor con membresía `club_president` activa en el club solicitado.
+- Lista de roles allowlist sin `club_president`; email/nombres normalizados, contraseña inicial validada entre 8 y 128 caracteres, `must_change_password` se marca solo para cuentas nuevas.
+- Si el usuario ya existe, solo se crea/activa la membresía: no se modifican ni devuelven sus datos de perfil/credenciales. Respuestas no incluyen password, email o ID destino; errores internos genéricos y sin logs.
+- CORS usa allowlist exacta por `ALLOWED_ORIGINS`; requiere configurar el origen real antes de invocar desde navegador.
+- Desplegada con `supabase functions deploy manage-club-user --use-api`. Deno no está instalado localmente; el deploy por API finalizó correctamente.
+- Documentado despliegue/actualización en `docs/DEPLOY_EDGE_FUNCTION.md`. Pendiente configurar `ALLOWED_ORIGINS` y probar con presidente, usuario nuevo/existente y roles rechazados.
