@@ -1,7 +1,7 @@
-<!-- MODIFICADO POR GITHUB COPILOT (2026-10-05): registra 032-046 aplicadas y el hardening 047 pendiente de revisión. -->
+<!-- MODIFICADO POR GITHUB COPILOT (2026-10-06): actualiza cierre 032-048, Edge Function y plan por rol. -->
 # PENDIENTES DEL PROYECTO
 
-> Última actualización: 2026-10-05 — GITHUB COPILOT
+> Última actualización: 2026-10-06 — GITHUB COPILOT
 
 > Los puntos marcados como pendientes de staging, Supabase, proveedores o producción requieren una validación externa y no se cierran solo con cambios de código.
 > Inventario de trabajo pendiente. La trazabilidad cronológica permanece en AI_CHANGELOG.md.
@@ -74,6 +74,7 @@
 - [x] Endurecer y desplegar `manage-club-user` mediante `--use-api`; secretos permanecen solo en el entorno de Supabase.
 - [ ] Configurar `ALLOWED_ORIGINS` con el origen real de Flutter Web y probar el alta con presidente activo y cuentas nueva/existente.
 - [x] Añadir cobertura inicial de seguridad para la matriz de permisos por rol; quedan pruebas de integración RLS/RPC para staging.
+- [x] Añadido `docs/TEST_PLAN_ROLES.md` con pruebas manuales por rol, UI, URL directa, revocación, sorteos y targets de notificación.
 - [x] Cambio de rol impide dejar el club sin presidente.
 - [x] Nombramiento de presidente reservado al administrador de plataforma.
 - [x] Alta de accesos bloquea también en backend el rol `club_president`.
@@ -101,6 +102,7 @@
 - [x] Verificar rutas con sesión cerrada mediante la matriz de permisos de ubicación y cobertura unitaria.
 - [x] Cubrir rutas de detalle de rifas, perfil, Mis rifas y páginas públicas en la matriz.
 - [ ] Verificar RLS con perfiles de cada rol.
+- [ ] Ejecutar el plan manual `docs/TEST_PLAN_ROLES.md` en staging; configurar `ALLOWED_ORIGINS` con el host real del frontend antes de probar altas.
 - [x] Hacer prueba de exportación Excel.
 - [ ] Hacer prueba completa de rifas con Supabase de staging.
 

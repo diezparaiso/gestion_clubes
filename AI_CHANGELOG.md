@@ -1391,3 +1391,9 @@ This file is the permanent handoff log between AI assistants working on this rep
 ### 2026-10-06 — MODIFICADO POR GITHUB COPILOT — plan manual por rol (Bloque 6)
 - Añadido `docs/TEST_PLAN_ROLES.md` con checklist de interfaz y URL directa para presidente, tesorero, secretario, entrenador, jugador/familiar y visitante anónimo.
 - Incluye cambio obligatorio de contraseña, revocación, preservación del único presidente, reserva pública, sorteo único, denegación del secretario y targets de notificación; el comando Flutter usa placeholders.
+
+### 2026-10-06 — MODIFICADO POR GITHUB COPILOT — cierre y documentación final (Bloque 7)
+- Actualizado `PENDIENTES.md`: 032–048 aplicadas; quedan pendientes checks SQL manuales, pruebas RLS por rol y configurar `ALLOWED_ORIGINS`.
+- Añadida al final de `docs/PLAN_CIERRE.md` la actualización posterior a la auditoría inicial, incluyendo deploy, migraciones y limitaciones de verificación.
+- Validación final: `flutter analyze --no-pub` limpio; `flutter test` pasó 42 pruebas.
+- La comprobación de secretos y los `git show --stat` se registran antes del push final; no se versionan `.env`, claves ni tokens.
