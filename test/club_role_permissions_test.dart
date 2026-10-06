@@ -45,18 +45,25 @@ void main() {
       expect(ClubRolePermissions.has(role, 'sponsors_manage'), isFalse);
     });
 
-    test('team roles can view teams and players but cannot manage club access', () {
+    test('team managers can manage players while coaches have read-only player access', () {
       for (final role in const ['team_manager', 'coach']) {
         expect(ClubRolePermissions.has(role, 'teams_view'), isTrue);
         expect(ClubRolePermissions.has(role, 'players_view'), isTrue);
-        expect(ClubRolePermissions.has(role, 'players_manage'), isTrue);
         expect(ClubRolePermissions.has(role, 'finance_manage'), isFalse);
         expect(ClubRolePermissions.has(role, 'access_manage'), isFalse);
       }
+      expect(ClubRolePermissions.has('team_manager', 'players_manage'), isTrue);
+      expect(ClubRolePermissions.has('coach', 'players_manage'), isFalse);
     });
 
     test('basic member roles do not gain management permissions', () {
-      for (final role in const ['staff', 'member', 'parent_guardian', 'player', 'follower']) {
+      for (final role in const [
+        'staff',
+        'member',
+        'parent_guardian',
+        'player',
+        'follower',
+      ]) {
         expect(ClubRolePermissions.has(role, 'members_manage'), isFalse);
         expect(ClubRolePermissions.has(role, 'teams_manage'), isFalse);
         expect(ClubRolePermissions.has(role, 'finance_manage'), isFalse);
@@ -66,41 +73,76 @@ void main() {
     });
 
     test('sponsors management is restricted to the president', () {
-      expect(ClubRolePermissions.has('club_president', 'sponsors_manage'), isTrue);
-      for (final role in const ['club_treasurer', 'club_secretary', 'team_manager', 'coach', 'staff', 'member', 'parent_guardian', 'player', 'follower']) {
+      expect(
+        ClubRolePermissions.has('club_president', 'sponsors_manage'),
+        isTrue,
+      );
+      for (final role in const [
+        'club_treasurer',
+        'club_secretary',
+        'team_manager',
+        'coach',
+        'staff',
+        'member',
+        'parent_guardian',
+        'player',
+        'follower',
+      ]) {
         expect(ClubRolePermissions.has(role, 'sponsors_manage'), isFalse);
       }
     });
 
     test('access and settings management are restricted consistently', () {
-      expect(ClubRolePermissions.has('club_president', 'access_manage'), isTrue);
-      expect(ClubRolePermissions.has('club_president', 'club_settings_manage'), isTrue);
-      for (final role in const ['club_treasurer', 'club_secretary', 'team_manager', 'coach', 'staff', 'member', 'parent_guardian', 'player', 'follower']) {
+      expect(
+        ClubRolePermissions.has('club_president', 'access_manage'),
+        isTrue,
+      );
+      expect(
+        ClubRolePermissions.has('club_president', 'club_settings_manage'),
+        isTrue,
+      );
+      for (final role in const [
+        'club_treasurer',
+        'club_secretary',
+        'team_manager',
+        'coach',
+        'staff',
+        'member',
+        'parent_guardian',
+        'player',
+        'follower',
+      ]) {
         expect(ClubRolePermissions.has(role, 'access_manage'), isFalse);
         expect(ClubRolePermissions.has(role, 'club_settings_manage'), isFalse);
       }
     });
 
     test('unknown role or permission is denied by default', () {
-      expect(ClubRolePermissions.has('unknown_role', 'dashboard_view'), isFalse);
+      expect(
+        ClubRolePermissions.has('unknown_role', 'dashboard_view'),
+        isFalse,
+      );
       expect(ClubRolePermissions.has(null, 'dashboard_view'), isFalse);
       expect(ClubRolePermissions.has('member', 'unknown_permission'), isFalse);
     });
   });
 
   group('ClubAccess', () {
-    test('keeps the selected club identity and exposes Spanish role labels', () {
-      const club = ClubAccess(
-        clubId: 'club-1',
-        clubName: 'Club Demo',
-        role: 'club_secretary',
-      );
+    test(
+      'keeps the selected club identity and exposes Spanish role labels',
+      () {
+        const club = ClubAccess(
+          clubId: 'club-1',
+          clubName: 'Club Demo',
+          role: 'club_secretary',
+        );
 
-      expect(club.clubId, 'club-1');
-      expect(club.clubName, 'Club Demo');
-      expect(club.role, 'club_secretary');
-      expect(club.roleLabel, 'Secretario/a');
-    });
+        expect(club.clubId, 'club-1');
+        expect(club.clubName, 'Club Demo');
+        expect(club.role, 'club_secretary');
+        expect(club.roleLabel, 'Secretario/a');
+      },
+    );
 
     test('falls back to the raw role for an unknown role', () {
       const club = ClubAccess(
