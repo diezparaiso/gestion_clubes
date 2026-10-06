@@ -1387,3 +1387,7 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Las recargas con sesión restaurada conservan el path/query interno durante la selección del club. Si hace falta cambiar contraseña, la continuación también se conserva y se reanuda tras completar el cambio.
 - Añadida validación de ruta de continuación interna y pruebas para redirección de rol, acceso a `/access-denied` y preservación/rechazo de URLs externas.
 - Validación enfocada: `flutter analyze --no-pub` limpio; `route_permissions_test.dart` pasó 8 pruebas.
+
+### 2026-10-06 — MODIFICADO POR GITHUB COPILOT — plan manual por rol (Bloque 6)
+- Añadido `docs/TEST_PLAN_ROLES.md` con checklist de interfaz y URL directa para presidente, tesorero, secretario, entrenador, jugador/familiar y visitante anónimo.
+- Incluye cambio obligatorio de contraseña, revocación, preservación del único presidente, reserva pública, sorteo único, denegación del secretario y targets de notificación; el comando Flutter usa placeholders.
