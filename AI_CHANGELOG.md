@@ -1342,7 +1342,6 @@ This file is the permanent handoff log between AI assistants working on this rep
 - `045_central_permission_rls_alignment.sql`: se añadieron drops de las políticas creadas previamente por 038 antes de recrearlas; el primer intento chocó con `seasons_manage_permission` ya existente (SQLSTATE 42710).
 - `supabase db push` terminó correctamente. `supabase migration list` confirmó que las migraciones `001`–`046` aparecen tanto en Local como en Remote. 032–044 se aplicaron antes del último intento, y 045–046 en el último.
 - No se modificaron migraciones 001–031 ni código de aplicación/pagos. No se hizo push a GitHub.
-- No se modificaron migraciones 001–031 ni código de aplicación/pagos. No se hizo push a GitHub.
 
 ### 2026-10-05 — MODIFICADO POR GITHUB COPILOT — preparación de hardening 047
 - Añadida `supabase/migrations/047_security_hardening.sql`; no se ejecutó `supabase db push` ni se consultó/modificó el remoto durante esta intervención.
@@ -1354,3 +1353,8 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Ganador manual y sorteo aleatorio vuelven a comprobar club/permiso, estado, fecha final y tickets pagados; bloquean fila de rifa (y tickets pertinentes) para serializar operaciones. La reserva pública también bloquea la misma fila de rifa.
 - Añadido `docs/sql/security_checks.sql` con comprobaciones de ACL efectivas, RLS, RPC públicas, funciones `SECURITY DEFINER` y ownership de tickets. `PENDIENTES.md` refleja 032–046 aplicadas y deja 047/validación staging pendientes.
 - Flutter: `flutter analyze --no-pub` sin incidencias; `flutter test` pasó 39 pruebas. 047 permanece sin aplicar hasta revisión del propietario.
+
+### 2026-10-06 — MODIFICADO POR GITHUB COPILOT — ACL pública de rifas (Bloque 1)
+- Creada `supabase/migrations/048_public_raffle_acl_and_legacy_draw.sql`; la política conserva exactamente `TO anon` como en 007 y usa un predicado `SECURITY DEFINER` para comprobar rifas activas sin conceder `raffles.club_id` a anon.
+- Búsqueda en migraciones y `lib/` no encontró invocaciones internas de `draw_raffle_random(uuid)`; 048 revoca EXECUTE de la función heredada de 009.
+- Retirado `docs/sql/048_draft.sql`. No se editó 047 ni se ejecutó `db push`.
