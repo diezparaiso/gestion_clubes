@@ -8,6 +8,13 @@ import '../../domain/entities/user_device.dart';
 final notificationRepositoryProvider = Provider<NotificationRepository>((ref) => NotificationRepository());
 
 class NotificationRepository {
+  static const supportedTargets = {
+    'all_members',
+    'managers',
+    'members',
+    'staff',
+  };
+
   Future<List<ClubNotification>> listNotifications(String clubId) async {
     if (!SupabaseService.isConfigured) return List.unmodifiable(_demoNotifications);
     final rows = await Supabase.instance.client.from('notifications').select('id, title, body, type, target, created_at').eq('club_id', clubId).order('created_at', ascending: false);
@@ -15,6 +22,9 @@ class NotificationRepository {
   }
 
   Future<ClubNotification> createNotification({required String clubId, required String title, required String body, required String type, required String target}) async {
+    if (!supportedTargets.contains(target)) {
+      throw FormatException('El destinatario de la notificación no es válido.');
+    }
     if (!SupabaseService.isConfigured) {
       final notification = ClubNotification(id: 'notification-${_demoNotifications.length + 1}', title: title.trim(), body: body.trim(), type: type, target: target, createdAt: DateTime.now());
       _demoNotifications.insert(0, notification);

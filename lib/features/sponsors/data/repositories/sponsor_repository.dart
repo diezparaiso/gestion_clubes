@@ -20,7 +20,7 @@ class SponsorRepository {
     try {
       final response = await supabase
           .from('sponsors')
-          .select()
+          .select('id, club_id, name, logo_url, website, contact_email, contact_phone, contract_start_date, contract_end_date, annual_amount, benefits, status, is_public, created_at, updated_at')
           .eq('club_id', clubId)
           .order('contract_start_date', ascending: false);
 
@@ -40,7 +40,7 @@ class SponsorRepository {
     try {
       final response = await _supabase
           .from('sponsors')
-          .select()
+          .select('id, club_id, name, logo_url, website, contact_email, contact_phone, contract_start_date, contract_end_date, annual_amount, benefits, status, is_public, created_at, updated_at')
           .eq('club_id', clubId)
           .eq('status', 'active')
           .order('contract_start_date', ascending: false);

@@ -1358,3 +1358,10 @@ This file is the permanent handoff log between AI assistants working on this rep
 - Creada `supabase/migrations/048_public_raffle_acl_and_legacy_draw.sql`; la política conserva exactamente `TO anon` como en 007 y usa un predicado `SECURITY DEFINER` para comprobar rifas activas sin conceder `raffles.club_id` a anon.
 - Búsqueda en migraciones y `lib/` no encontró invocaciones internas de `draw_raffle_random(uuid)`; 048 revoca EXECUTE de la función heredada de 009.
 - Retirado `docs/sql/048_draft.sql`. No se editó 047 ni se ejecutó `db push`.
+
+### 2026-10-06 — MODIFICADO POR GITHUB COPILOT — proyecciones y notificaciones (Bloque 2)
+- Reemplazados SELECT sin columnas en SponsorRepository por proyecciones explícitas basadas en `sponsors`.
+- La exportación usa proyecciones explícitas para `posts`, `events` y `raffles`; corregido el nombre no existente `news` por la tabla real `posts`.
+- `NotificationRepository.createNotification` acepta solo `all_members`, `managers`, `members` y `staff`; targets personales/desconocidos fallan antes de acceder a Supabase. Añadida prueba unitaria.
+- No se encontraron consultas directas adicionales a las tablas auditadas con `select('*')` ni UI de edición/borrado de notificaciones.
+- Validación: `flutter analyze --no-pub` limpio; `flutter test` pasó 40 pruebas.

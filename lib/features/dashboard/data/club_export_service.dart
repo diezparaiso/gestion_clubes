@@ -91,15 +91,15 @@ class ClubExportService {
         _writeMapSheet(workbook, 'Jugadores', (rows as List).cast<Map<String, dynamic>>());
       }
       if (allowed.contains('news_view')) {
-        final rows = await client.from('news').select('*').eq('club_id', clubId);
+        final rows = await client.from('posts').select('id, club_id, title, body, image_url, author_id, status, published_at, created_at, updated_at').eq('club_id', clubId);
         _writeMapSheet(workbook, 'Noticias', (rows as List).cast<Map<String, dynamic>>());
       }
       if (allowed.contains('events_view')) {
-        final rows = await client.from('events').select('*').eq('club_id', clubId);
+        final rows = await client.from('events').select('id, club_id, title, description, location, start_at, end_at, image_url, type, visibility, created_by, created_at, updated_at').eq('club_id', clubId);
         _writeMapSheet(workbook, 'Eventos', (rows as List).cast<Map<String, dynamic>>());
       }
       if (allowed.contains('raffles_view')) {
-        final rows = await client.from('raffles').select('*').eq('club_id', clubId);
+        final rows = await client.from('raffles').select('id, club_id, slug, title, description, image_url, ticket_price, total_numbers, start_at, end_at, draw_at, status, terms_url, created_by, created_at, updated_at, raffle_type, winning_number, monthly_day, subscription_enabled').eq('club_id', clubId);
         _writeMapSheet(workbook, 'Rifas', (rows as List).cast<Map<String, dynamic>>());
       }
     }
