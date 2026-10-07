@@ -137,6 +137,9 @@ class ClubRolePermissions {
   };
 
   static bool has(String? role, String permission) => _permissions[role]?.contains(permission) ?? false;
+
+  static bool canCreateNotifications(String? role) =>
+      role == 'club_president' || role == 'club_secretary';
 }
 
 final authControllerProvider = NotifierProvider<AuthController, AuthState>(AuthController.new);
