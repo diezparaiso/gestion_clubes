@@ -1,5 +1,5 @@
 -- Solo para pruebas QA locales/remotas autorizadas. No ejecutado por Copilot.
--- Inserta una participacion QA marcada como pagada para poder probar el sorteo.
+-- Inserta como máximo una participación QA marcada como pagada por rifa.
 -- No crea ni confirma ningun pago real, ni invoca Stripe o record_raffle_payment.
 -- Requiere la rifa qa-ended-raffle-... creada por security_e2e.ps1.
 
@@ -23,7 +23,16 @@ begin
   limit 1;
 
   if v_raffle.id is null then
-    raise exception 'No active future QA raffle found; no rows inserted';
+    raise exception 'No ended active QA raffle found; no rows inserted';
+  end if;
+
+  if exists (
+    select 1
+    from public.raffle_tickets t
+    where t.raffle_id = v_raffle.id
+      and t.payment_reference = 'qa-test-only'
+  ) then
+    return;
   end if;
 
   select coalesce(max(t.number), 0) + 1
