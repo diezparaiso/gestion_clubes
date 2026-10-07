@@ -7,8 +7,92 @@ import '../../domain/entities/club.dart';
 final clubRepositoryProvider = Provider<ClubRepository>((ref) => ClubRepository());
 
 class ClubRepository {
+  static const _slugPattern = r'^[a-z0-9]+(?:-[a-z0-9]+)*$';
+
+  static String normalizeSlug(String value) {
+    const replacements = {
+      'á': 'a',
+      'à': 'a',
+      'ä': 'a',
+      'â': 'a',
+      'ã': 'a',
+      'å': 'a',
+      'é': 'e',
+      'è': 'e',
+      'ë': 'e',
+      'ê': 'e',
+      'í': 'i',
+      'ì': 'i',
+      'ï': 'i',
+      'î': 'i',
+      'ó': 'o',
+      'ò': 'o',
+      'ö': 'o',
+      'ô': 'o',
+      'õ': 'o',
+      'ú': 'u',
+      'ù': 'u',
+      'ü': 'u',
+      'û': 'u',
+      'ñ': 'n',
+      'ç': 'c',
+      'ý': 'y',
+      'ÿ': 'y',
+    };
+
+    var normalized = value.trim().toLowerCase();
+    for (final entry in replacements.entries) {
+      normalized = normalized.replaceAll(entry.key, entry.value);
+    }
+    return normalized
+        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+        .replaceAll(RegExp(r'^-+|-+$'), '');
+  }
+
+  static String? validateSlug(String value) {
+    final slug = normalizeSlug(value);
+    if (!RegExp(_slugPattern).hasMatch(slug)) {
+      return 'El nombre debe incluir letras o números para crear un identificador válido.';
+    }
+    return null;
+  }
+
+  static bool isSlugConflict({
+    required String? code,
+    String? message,
+    Object? details,
+    Object? hint,
+  }) {
+    if (code != '23505') return false;
+    final errorText = [message, details, hint]
+        .whereType<Object>()
+        .map((value) => value.toString())
+        .join(' ');
+    return errorText.contains('clubs_slug_key');
+  }
+
+  static String creationErrorMessage({
+    required String? code,
+    String? message,
+    Object? details,
+    Object? hint,
+  }) {
+    if (isSlugConflict(
+      code: code,
+      message: message,
+      details: details,
+      hint: hint,
+    )) {
+      return 'Ese identificador ya está en uso, elige otro.';
+    }
+    return 'No se ha podido crear el club. Inténtalo de nuevo.';
+  }
+
   Future<Club> createClub({required String publicName}) async {
-    final slug = _createSlug(publicName);
+    final slug = normalizeSlug(publicName);
+    final slugError = validateSlug(publicName);
+    if (slugError != null) throw FormatException(slugError);
+
     if (!SupabaseService.isConfigured) {
       return Club(id: 'demo-club', publicName: publicName.trim(), slug: slug);
     }
@@ -45,13 +129,4 @@ class ClubRepository {
   }
 
   String? _nullable(String? value) => value == null || value.trim().isEmpty ? null : value.trim();
-
-  String _createSlug(String value) {
-    final normalized = value
-        .toLowerCase()
-        .trim()
-        .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
-        .replaceAll(RegExp(r'^-+|-+$'), '');
-    return normalized.isEmpty ? 'club' : normalized;
-  }
 }

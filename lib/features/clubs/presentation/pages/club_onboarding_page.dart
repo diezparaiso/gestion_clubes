@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../auth/application/auth_controller.dart';
+import '../../data/repositories/club_repository.dart';
 import '../../../../core/utils/safe_internal_location.dart';
 
 // MODIFICADO POR GPT-5.6 LUNA (2026-09-26): permite entrar en clubes existentes donde el usuario tenga acceso activo.
@@ -25,6 +26,9 @@ class _ClubOnboardingPageState extends ConsumerState<ClubOnboardingPage> {
   }
 
   Future<void> _createClub() async {
+    if (ref.read(authControllerProvider).status == AuthStatus.creatingClub) {
+      return;
+    }
     if (!_formKey.currentState!.validate()) return;
     final destination = _continueDestination(context);
     await ref.read(authControllerProvider.notifier).createClub(_clubNameController.text);
@@ -151,9 +155,12 @@ class _ClubOnboardingPageState extends ConsumerState<ClubOnboardingPage> {
                               labelText: 'Nombre público del club',
                               prefixIcon: Icon(Icons.shield_outlined),
                             ),
-                            validator: (value) => value == null || value.trim().length < 3
-                                ? 'Introduce al menos 3 caracteres'
-                                : null,
+                            validator: (value) {
+                              if (value == null || value.trim().length < 3) {
+                                return 'Introduce al menos 3 caracteres';
+                              }
+                              return ClubRepository.validateSlug(value);
+                            },
                           ),
                           const SizedBox(height: 12),
                           const Text(
@@ -163,6 +170,21 @@ class _ClubOnboardingPageState extends ConsumerState<ClubOnboardingPage> {
                           if (authState.errorMessage != null) ...[
                             const SizedBox(height: 16),
                             Text(authState.errorMessage!, style: const TextStyle(color: Colors.red)),
+                          ],
+                          if (authState.duplicateClub case final club?) ...[
+                            const SizedBox(height: 12),
+                            Text('Ya eres presidente de ${club.clubName}.'),
+                            const SizedBox(height: 8),
+                            OutlinedButton.icon(
+                              onPressed: isLoading
+                                  ? null
+                                  : () => _selectClub(
+                                        club,
+                                        _continueDestination(context),
+                                      ),
+                              icon: const Icon(Icons.login),
+                              label: const Text('Entrar en ese club'),
+                            ),
                           ],
                           const SizedBox(height: 24),
                           FilledButton.icon(

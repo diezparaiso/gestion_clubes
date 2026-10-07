@@ -13,11 +13,13 @@ class ClubAccess {
   const ClubAccess({
     required this.clubId,
     required this.clubName,
+    required this.slug,
     required this.role,
   });
 
   final String clubId;
   final String clubName;
+  final String slug;
   final String role;
 
   String get roleLabel => switch (role) {
@@ -42,7 +44,7 @@ final availableClubsProvider = FutureProvider<List<ClubAccess>>((ref) async {
 
   final rows = await Supabase.instance.client
       .from('club_memberships')
-      .select('club_id, role, clubs!inner(id, public_name)')
+      .select('club_id, role, clubs!inner(id, public_name, slug)')
       .eq('profile_id', userId)
       .eq('is_active', true)
       .order('created_at');
@@ -52,6 +54,7 @@ final availableClubsProvider = FutureProvider<List<ClubAccess>>((ref) async {
     return ClubAccess(
       clubId: row['club_id'] as String,
       clubName: club['public_name'] as String,
+      slug: club['slug'] as String,
       role: row['role'] as String,
     );
   }).toList();
@@ -65,6 +68,7 @@ class AuthState {
     this.clubId,
     this.clubName,
     this.role,
+    this.duplicateClub,
     this.mustChangePassword = false,
     this.passwordRecovery = false,
   });
@@ -75,12 +79,14 @@ class AuthState {
   final String? clubId;
   final String? clubName;
   final String? role;
+  final ClubAccess? duplicateClub;
   final bool mustChangePassword;
   final bool passwordRecovery;
 
   String get roleLabel => ClubAccess(
     clubId: clubId ?? '',
     clubName: clubName ?? '',
+    slug: '',
     role: role ?? '',
   ).roleLabel;
 
@@ -91,9 +97,11 @@ class AuthState {
     String? clubId,
     String? clubName,
     String? role,
+    ClubAccess? duplicateClub,
     bool? mustChangePassword,
     bool? passwordRecovery,
     bool clearError = false,
+    bool clearDuplicateClub = false,
   }) {
     return AuthState(
       status: status ?? this.status,
@@ -102,6 +110,9 @@ class AuthState {
       clubId: clubId ?? this.clubId,
       clubName: clubName ?? this.clubName,
       role: role ?? this.role,
+      duplicateClub: clearDuplicateClub
+          ? null
+          : duplicateClub ?? this.duplicateClub,
       mustChangePassword: mustChangePassword ?? this.mustChangePassword,
       passwordRecovery: passwordRecovery ?? this.passwordRecovery,
     );
@@ -214,7 +225,13 @@ class AuthController extends Notifier<AuthState> {
   }
 
   Future<void> createClub(String clubName) async {
-    state = state.copyWith(status: AuthStatus.creatingClub, clearError: true);
+    if (state.status == AuthStatus.creatingClub) return;
+    final slug = ClubRepository.normalizeSlug(clubName);
+    state = state.copyWith(
+      status: AuthStatus.creatingClub,
+      clearError: true,
+      clearDuplicateClub: true,
+    );
     try {
       final club = await ref.read(clubRepositoryProvider).createClub(publicName: clubName);
       state = state.copyWith(
@@ -224,14 +241,63 @@ class AuthController extends Notifier<AuthState> {
         role: 'club_president',
         mustChangePassword: false,
         clearError: true,
+        clearDuplicateClub: true,
       );
-    } on PostgrestException catch (error) {
-      state = state.copyWith(status: AuthStatus.needsClub, errorMessage: error.message);
-    } on AuthException catch (error) {
-      state = state.copyWith(status: AuthStatus.needsClub, errorMessage: error.message);
-    } catch (_) {
-      state = state.copyWith(status: AuthStatus.needsClub, errorMessage: 'No se ha podido crear el club. Inténtalo de nuevo.');
+    } catch (error) {
+      await _handleClubCreationFailure(error, slug);
     }
+  }
+
+  Future<void> _handleClubCreationFailure(Object error, String slug) async {
+    var errorMessage = 'No se ha podido crear el club. Inténtalo de nuevo.';
+    var slugConflict = false;
+    if (error is PostgrestException) {
+      slugConflict = ClubRepository.isSlugConflict(
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      );
+      errorMessage = ClubRepository.creationErrorMessage(
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      );
+    } else if (error is AuthException) {
+      errorMessage = 'Tu sesión ha expirado. Inicia sesión de nuevo.';
+    } else if (error is FormatException) {
+      errorMessage =
+          'El nombre debe incluir letras o números para crear un identificador válido.';
+    }
+
+    ClubAccess? duplicateClub;
+    var refreshFailed = false;
+    ref.invalidate(availableClubsProvider);
+    try {
+      final clubs = await ref.read(availableClubsProvider.future);
+      if (slugConflict) {
+        for (final club in clubs) {
+          if (club.role == 'club_president' && club.slug == slug) {
+            duplicateClub = club;
+            break;
+          }
+        }
+      }
+    } on Exception {
+      refreshFailed = true;
+    }
+
+    if (refreshFailed) {
+      errorMessage =
+          '$errorMessage No se pudo actualizar la lista de clubes; vuelve a intentarlo.';
+    }
+    state = state.copyWith(
+      status: AuthStatus.needsClub,
+      errorMessage: errorMessage,
+      duplicateClub: duplicateClub,
+      clearDuplicateClub: duplicateClub == null,
+    );
   }
 
   void clearPasswordChangeRequirement() {

@@ -134,6 +134,7 @@ void main() {
         const club = ClubAccess(
           clubId: 'club-1',
           clubName: 'Club Demo',
+          slug: 'club-demo',
           role: 'club_secretary',
         );
 
@@ -148,6 +149,7 @@ void main() {
       const club = ClubAccess(
         clubId: 'club-2',
         clubName: 'Otro Club',
+        slug: 'otro-club',
         role: 'future_role',
       );
 
